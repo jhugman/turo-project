@@ -2,16 +2,17 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import { EditorState } from 'draft-js';
 import './App.css';
-import turo from 'turo/lib/turo';
+
+import turoApp from '../../model/lib/turo';
 import Editor from 'draft-js-plugins-editor';
 
-const t = new turo.Turo();
-t.resetScope();
-
-const st = ['x = 1', 'x + 2'];
-const doc = t.parse(st.join('\n') + '\n', 'EditorText');
-
-console.log(doc)
+// const t = new turo.Turo();
+// t.resetScope();
+// 
+// const st = ['x = 1', 'x + 2'];
+// const doc = t.parse(st.join('\n') + '\n', 'EditorText');
+// 
+// console.log(doc)
 
 class App extends Component {
   state = {

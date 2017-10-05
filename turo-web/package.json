@@ -6,9 +6,7 @@
     "draft-js": "^0.10.3",
     "draft-js-plugins-editor": "2.0.0-rc8",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "turo": "jhugman/turo",
-    "turo-app": "jhugman/turo-app"
+    "react-dom": "^15.6.1"
   },
   "devDependencies": {
     "react-scripts": "1.0.10"

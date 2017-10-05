@@ -1,0 +1,22 @@
+{
+  "name": "turo-editor",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "draft-js": "^0.10.3",
+    "draft-js-plugins-editor": "2.0.0-rc8",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "turo": "jhugman/turo",
+    "turo-app": "jhugman/turo-app"
+  },
+  "devDependencies": {
+    "react-scripts": "1.0.10"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

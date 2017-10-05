@@ -1,0 +1,3 @@
+// importing a constant
+import "./loaded-from-disk"
+X / 2

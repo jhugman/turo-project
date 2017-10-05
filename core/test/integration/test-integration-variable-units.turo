@@ -1,0 +1,23 @@
+test "Implicit conversion"
+unit m : Length
+unit km : 1000 m
+x = 1 km
+test x m = "x m = 1000 m"
+
+test "Variable reassignment bug"
+unit m : Length
+unit s : Time
+x = 1 m
+test x = "x = 1 m"
+x = 1 s
+test x = "x = 1s"
+
+
+unit m : L
+unit mi : 1609m
+unit s : T
+unit min : 60 s
+distance = 5 mi
+time = 20 min
+speed = (distance / time) m/s
+speed = (distance / time)

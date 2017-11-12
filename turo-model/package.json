@@ -32,7 +32,6 @@
   },
   "homepage": "https://github.com/jhugman/turo-app",
   "dependencies": {
-    "turo": "jhugman/turo",
     "underscore": "~1.5.2",
     "overidify": "jhugman/overidify"
   },

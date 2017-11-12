@@ -1,11 +1,13 @@
-"    use strict";
+import turo from 'turo';
+import extend from 'lodash/extend';
+import defaults from 'lodash/defaults';
+import each from 'lodash/each';
+import bindAll from 'lodash/bindAll';
+import { EventEmitter } from 'events';
+import output from './to-html';
+import editable from './to-editable-html';
 
-var _ = require("underscore"),
-  EventEmitter = require('events').EventEmitter,
-  turo = require("turo"),
-  Turo = turo.Turo,
-  output = require("./to-html"),
-  editable = require('./to-editable-html');
+const { Turo } = turo;
 
 /*
  * TODO Refactor This is way too much UI in the model.
@@ -34,7 +36,7 @@ var Statement = function(result){
   this.result = result;
 };
 
-_(Statement.prototype).extend(EventEmitter.prototype, {
+extend(Statement.prototype, EventEmitter.prototype, {
 
   toString: function () {
     return this.result.toSource();
@@ -57,7 +59,7 @@ _(Statement.prototype).extend(EventEmitter.prototype, {
 
   _expresssionWithRenderer: function (literals, prefs, renderer) {
     if (prefs) {
-      prefs = _.defaults(prefs, this.result.turo.prefs());
+      prefs = defaults(prefs, this.result.turo.prefs());
     } else {
       prefs = this.result.turo.prefs();
     }
@@ -75,7 +77,7 @@ _(Statement.prototype).extend(EventEmitter.prototype, {
   // TODO Refactor This is way too much UI in the model.
   valueToHtml: function (prefs) {
     if (prefs) {
-      prefs = _.defaults(prefs, this.result.turo.prefs());
+      prefs = defaults(prefs, this.result.turo.prefs());
     } else {
       prefs = this.result.turo.prefs();
     }
@@ -108,10 +110,11 @@ var Model = function(_turo, statements, id2Indexes) {
 
   this._nextId = 0;
 
-  _(this).bindAll('removeStatement');
+  bindAll(this, 'removeStatement');
 };
 
-_.extend(Model.prototype,
+extend(
+  Model.prototype,
   EventEmitter.prototype,
   {
     putStatement: function (string, name, i) {
@@ -148,7 +151,7 @@ _.extend(Model.prototype,
     },
 
     reset: function () {
-      _.each(this.statements, function (statement) {
+      each(this.statements, function (statement) {
         statement.removeAllListeners();
       });
       this.removeAllListeners();
@@ -232,7 +235,7 @@ _.extend(Model.prototype,
     _processCascade: function (result) {
       var consequents = result.consequents(),
       self = this;
-      _(consequents).each(function (r) {
+      each(consequents, function (r) {
         var index = self.indexes[r.id],
         s = self.statements[index];
         s.index = index;
@@ -293,22 +296,23 @@ _.extend(Model.prototype,
       return this.statements;
     },
 
-    getStatementWithId: function (id) {
+    getStatementWithId(id) {
       var index = this.indexes[id];
       if (index !== undefined) {
         return this._getStatement(index);
       }
     },
 
-    getTokenPredictor: function () {
+    getTokenPredictor() {
+      console.log('hello', this.turo.getTokenPredictor)
       return this.turo.getTokenPredictor();
     },
 
-    _getStatement: function (i) {
+    _getStatement: (i) => {
       return this.statements[i];
     },
 
-    swapStatements: function (i, j) {
+    swapStatements: (i, j) => {
       var im = this.indexes,
       s = this.statements,
       tmp;
@@ -329,7 +333,7 @@ _.extend(Model.prototype,
       this.emit('onChange');
     },
 
-    removeStatement: function(index) {
+    removeStatement: (index) => {
       // TODO do we have to make sure this is an int?
       index = parseInt(index);
 
@@ -388,16 +392,7 @@ _.extend(Model.prototype,
 
       return im;
     },
+  }
+);
 
-    pinStatement: function (i) {
-
-    },
-
-    unpinStatement: function (i) {
-
-    },
-
-
-  });
-
-module.exports = Model;
+export default Model;

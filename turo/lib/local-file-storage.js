@@ -1,8 +1,5 @@
-'use strict';
-
-var _ = require('underscore');
-
-var files = require('turo-docs');
+import extend from 'lodash/extend';
+import * as files from 'turo-documents';
 
 var AbstractStorage = require('./abstract-storage');
 
@@ -13,14 +10,13 @@ function LocalFileStorage (basePath) {
 
 LocalFileStorage.prototype = new AbstractStorage();
 
-_.extend(LocalFileStorage.prototype, {
-
+extend(LocalFileStorage.prototype, {
   saveDocument: function (doc, opts) {
     //
   },
 
   resolveLocation: function (id, baseLocation, callback) {
-    var location = files.resolve(id, baseLocation || this.baseLocation);
+    var location = files[id] ? id : null
     callback(location, this);
     return location;
   },
@@ -29,8 +25,8 @@ _.extend(LocalFileStorage.prototype, {
     if (!location) {
       callback('NO_DOCUMENT');
     }
-    files.loadSource(location, callback);
+    callback(files[location]);
   },
 });
 
-module.exports = LocalFileStorage;
+export default LocalFileStorage;

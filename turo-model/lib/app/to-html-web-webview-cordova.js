@@ -1,7 +1,6 @@
-"use strict";
-var _ = require("underscore"),
-    turo = require("turo"),
-    toSource = turo.toSource;
+import defaults from 'lodash/defaults';
+import turo from 'turo';
+const { toSource } = turo;
 
 function _formatNumber (string, comma, point) {
   var parts = string.split(".");
@@ -9,7 +8,7 @@ function _formatNumber (string, comma, point) {
   return parts.join(point);
 }
 
-var display = _.defaults({
+var display = defaults({
   bracketStart: function (token, string, context, offset) {
     return '<span class="bracket">(</span>';
   },
@@ -53,11 +52,11 @@ var display = _.defaults({
 
 }, toSource.stringDisplay);
 
-module.exports = {
+export default {
   toString: toSource.createToString(display),
   display: display,
   displayImpliedParentheses: function (bool) {
     display.alwaysDisplayParens = !!bool;
   },
-  
-};
+}
+

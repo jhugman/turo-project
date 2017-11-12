@@ -1,5 +1,4 @@
-"use strict";
-var _ = require("underscore");
+import _ from 'lodash';
 
 function TokenPredictor (parser, generatorMap) {
   this.generatorMap = generatorMap || {};
@@ -7,7 +6,6 @@ function TokenPredictor (parser, generatorMap) {
 }
 
 _.extend(TokenPredictor.prototype, {
-
   addListCreator: function (tokenType, fn) {
     this.generatorMap[tokenType] = fn;
   },
@@ -183,11 +181,6 @@ _.extend(TokenPredictor.prototype, {
   }
 });
 
-
-
-
-
-
 function create (turo) {
   return new TokenPredictor(turo.parser, {
     variable: _.bind(turo.variables.getVariableNames, turo.variables),
@@ -205,8 +198,7 @@ function create (turo) {
   });
 }
 
-module.exports = {
+export default {
   TokenPredictor: TokenPredictor,
   create: create
-
 };

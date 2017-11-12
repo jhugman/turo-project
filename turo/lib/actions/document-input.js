@@ -1,6 +1,4 @@
-'use strict';
-
-var EditableActions = require('../editor-actions');
+import EditableActions from '../editor-actions';
 
 EditableActions.extend(
   {
@@ -38,7 +36,5 @@ EditableActions.extend(
       this.doAvailable('update-editor');
       return editToken;
     },
-
-
   }
 );

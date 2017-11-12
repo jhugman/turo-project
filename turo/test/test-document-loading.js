@@ -1,5 +1,3 @@
-'use strict';
-
 var _ = require('underscore'),
     test = require('tap').test,
     path = require('path');
@@ -10,8 +8,6 @@ var prefs = {
 
 var Storage = require('../lib/local-file-storage');
 var EditableDocument = require('../lib/editable-document');
-
-
 
 function file (relative) {
   return path.resolve(__dirname, 'fixtures', relative);

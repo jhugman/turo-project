@@ -1,10 +1,13 @@
-'use strict';
+import turo from 'turo';
+import _ from 'underscore';
+import buttonLookups from './button-lookups';
+import inserter from './insert-key-by-position';
 
-var _ = require('underscore'),
-    toSource = require('turo').toSource,
-    literals = require('./button-lookups').prettyOutput,
-    injected = {},
-    tokenizerOptions = {editable: true};
+const { prettyOutput: literals } = buttonLookups;
+const { toSource } = turo;
+
+var injected = {},
+    tokenizerOptions = { editable: true };
 
 var defaultContext = {
   literals: literals,
@@ -23,7 +26,7 @@ var reverseLiteralTokensGenerator = function (tokenArray, index) {
     do {
       index --;
     } while (index >= 0 && !tokenArray[index].literal);
-    
+
     if (index >= 0) {
       return tokenArray[index];
     }
@@ -31,15 +34,11 @@ var reverseLiteralTokensGenerator = function (tokenArray, index) {
   };
 };
 
-
-
 /* TODO
    * make toSource.tokenize(editing) spit out 
 */
-
 ///////////////////////////////////////////////////////////////////
 function EditableExpression (string, cursorPosition, previous) {
- 
   if (!string) {
     // the empty string.
     this.tokenArray = [];
@@ -81,8 +80,6 @@ _.extend(EditableExpression.prototype, {
       var previousToken = reverseLiteralTokensGenerator(this.tokenArray),
           t, u;
       while ((t = previousToken())){
-
-        
         if (t.startOffset < 0) {
           continue;
         } else if (t.startOffset + t.literal.length <= cursorPosition) {
@@ -102,7 +99,7 @@ _.extend(EditableExpression.prototype, {
       this.cursorPosition = cursorToken.startOffset + tokenLength;
       delete this._postEditCursorToken;
     }
-    
+
     if (this.cursorPosition === undefined) {
       this.cursorPosition = expressionString.length;
     }
@@ -158,10 +155,9 @@ _.extend(EditableExpression.prototype, {
 
     var tokenArray = this.tokenArray,
         cursorPosition = this.cursorPosition;
-    
+
     // XXX yikes, side effects. 
     this.toString();
-
 
     var index = tokenArray.length,
         condemnedToken, precedingToken, condemnedIndex, token, t;
@@ -173,7 +169,7 @@ _.extend(EditableExpression.prototype, {
       do {
         index --;
       } while (index >= 0 && !tokenArray[index].literal);
-      
+
       if (index >= 0) {
         return tokenArray[index];
       }
@@ -252,8 +248,6 @@ _.extend(EditableExpression.prototype, {
         newTokenArray = removeTokenAt(newTokenArray, condemnedIndex);
     }
 
-
-
     if (precedingToken) {
       precedingToken.tokenLength = precedingToken.literal.length;
     }
@@ -267,7 +261,6 @@ _.extend(EditableExpression.prototype, {
     return new EditableExpression(this.tokenArray, pos);
   },
 
-  
   insert: function (keyObject) {
     // We need node we can insert into.
 
@@ -288,7 +281,6 @@ _.extend(EditableExpression.prototype, {
   },
 
   _insertByPosition: function (keyObject) {
-    var inserter = require('./insert-key-by-position');
 
     var node = this.evalResult.ast, 
         newNode, newTokens;
@@ -298,14 +290,14 @@ _.extend(EditableExpression.prototype, {
       throw new Error('No inserting ' + keyObject.key);
       //return this._insertWithTokens(keyObject);
     }
-    
+
     newTokens = toSource.toTokenArray(newNode, tokenizerOptions);
 
     return new EditableExpression(newTokens, newNode.cursorPosition, this);
   },
 
   _insertWithTokens: function (keyObject) {
-    
+
     var newTokenArray = [],
         insertedToken,
         cursorPosition = this.cursorPosition;
@@ -316,7 +308,6 @@ _.extend(EditableExpression.prototype, {
     };
     var newTokens = toSource.toTokensFromKey(keyObject);
 
-    
     if (this.tokenArray.length > 0) {
       _.each(this.tokenArray, function (t) {
         if (!insertedToken && t.startOffset >= cursorPosition) {
@@ -348,7 +339,6 @@ _.extend(EditableExpression.prototype, {
 
     insertedToken.tokenLength = insertedToken.literal.length;
     return new EditableExpression(newTokenArray, insertedToken, this);
-    
   },
 
   toString: function (display, context) {
@@ -375,18 +365,13 @@ _.extend(EditableExpression.prototype, {
 
     var string = this._expressionString;
 
-
-
     if (tokenTypes.unit) {
-
     }
-
   }
 
 });
 
 Object.defineProperties(EditableExpression.prototype, {
-  
   cursorPosition: {
     get: function () {
       return this._cursorPosition;
@@ -409,10 +394,10 @@ Object.defineProperties(EditableExpression.prototype, {
 });
 
 
-module.exports = {
+export default {
   inject: function (obj) {
     injected = obj;
   },
 
-  EditableExpression: EditableExpression,
+  EditableExpression,
 };

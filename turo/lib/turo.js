@@ -1,21 +1,30 @@
-var _ = require("underscore");
+import defaults from 'lodash/defaults';
+import extend from 'lodash/extend';
+import parser from './parser';
+import evaluator from './evaluator';
+import unitsTable from './units-table';
+import EditorActions from './editor-actions';
+import variablesSymbolTable from './variables-symbol-table';
+import operatorsTable from './operators-symbol-table';
+import output from './to-source';
+import AST from './ast';
+import turoNumber from './turo-number';
+import lang from './language-model';
+import EditableDocument from './editable-document';
+import Storage from './local-file-storage';
+import wordCleaners from "./preprocessor-word-cleaner";
+import preprocessorParenBalancer from './preprocessor-paren-balancer';
+import autocomplete from './autocomplete';
 
-var parser = require("./parser"),
-    evaluator = require("./evaluator"),
-    Units = require("./units-table").UnitsTable,
-    Variables = require("./variables-symbol-table").Context,
-    operatorsTable = require("./operators-symbol-table"),
-    output = require("./to-source"),
-    AST = require("./ast"),
-    turoNumber = require('./turo-number'),
-    lang = require('./language-model');
+import './actions/document-input';
+import './actions/suggestions';
+import './precision-hacks';
 
-var EditableDocument = require('./editable-document'),
-    Storage = require('./local-file-storage');
+const { UnitsTable: Units } = unitsTable
+const { Context: Variables } = variablesSymbolTable;
 
 EditableDocument.storage = new Storage();
 
-require("./precision-hacks");
 var MAX_SF = 14;
 
 var DEFAULT_PREFS = {
@@ -41,7 +50,7 @@ function Result (parent, ast, result) {
   }
 }
 
-_.extend(Result.prototype, {
+extend(Result.prototype, {
 
   toSource: function () {
     // TODO remove the space. It requires work in to-source, and lots of tests.
@@ -114,14 +123,14 @@ _.extend(Result.prototype, {
 
     function prepare (turoValue) {
       if (prefs) {
-        prefs = _.defaults(prefs, self.turo.prefs());
+        prefs = defaults(prefs, self.turo.prefs());
       } else {
         prefs = self.turo.prefs();
       }
 
       var node, result, unit;
       unit = turoValue.unit;
-      
+
       if (unit && prefs.useUnitRefactor) {
         node = turoValue.unit.refactoredNode(
           turoValue.number, 
@@ -210,9 +219,9 @@ Object.defineProperties(Result.prototype, {
     }
   }
 });
-////////////////////////////////////////////////////////////////////////////
-_.extend(Turo.prototype, {
 
+////////////////////////////////////////////////////////////////////////////
+extend(Turo.prototype, {
   resetScope: function () {
     this.scope = this.rootScope.fresh();
   },
@@ -222,24 +231,26 @@ _.extend(Turo.prototype, {
     this.resetScope();
   },
 
+  getTokenPredictor: () => this.tokenPredictor,
+
   reset: function () {
     this.variables = new Variables();
     this.units = new Units();
     this.operators = operatorsTable.createDefaultOperators(this._prefs);
     this.parser = parser;
     this.scope = lang.newScope();
+    this.tokenPredictor = autocomplete.create(this);
     this.parser.turo = this;
     delete this._scopesInMemory;
-    var wordCleaners = require("./preprocessor-word-cleaner");
     this.wordCleaner = wordCleaners.createWithContext(this.variables, this.operators, this.units);
-    this.parenBalancer = require("./preprocessor-paren-balancer").createEmpty();
+    this.parenBalancer = preprocessorParenBalancer.createEmpty();
   },
 
   prefs: function (prefs) {
     if (!prefs) {
       return this._prefs;
     }
-    this._prefs = _.defaults(prefs, DEFAULT_PREFS);
+    this._prefs = defaults(prefs, DEFAULT_PREFS);
     return this._prefs;
   },
 
@@ -309,13 +320,13 @@ _.extend(Turo.prototype, {
   evaluate: function (string, parseRule, id)  {
     string = string || '';
     var originalInput = string, result;
-    
+
     if (!parseRule) {
       string = this.cleanString(string);
     }
     parser.turo = this;
     parser.inputLength = originalInput.length;
-    
+
     try {
       var ast = this.parse(string, parseRule);
 
@@ -349,11 +360,7 @@ _.extend(Turo.prototype, {
 
 // Not sure where to put this, tbh.
 
-var EditorActions = require('./editor-actions');
-require('./actions/document-input');
-require('./actions/suggestions');
-
-module.exports = _.extend(new Turo(), {
+export default extend(new Turo(), {
   Turo: Turo,
   EditableDocument: EditableDocument,
   EditorActions: EditorActions,

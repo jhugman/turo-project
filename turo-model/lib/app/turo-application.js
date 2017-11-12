@@ -1,3 +1,5 @@
+import Calculator from './calculator-controller';
+
 var application = {};
 
 Object.defineProperties(application, {
@@ -27,7 +29,6 @@ lazyGetter('model', function () {
 });
 
 lazyGetter('calculator', function () {
-  var Calculator = require('./calculator-controller');
   var c = new Calculator();
   return c;
 });
@@ -38,24 +39,22 @@ lazyGetter('editor', function () {
   return ec;
 });
 
-lazyGetter('EditorDisplayController', function () {
-  return require('./editor-display-controller'); 
-});
-
-lazyGetter('KeyboardController', function () {
-  return require('./keyboard-controller'); 
-});
-
+// TODO: do we really need this?
+// lazyGetter('EditorDisplayController', function () {
+//   return require('./editor-display-controller'); 
+// });
+// 
+// lazyGetter('KeyboardController', function () {
+//   return require('./keyboard-controller'); 
+// });
 
 // Just for testing right now.
 // Hope that any duplicate applications would be in their own web-component bubble.
 application.reset = function () {
   delete this._calculator;
   delete this._model;
-  delete this._editor;  
+  delete this._editor;
   return this;
 };
 
-
-
-module.exports = application.reset();
+export default application.reset();

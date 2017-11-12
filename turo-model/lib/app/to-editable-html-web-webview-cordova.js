@@ -1,8 +1,9 @@
-"use strict";
-var _ = require("underscore"),
-    turo = require("turo"),
-    toSource = turo.toSource,
-    toHtml = require("./to-html");
+import defaults from 'lodash/defaults';
+import isString from 'lodash/isString';
+import turo from 'turo';
+import toHtml from './to-html';
+
+const { toSource } = turo;
 
 function tokenElementString (token, type, value, offset, classList) {
   if (offset === undefined) {
@@ -11,7 +12,7 @@ function tokenElementString (token, type, value, offset, classList) {
   var string = 
       '<x-turo-token type="' + type + '" offset="' + offset + '"';
 
-  if (classList && _.isString(classList)) {
+  if (classList && isString(classList)) {
     string += ' class="' + classList + '"';
   }
 
@@ -25,7 +26,7 @@ function tokenElementString (token, type, value, offset, classList) {
 
 var pc = tokenElementString;
 
-var display = _.defaults({
+var display = defaults({
 
   cursorString: '<x-turo-cursor></x-turo-cursor>',
 
@@ -77,7 +78,7 @@ var display = _.defaults({
   },
 }, toHtml.display);
 
-module.exports = {
+export default {
   toString: toSource.createToString(display),
 
   insertCursorIntoString: function (text, pos, txt) {

@@ -1,10 +1,7 @@
-"use strict";
-
-var _ = require("underscore"),
-  app = require('./turo-application'),
-  Model = require("./model"),
-  editing = require("./editing-controller"),
-  application = require('./turo-application');
+import extend from 'lodash/extend';
+import application from './turo-application';
+import Model from './model';
+import editing from './editing-controller';
 
 function Controller ($native) {
   application.calculator = this;
@@ -15,7 +12,7 @@ function Controller ($native) {
   }
 }
 
-_.extend(Controller.prototype, {
+extend(Controller.prototype, {
 
   onLoad: function ($native) {
     this.$native = $native;
@@ -64,4 +61,4 @@ _.extend(Controller.prototype, {
 });
 
 
-module.exports = Controller;
+export default Controller;

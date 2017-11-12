@@ -1,4 +1,10 @@
-var _ = require("underscore");
+import keys from 'lodash/keys';
+import extend from 'lodash/extend';
+import indexOf from 'lodash/indexOf';
+import expressionEditor from './expression-src-editor';
+import editableExpression from './editable-expression';
+
+const editor = new expressionEditor.ExpressionEditor();
 
 /************************************************************
  * Stateless helpers.
@@ -9,12 +15,6 @@ var states = {
   APPEND_ONLY: 0,
   ENTER_PRESSED: 1,
 };
-
-var expressionEditor = require('./expression-src-editor'),
-    editor = new expressionEditor.ExpressionEditor(),
-    editableExpression = require('./editable-expression');
-
-
 
 /************************************************************
  * Constructor and properties
@@ -53,13 +53,11 @@ Object.defineProperties(Controller.prototype, {
   },
 });
 
-_.extend(Controller.prototype, {
+extend(Controller.prototype, {
 
 /************************************************************
  * From UI
- * 
  ************************************************************/
-
   clearPressed: function() { 
     
     this.state = states.APPEND_ONLY;
@@ -91,11 +89,7 @@ _.extend(Controller.prototype, {
       self.turoStringCursorPosition = this.editableExpression.cursorPosition;
       self.updateStatement(string, string);
     }
-
-    
   },
-
-
 
   writerPressed: function(e) {
     // I'm not sure where the cursor is going to go,
@@ -112,7 +106,7 @@ _.extend(Controller.prototype, {
     var lineToCursor = string; // self.$editor.lineToCursor;
     
     var isa = function isa(oneOf) {
-      return _.indexOf(oneOf, e.type) >= 0;
+      return indexOf(oneOf, e.type) >= 0;
     };
     var obj;
     if (states.ENTER_PRESSED === self.state) {
@@ -155,13 +149,11 @@ _.extend(Controller.prototype, {
       string = this.editableExpression.toString();
       cursorPosition = this.editableExpression.cursorPosition;
 
-
       this.turoStringCursorPosition = cursorPosition;
       lineToCursor = string.substring(0, cursorPosition);
 
       // TODO editor needs to be able to set the cursorPosition
-      //self.$editor.cursorPosition += cursorPosition;
-      
+      // self.$editor.cursorPosition += cursorPosition;
     }
 
     self.state = states.APPEND_ONLY;
@@ -233,11 +225,9 @@ _.extend(Controller.prototype, {
     };
   }()),
 
-
 /************************************************************
  * 
  ************************************************************/
-
   refreshAnswerUi: function () {
     var self = this,
         string;
@@ -306,9 +296,9 @@ _.extend(Controller.prototype, {
       var appendSet = predictor.createKeyboard(lineToCursor);
       
       
-      this.enterAppendSet = _.keys(appendSet);
+      this.enterAppendSet = keys(appendSet);
 
-      layout = _.extend({}, emptySet, appendSet);
+      layout = extend({}, emptySet, appendSet);
     } else {
       layout = predictor.createKeyboard(lineToCursor);
     }
@@ -341,7 +331,7 @@ _.extend(Controller.prototype, {
       this.$keyboard.hasUnits = hasUnits;
     }
 
-    var layout = _.keys(tokenMap);
+    var layout = keys(tokenMap);
     
     // Horrible hack to get the ans button showing only if we have an answer.
     if (this.hasAnswer) {
@@ -371,7 +361,6 @@ _.extend(Controller.prototype, {
   }
 });
 
-
-module.exports = {
-  Controller: Controller
+export default {
+  Controller
 };

@@ -8,8 +8,8 @@ import unitsTable from './units-table';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
 import operatorsSymbolTable from './operators-symbol-table';
-import variablesSymbolTable from './variables-symbol-table';
 import lang from './language-model';
+import variablesSymbolTable from './variables-symbol-table';
 
 const { Parser } = parser;
 const { UnitsTable: Units } = unitsTable;
@@ -314,6 +314,7 @@ statics = {
   createEditableDocument: function (id, string, cb) {
     var theDocument = new EditableDocument(id),
         isReady;
+
     if (string) {
       isReady = theDocument.evaluateDocument(string, cb);
     }

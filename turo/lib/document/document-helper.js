@@ -47,7 +47,7 @@ _.extend(DocumentHelper.prototype, {
         return !storage.hasDocument(id);
       }
     );
-    
+
     if (_.isEmpty(toLoad)) {
       // We can evaluate immediately.
       this._finishLoading(toImport, scope);

@@ -24,7 +24,7 @@ extend(LocalFileStorage.prototype, {
     if (!location) {
       callback('NO_DOCUMENT');
     }
-    callback(files[location]);
+    callback(null, files[location]);
   },
 });
 

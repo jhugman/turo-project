@@ -10,11 +10,11 @@ import turo from 'turo';
 // import Turo from 'turo';
 
 const t = new turo.Turo();
- t.reset();
-// t.include('fundamental');
+t.reset();
+t.include('app');
 // const { EditableDocument: doc } = turo;
 
-const text = "area = 2 m * 2m";
+const text = "200m * 2";
 
 const res = turo.evaluate(text);
 console.log(res);

@@ -885,8 +885,6 @@ _.extend(CompoundUnit.prototype, {
           increment(removable, direction);
           increment(cancelable, -direction);
 
-          //console.error("\t" + cancelable +  " / " + removable);
-
           // now calculate the multipler
           cancelable = self.unitsTable.getUnit(cancelable);
           removable = self.unitsTable.getUnit(removable);
@@ -898,7 +896,6 @@ _.extend(CompoundUnit.prototype, {
           } else {
             multiplier = removable._convertSimpleUnit(multiplier, cancelable);
           }
-          //console.error("\t = " + multiplier);
         });
         removalList.length = 0;
       }

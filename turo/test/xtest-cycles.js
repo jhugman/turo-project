@@ -1,7 +1,8 @@
-var test = require("tap").test,
-    _ = require("underscore"),
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
 
-    turo = require("../lib/turo");
+const { test, plan } = tap;
 
 function exec(str) {
   return turo.evaluate(str).resultValueNode;

@@ -1,14 +1,13 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import Storage from '../lib/local-file-storage';
+import EditableDocument from '../lib/editable-document';
 
-var _ = require('underscore'),
-    test = require('tap').test;
+const { test, plan } = tap;
 
 var prefs = {
   padding: ' ',
 };
-
-var Storage = require('../lib/local-file-storage');
-var EditableDocument = require('../lib/editable-document');
 
 EditableDocument.storage = new Storage();
 

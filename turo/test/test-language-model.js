@@ -1,11 +1,10 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import lang from '../lib/language-model';
 
-var test = require('tap').test,
-    _ = require('underscore');
-
-var lang = require('../lib/language-model'),
-    Scope = lang.Scope,
-    LM = lang.LanguageModel;
+const { test, plan } = tap;
+const { Scope, LanguageModel } = lang;
 
 var aUnit = ['unit-metre'],
     aVariable = ['_id_'],
@@ -125,10 +124,9 @@ test('Available variable tokens', function (t) {
   t.end();
 });
 
-
 test('Integration with turo object', function (t) {
-  var Turo = new require('../lib/turo').Turo,
-    turo = new Turo();
+  var Turo = require('../lib/turo').Turo;
+  var turo = new Turo();
 
   function testParseable (string) {
     var prevScopeId = turo.parser.parseContext.scope.id;

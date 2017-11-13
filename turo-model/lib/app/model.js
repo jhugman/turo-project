@@ -227,7 +227,7 @@ extend(
 
       // Process consequents here.
 
-      this._processCascade(result);
+      // this._processCascade(result);
 
       return statement;
     },
@@ -304,7 +304,6 @@ extend(
     },
 
     getTokenPredictor() {
-      console.log('hello', this.turo.getTokenPredictor)
       return this.turo.getTokenPredictor();
     },
 

@@ -1,12 +1,8 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
 
-var turo = require("../lib/turo");
-
-
+const { test, plan } = tap;
 
 test("Implicit conversion", function (t) {
   turo.reset();

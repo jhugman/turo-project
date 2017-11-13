@@ -1,9 +1,8 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import EditorActions from '../lib/editor-actions';
 
-var test = require('tap').test,
-    _ = require('underscore');
-
-var EditorActions = require('../lib/editor-actions');
+const { test, plan } = tap;
 
 function MockDocument () {}
 

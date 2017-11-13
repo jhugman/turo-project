@@ -52,55 +52,55 @@ function Result (parent, ast, result) {
 
 extend(Result.prototype, {
 
-  toSource: function () {
+  toSource() {
     // TODO remove the space. It requires work in to-source, and lots of tests.
     return output.toString(this.ast, " ");
   },
-  toString: function (prefs) {
+  toString(prefs) {
     this._calculateValue(prefs);
     // TODO remove the space. It requires work in to-source, and lots of tests.
     return output.toString(this, " ");
   },
-  expression: function () {
+  expression() {
     if (this.ast.identifier && this.ast.ast) {
       return this.ast.ast;
     }
     return this.ast;
   },
-  expressionToString: function (literals, prefs) {
+  expressionToString(literals, prefs) {
     if (!this.ast) {
       return this.parsedLine;
     }
     return output.toString(this.expression(), literals, prefs);
   },
-  expressionErrors: function () {
+  expressionErrors() {
     this._calculateValue();
     return this.parseError || this.ast.errors;
   },
-  identifier: function () {
+  identifier() {
     if (!this._identifier && this.ast) {
       return this.ast.identifier;
     } else {
       return this._identifier;
     }
   },
-  identifierToString: function () {
+  identifierToString() {
     var id = this.identifier();
     return id ? id : "";
   },
-  identifierErrors: function () {
+  identifierErrors() {
     return this._identifierErrors;
   },
-  value: function () {
+  value() {
     this._calculateValue();
     return this._valueNode;
   },
-  valueToString: function () {
+  valueToString() {
     this._calculateValue();
     return output.toString(this._valueNode, " ");
   },
 
-  _calculateValue: function (prefs) {
+  _calculateValue(prefs) {
     var self = this, 
         valueNode = this._valueNode,
         result, unit, valueType;
@@ -115,11 +115,12 @@ extend(Result.prototype, {
       if (prefs) {
         value = prefs[key];
         if (value !== undefined) {
-          return value;  
+          return value;
         }
       }
       return defaultPrefs[key];
     }
+
 
     function prepare (turoValue) {
       if (prefs) {
@@ -133,8 +134,8 @@ extend(Result.prototype, {
 
       if (unit && prefs.useUnitRefactor) {
         node = turoValue.unit.refactoredNode(
-          turoValue.number, 
-          fromPrefs('unitScheme'), 
+          turoValue.number,
+          fromPrefs('unitScheme'),
           fromPrefs('simpleUnits')
         );
         turoValue = turoNumber.newInstance(node.value, node.unit, turoValue.valueType);
@@ -165,11 +166,11 @@ extend(Result.prototype, {
     }
   },
 
-  _createValueNode: function (numString, unit, valueType) {
+  _createValueNode(numString, unit, valueType) {
     return AST.valueNode(numString, unit, valueType);
   },
 
-  accept: function (visitor) {
+  accept(visitor) {
     return AST.acceptVisitor(this, visitor, visitor.visitResultObject, arguments);
   },
 
@@ -184,22 +185,22 @@ function Turo (prefs) {
 
 Object.defineProperties(Turo.prototype, {
   scope: {
-    get: function () {
+    get() {
       return this.parser.parseContext.scope;
     },
-    set: function (scope) {
+    set(scope) {
       this.parser.parseContext.scope = scope;
     }
   },
 
   rootScope: {
-    get: function () {
+    get() {
       if (!this._rootScope) {
         this._rootScope = lang.newScope();
       }
       return this._rootScope;
     },
-    set: function (scope) {
+    set(scope) {
       this._rootScope = scope;
     }
   },
@@ -207,14 +208,14 @@ Object.defineProperties(Turo.prototype, {
 
 Object.defineProperties(Result.prototype, {
   resultValueNode: {
-    get: function () {
+    get() {
       if (!this._valueNode) {
         this._calculateValue();
       }
       return this._valueNode;
     },
 
-    set: function (node) {
+    set(node) {
       this._valueNode = node;
     }
   }
@@ -222,18 +223,18 @@ Object.defineProperties(Result.prototype, {
 
 ////////////////////////////////////////////////////////////////////////////
 extend(Turo.prototype, {
-  resetScope: function () {
+  resetScope() {
     this.scope = this.rootScope.fresh();
   },
 
-  markRootScope: function () {
+  markRootScope() {
     this.rootScope = this.scope.newScope();
     this.resetScope();
   },
 
   getTokenPredictor: () => this.tokenPredictor,
 
-  reset: function () {
+  reset() {
     this.variables = new Variables();
     this.units = new Units();
     this.operators = operatorsTable.createDefaultOperators(this._prefs);
@@ -246,7 +247,7 @@ extend(Turo.prototype, {
     this.parenBalancer = preprocessorParenBalancer.createEmpty();
   },
 
-  prefs: function (prefs) {
+  prefs(prefs) {
     if (!prefs) {
       return this._prefs;
     }
@@ -254,7 +255,7 @@ extend(Turo.prototype, {
     return this._prefs;
   },
 
-  include: function include (turoFilename) {
+  include(turoFilename) {
     var doc = this.theDocument;
     if (!doc) {
       this.theDocument = doc = EditableDocument.create('doc');
@@ -266,7 +267,7 @@ extend(Turo.prototype, {
     this.units = doc.units;
   },
 
-  _cleanWords: function (string) {
+  _cleanWords(string) {
     var self = this,
         re, applied = false,
         expressions = [
@@ -301,7 +302,7 @@ extend(Turo.prototype, {
     return string;
   },
 
-  cleanString: function (string) {
+  cleanString(string) {
     if (this.lenientParser) {
       string = this._cleanWords(string);
     }
@@ -309,15 +310,18 @@ extend(Turo.prototype, {
     return this.parenBalancer.preprocess(string);
   },
 
-  parse: function (string, parseRule) {
+  parse(string, parseRule) {
+    if (string[string.length - 1] !== '\n') {
+      string += '\n';
+    }
     return parser.parse(string, parseRule || "PaddedStatement");
   },
 
-  evaluateNode: function (node) {
+  evaluateNode(node) {
     return evaluator.evaluate(node, this);
   },
 
-  evaluate: function (string, parseRule, id)  {
+  evaluate(string, parseRule, id)  {
     string = string || '';
     var originalInput = string, result;
 
@@ -349,11 +353,11 @@ extend(Turo.prototype, {
     return result;
   },
 
-  newResult: function (ast) {
+  newResult(ast) {
     return new Result(this, ast);
   },
 
-  setWriter: function (writer) {
+  setWriter(writer) {
     this.writer = writer;
   },
 });

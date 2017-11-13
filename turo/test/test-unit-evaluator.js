@@ -1,14 +1,16 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import parser from '../lib/parser';
+import ast from '../lib/ast';
+import evaluator from '../lib/evaluator';
+import unitsTable from '../lib/units-table';
+import variablesSymbolTable from '../lib/variables-symbol-table';
 
-var parser = require("../lib/parser"),
-    ast = require("../lib/ast"),
-    evaluator = require("../lib/evaluator"),
-    Units = new require("../lib/units-table").UnitsTable,
-    Variables = new require("../lib/variables-symbol-table").Context;
+const { test, plan } = tap;
+
+const { Context: Variables } = variablesSymbolTable;
+const { UnitsTable: Units } = unitsTable;
 
 test("Expressions with units", function (t) {
 

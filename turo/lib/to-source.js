@@ -1,6 +1,5 @@
-"use strict";
-var _ = require("underscore"),
-    tokenizer = require('./to-tokens');
+import _ from 'lodash';
+import tokenizer from './to-tokens';
 
 var defaultFormatting = {
   'm/': '', // unit followed by unit per.
@@ -240,8 +239,7 @@ var toStringWithDisplay = function (node, display, prefs, literals) {
   }
 };
 
-module.exports = {
-
+export default {
   stringDisplay: STRING_DISPLAY,
 
   createToString: createToString,

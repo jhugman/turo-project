@@ -1,11 +1,9 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
 
-var turo = require("../lib/turo"),
-    prefs = turo.prefs();
+const { test, plan } = tap;
+const prefs = turo.prefs();
 turo.include("app");
 
 function eval_t (t, input, expectedOutput) {

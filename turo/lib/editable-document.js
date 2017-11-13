@@ -1,14 +1,20 @@
-'use strict';
+import map from 'lodash/map';
+import extend from 'lodash/extend';
+import isArray from 'lodash/isArray';
+import each from 'lodash/each';
+import clone from 'lodash/clone';
+import DocumentModel from './document/document-model';
+import unitsTable from './units-table';
+import parser from './parser';
+import DocumentHelper from './document/document-helper';
+import operatorsSymbolTable from './operators-symbol-table';
+import variablesSymbolTable from './variables-symbol-table';
+import lang from './language-model';
 
-var _ = require('underscore'),
-    DocumentModel = require('./document/document-model'),
-    Parser = require('./parser').Parser,
-    Units = require('./units-table').UnitsTable,
-    DocumentHelper = require('./document/document-helper'),
-    defaultOperators = require('./operators-symbol-table').defaultOperators,
-    lang = require('./language-model');
-
-var LegacyVariables = require('./variables-symbol-table').Variables;
+const { Parser } = parser;
+const { UnitsTable: Units } = unitsTable;
+const { defaultOperators } = operatorsSymbolTable;
+const { Variables: LegacyVariables } = variablesSymbolTable;
 
 var statics;
 
@@ -41,7 +47,7 @@ function EditableDocument (id) {
   this.documentHelper = new DocumentHelper(EditableDocument.storage);
 }
 
-_.extend(EditableDocument.prototype, {
+extend(EditableDocument.prototype, {
 
   /**
    * Asynchronously imports one or more documents into this document's parent scope.
@@ -375,4 +381,4 @@ EditableDocument.storage = null;
 EditableDocument.create = statics.createEditableDocument;
 EditableDocument.load = statics.loadEditableDocument;
 
-module.exports = EditableDocument;
+export default EditableDocument;

@@ -1,16 +1,13 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import ast from '../lib/ast';
+import parser from '../lib/parser';
+import output from '../lib/to-source';
+import operatorSymbolTable from '../lib/operators-symbol-table';
 
-
-var ast = require("../lib/ast"),
-    parser = require("../lib/parser"),
-    output = require("../lib/to-source"),
-    Operators = require("../lib/operators-symbol-table").Operators;
-
-
+const { Operators } = operatorSymbolTable;
+const { test, plan } = tap;
 
 test("simple", function (t) {
   var operators = new Operators({});

@@ -1,15 +1,16 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
 
-var parser = require("../lib/parser"),
-    ast = require("../lib/ast"),
-    evaluator = require("../lib/evaluator"),
-    Units = new require("../lib/units-table").UnitsTable,
-    Variables = new require("../lib/variables-symbol-table").Context,
-    output = require("../lib/to-source");
+import parser from "../lib/parser";
+import ast from "../lib/ast";
+import evaluator from "../lib/evaluator";
+import unitsTable from "../lib/units-table";
+import variablesSymbolTable from "../lib/variables-symbol-table";
+import output from "../lib/to-source";
+
+const { Context: Variables } = variablesSymbolTable;
+const { UnitsTable: Units } = unitsTable;
+const { test, plan } = tap;
 
 var operatorNames = {
   sin: true,
@@ -256,7 +257,6 @@ test("Unary & Binary Operation Interactions", function (t) {
   output.displayImpliedParentheses(false);
   t.end();
 });
-
 
 test("Variables in expressions", function (t) {
   var units = parser.units = new Units(),

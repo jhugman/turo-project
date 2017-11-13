@@ -1,89 +1,88 @@
-'use strict';
-var _ = require('underscore'),
-    turoNumber = require('../turo-number'),
-    mixins = require('./mixins'),
+import _ from 'lodash';
+import turoNumber from '../turo-number';
+import mixins from './mixins';
 
-    makeMixin = mixins.makeMixin,
-    isDimensionless = mixins.isDimensionless;
-    
+const { makeMixin, isDimensionless } = mixins;
+
 var number = 'number',
     bool = 'boolean';
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Unit aware comparisons. 
 /////////////////////////////////////////////////////////////////////////////////////////////
-module.exports.registerOperators = function registerOperators (ops) {
+export default {
+  registerOperators(ops) {
 
-  ops.addInfixOperator(
-    // 1 m < 1 yd
-    '<',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l < r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
+    ops.addInfixOperator(
+      // 1 m < 1 yd
+      '<',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l < r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
 
-  ops.addInfixOperator(
-    // 1 m <= 1 yd
-    '<=',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l <= r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
+    ops.addInfixOperator(
+      // 1 m <= 1 yd
+      '<=',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l <= r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
 
-  ops.addInfixOperator(
-    // 1 m == 1 yd
-    '==',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l === r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
+    ops.addInfixOperator(
+      // 1 m == 1 yd
+      '==',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l === r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
 
-  ops.addInfixOperator(
-    // 1 m >= 1 yd
-    '>=',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l >= r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
+    ops.addInfixOperator(
+      // 1 m >= 1 yd
+      '>=',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l >= r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
 
-  ops.addInfixOperator(
-    // 1 m > 1 yd
-    '>',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l > r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
+    ops.addInfixOperator(
+      // 1 m > 1 yd
+      '>',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l > r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
 
-  ops.addInfixOperator(
-    // 1 m != 1 yd
-    '!=',
-    number, number, bool,
-    makeMixin(
-      function (l, r) {
-        return l !== r;
-      },
-      mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
-    )
-  );
-
+    ops.addInfixOperator(
+      // 1 m != 1 yd
+      '!=',
+      number, number, bool,
+      makeMixin(
+        function (l, r) {
+          return l !== r;
+        },
+        mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
+      )
+    );
+  }
 };

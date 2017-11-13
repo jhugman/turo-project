@@ -1,0 +1,11 @@
+{
+  "name": "turo-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:jhugman/turo-project.git",
+  "author": "Julian Krispel <julian@reactrocket.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-preset-react-app": "^3.1.0"
+  }
+}

@@ -1,9 +1,11 @@
-"use string";
-var _ = require("underscore"),
-    operators = require("./operators-symbol-table").defaultOperators,
-    operatorLabeller = require("./operation-labeller"),
-    ast = require("./ast"),
-    turoNumber = require('./turo-number');
+import extend from 'lodash/extend';
+import each from 'lodash/each';
+import operatorSymbolTable from './operators-symbol-table';
+import operatorLabeller from './operation-labeller';
+import ast from './ast';
+import turoNumber from './turo-number';
+
+const { defaultOperators: operators } = operatorSymbolTable;
 
 function unitConversion(node, resultValue) {
   if (resultValue === undefined) {
@@ -31,7 +33,7 @@ function unitConversion(node, resultValue) {
 function EvaluatorVisitor () {
 }
 
-_.extend(EvaluatorVisitor.prototype, {
+extend(EvaluatorVisitor.prototype, {
 
   visitIncludeStatement: function (node, context) {
     // NOP, we do this in the parser.
@@ -43,7 +45,7 @@ _.extend(EvaluatorVisitor.prototype, {
       throw "No turo object";
     }
 
-    _.each(node.ast, function(st) {
+    each(node.ast, function(st) {
       node.accept(this, context, turo);
     });
   },
@@ -130,10 +132,10 @@ _.extend(EvaluatorVisitor.prototype, {
 
 function Evaluator (visitor, opts) {
   this.visitor = visitor;
-  _.extend(this, opts);
+  extend(this, opts);
 }
 
-_.extend(Evaluator.prototype, {
+extend(Evaluator.prototype, {
   evaluate: function (node) {
     if (node.accept) {
       return node.accept(this.visitor, this);
@@ -156,7 +158,7 @@ _.extend(Evaluator.prototype, {
   },
 });
 
-module.exports = {
+export default {
   visitor: new EvaluatorVisitor(), // new ast can be plugged in as and when by extending this
   variables: null,
   evaluate: function (node, turo) {

@@ -1,13 +1,12 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import output from '../lib/to-source';
+import ast from '../lib/ast';
+import parser from '../lib/parser';
+import variables from '../lib/variables-symbol-table';
 
-var ast = require("../lib/ast"),
-    parser = require("../lib/parser"),
-    variables = require('../lib/variables-symbol-table'),
-    output = require("../lib/to-source");
+const { test, plan } = tap;
 
 function roundtrip(t, src) {
   var node = parser.parse(src);

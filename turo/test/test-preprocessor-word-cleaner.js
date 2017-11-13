@@ -1,10 +1,9 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import wordCleaner from '../lib/preprocessor-word-cleaner';
 
-var wordCleaner = require("../lib/preprocessor-word-cleaner");
+const { test, plan } = tap;
 
 test("Identity", function (t) {
   var wc = wordCleaner.createEmpty(["foo", "bar", "baz"]);

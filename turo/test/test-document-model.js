@@ -1,10 +1,9 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import $turo from '../lib/turo';
+import DocumentModel from '../lib/document/document-model';
 
-var test = require('tap').test,
-    _ = require('underscore');
-
-var $turo = require('../lib/turo'),
-    DocumentModel = require('../lib/document/document-model');
+const { test, plan } = tap;
 
 var model, turo;
 function createModel() {

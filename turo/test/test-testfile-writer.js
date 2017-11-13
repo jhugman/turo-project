@@ -1,16 +1,12 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import ast from '../lib/ast';
+import evaluator from '../lib/evaluator';
+import testfileWriter from '../lib/testfile-writer';
 
-var ast = require("../lib/ast"),
-    evaluator = require("../lib/evaluator"),
-    Writer = require("../lib/testfile-writer").Writer;
-
-
-
-
+const { test, plan } = tap;
+const { Writer } = testfileWriter; 
 
 test("Test line", function (t) {
 

@@ -1,15 +1,15 @@
-'use strict';
+import _ from 'lodash';
+import { test, plan } from 'tap';
 
-var test = require('tap').test,
-    _ = require('underscore');
+import DocumentHelper from '../lib/document/document-helper';
+import AbstractStorage from '../lib/abstract-storage';
+import _parser from '../lib/parser';
+import lang from '../lib/language-model';
+import EditableDocument from '../lib/editable-document';
 
-var DocumentHelper = require('../lib/document/document-helper'),
-    AbstractStorage = require('../lib/abstract-storage'),
-    Parser = require('../lib/parser').Parser,
-    lang = require('../lib/language-model');
+const { Parser } = _parser;
 
 /////////////////////////////////////////////////////////////////////////
-
 var fileSource, parser, helper;
 
 function mockEvaluator (id, string, cb) {
@@ -230,8 +230,6 @@ test('evaluateDocument', function (t) {
     });
   });
 });
-
-var EditableDocument = require('../lib/editable-document');
 
 
 var scopeUnderTest;

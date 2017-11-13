@@ -1,15 +1,16 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import parser from '../lib/parser';
+import ast from '../lib/ast';
+import evaluator from '../lib/evaluator';
+import unitsTable from '../lib/units-table';
+import variablesSymbolTable from '../lib/variables-symbol-table';
+import output from '../lib/to-source';
 
-var _ = require('underscore'),
-    test = require('tap').test;
+const { test, plan } = tap;
+const { UnitsTable: Units } = unitsTable;
+const { Context: Variables } = variablesSymbolTable;
 
-var parser = require("../lib/parser"),
-    ast = require("../lib/ast"),
-    evaluator = require("../lib/evaluator"),
-    Units = new require("../lib/units-table").UnitsTable,
-    Variables = new require("../lib/variables-symbol-table").Context,
-    output = require("../lib/to-source");
-  
 parser.units = new Units();
 parser.variables = new Variables();
 

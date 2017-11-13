@@ -1,13 +1,14 @@
-var _ = require('underscore'),
-    test = require('tap').test,
-    path = require('path');
+import tap from 'tap';
+import _ from 'lodash';
+import $turo from '../lib/turo';
+import graphBuilder from '../lib/document/document-graph-builder';
+import path from 'path';
+import Storage from '../lib/local-file-storage';
+import EditableDocument from '../lib/editable-document';
 
-var prefs = {
-  shortUnitNames: true,
-};
+const { test, plan } = tap;
 
-var Storage = require('../lib/local-file-storage');
-var EditableDocument = require('../lib/editable-document');
+const prefs = { shortUnitNames: true };
 
 function file (relative) {
   return path.resolve(__dirname, 'fixtures', relative);

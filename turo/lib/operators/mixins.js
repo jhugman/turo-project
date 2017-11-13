@@ -1,8 +1,7 @@
-'use strict';
+import _ from 'lodash';
+import turoNumber from '../turo-number';
 
-var _ = require('underscore'),
-    turoNumber = require('../turo-number'),
-    NO_UNITS = null;
+const NO_UNITS = null;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Exported functions.
@@ -334,4 +333,4 @@ var mixins = {
 mixins.makeMixin = makeMixin;
 mixins.isDimensionless = isDimensionless;
 
-module.exports = mixins;
+export default mixins;

@@ -1,14 +1,24 @@
-'use strict';
-var _ = require('underscore');
+import _ from 'lodash';
+import basicArithmetic from './basic-arithmetic';
+import advancedArithmetic from './advanced-arithmetic';
+import trigonometry from './trigonometry';
+import hyperbolic from './hyperbolic';
+import percent from './percent';
+import booleanOps from './boolean';
+import numberComparisons from './number-comparisons';
 
-module.exports = function (ops) {
-  require('./basic-arithmetic').registerOperators(ops);
-  require('./advanced-arithmetic').registerOperators(ops);
-  require('./trigonometry').registerOperators(ops);
-  require('./hyperbolic').registerOperators(ops);
-  require('./percent').registerOperators(ops);
-  require('./boolean').registerOperators(ops);
-  require('./number-comparisons').registerOperators(ops);
+const operations = [
+  basicArithmetic,
+  advancedArithmetic,
+  trigonometry,
+  hyperbolic,
+  percent,
+  booleanOps,
+  numberComparisons,
+];
 
-  return ops;
+export default function (opts) {
+  operations.forEach(type => type.registerOperators(opts));
+
+  return opts;
 };

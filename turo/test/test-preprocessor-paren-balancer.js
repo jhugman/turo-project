@@ -1,10 +1,9 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import balancer from '../lib/preprocessor-paren-balancer';
 
-var balancer = require("../lib/preprocessor-paren-balancer");
+const { test, plan } = tap;
 
 test("Identity", function (t) {
   var b = balancer.createEmpty();

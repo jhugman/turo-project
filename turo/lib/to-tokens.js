@@ -1,5 +1,4 @@
-"use strict";
-var _ = require("underscore");
+import _ from 'lodash';
 
 function t(displayType, literal, offset, shortType, shortTypeAlpha) {
   if (shortTypeAlpha && literal.match(/^\w+$/)) {
@@ -395,7 +394,7 @@ _.extend(ToSourceVisitor.prototype, {
 
 var visitor = new ToSourceVisitor();
 
-module.exports = {
+export default {
   toTokenArray: function (node, context, optionalTokens) {
     var tokens = optionalTokens || [];
     context = context || {};
@@ -410,6 +409,4 @@ module.exports = {
     return tokens;
   },
   tokensFromKey: tokensFromKey,
-
-
 };

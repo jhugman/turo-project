@@ -61,7 +61,7 @@ function precision10 (value) {
   return [largest, smallest];
 }
 
-module.exports = {
+export default {
   toPrecision10: function (value, desiredPrecision) {
     var precision = precision10(value),
         roundTo;

@@ -1,6 +1,5 @@
-'use strict';
+import ast from '../lib/ast';
 
-var ast = require("../lib/ast");
 var infixAliases = {
   '**': '^',
   '÷': '/',
@@ -19,8 +18,6 @@ var infixAliases = {
 var unaryAliases = {
   '√': 'sqrt',
 };
-
-
 
 function decorateTerminal (node, offset, string) {
   var last = offset + string.length - 1;
@@ -119,9 +116,7 @@ function unpackUnaryOperations(current, operators, isPrefix) {
   return current;
 }
 
-////////////////////////////////////////////////////////////
-
-module.exports = {
+export default {
   decorateStatement: decorateStatement,
   decorateTerminal: decorateTerminal,
   decorateNonTerminal: decorateNonTerminal,

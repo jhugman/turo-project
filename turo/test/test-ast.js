@@ -1,11 +1,9 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import _ from 'lodash';
+import tap from 'tap';
+import ast from '../lib/ast';
+import evaluator from '../lib/evaluator';
 
-var ast = require("../lib/ast"),
-    evaluator = require("../lib/evaluator");
+const { test, plan } = tap;
 
 function i(num) {
   return new ast.NumberNode(num);

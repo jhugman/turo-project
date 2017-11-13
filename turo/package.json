@@ -4,16 +4,19 @@
   "main": "./lib/turo.js",
   "dependencies": {
     "async": "~0.9.0",
+    "babel-tap": "^5.0.0",
     "dependency-graph": "~0.1.0",
     "turo-docs": "github:jhugman/turo-docs",
     "underscore": "~1.4.4"
   },
   "scripts": {
     "start": "node lib/repl.js --strict",
-    "test": "tap test/test-*.js",
+    "test": "BABEL_ENV=test webpack --config webpack.test.config.js --display-error-details && tap ./build/test.js",
     "build": "rimraf build && webpack"
   },
   "devDependencies": {
+    "babel-loader": "^7.1.2",
+    "babel-preset-react-app": "^3.1.0",
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.0",
     "grunt-contrib-watch": "~0.4.4",
@@ -22,8 +25,10 @@
     "lodash": "~2.4.1",
     "mkdirp": "~0.3.5",
     "optimist": "~0.6.0",
+    "raw-loader": "^0.5.1",
     "rimraf": "^2.6.2",
     "tap": "~0.4.4",
+    "tap-webpack-plugin": "^2.0.0",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "underscore.string": "~2.3.3",
     "webpack": "^3.6.0"

@@ -1,6 +1,4 @@
-"use strict";
-
-var _ = require("underscore");
+import _ from 'lodash';
 
 function UnitSchemeHelper () {
   this._table = {};
@@ -154,7 +152,6 @@ _.extend(UnitSchemeHelper.prototype, {
 
 });
 
-
-module.exports = {
+export default {
   UnitSchemeHelper: UnitSchemeHelper
 };

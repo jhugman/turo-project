@@ -1,7 +1,5 @@
-"use strict";
-var _ = require("underscore"),
-    ast = require("./ast");
-
+import extend from 'lodash/extend';
+import ast from './ast';
 
 function addError (errorName, parent, context) {
   ast.addError(errorName, parent, context);
@@ -18,8 +16,7 @@ function addError (errorName, parent, context) {
 function OperationLabellerVisitor () {
 }
 
-_.extend(OperationLabellerVisitor.prototype, {
-
+extend(OperationLabellerVisitor.prototype, {
   visitBinaryOperator: function (node, context) {
 
     var len = context.errors.length;
@@ -33,6 +30,8 @@ _.extend(OperationLabellerVisitor.prototype, {
       return;
     }
 
+    console.log('context', context);
+    console.log('context.operators', context.operators);
     operator = context.operators.findOperator(node.literal, lType, rType);
 
     if (!operator) {
@@ -148,7 +147,7 @@ function Labeller (visitor, operators, errors, evaluator) {
   this.prefs = evaluator.prefs;
 }
 
-_.extend(Labeller.prototype, {
+extend(Labeller.prototype, {
   label: function (node) {
     if (node.accept) {
       var valueType = node.accept(this.visitor, this);
@@ -164,7 +163,7 @@ _.extend(Labeller.prototype, {
   }
 });
 
-module.exports = {
+export default {
   visitor: new OperationLabellerVisitor(), // new ast can be plugged in as and when by extending this
   label: function (node, operators, errors, evaluator) {
     return new Labeller(this.visitor, operators, errors, evaluator).label(node);

@@ -1,5 +1,9 @@
-
-var _ = require("underscore");
+import isFunction from 'lodash/isFunction';
+import each from 'lodash/each';
+import isArray from 'lodash/isArray';
+import isObject from 'lodash/isObject';
+import flatten from 'lodash/flatten';
+import _ from 'lodash';
 
 var PATTERN = /([^\w\s]?)\b([a-z_]\w*)\b([^\w\s]?)/gi;
 
@@ -10,11 +14,11 @@ var makeObject = (function () {
 
   return function makeObject (list, fn) {
     var result = {};
-    if (!_.isFunction(fn)) {
+    if (!isFunction(fn)) {
       fn = alwaysTrue;
     }
 
-    _.each(list, function (key) {
+    each(list, function (key) {
       result[key] = fn(key);
     });
 
@@ -23,9 +27,9 @@ var makeObject = (function () {
 })();
 
 function PreProcessor (words) {
-  if (_.isArray(words)) {
+  if (isArray(words)) {
     this.reservedWords = makeObject(words);
-  } else if (_.isObject(words)) {
+  } else if (isObject(words)) {
     this.reservedWords = words;
   } else {
     this.reservedWords = {};
@@ -64,11 +68,10 @@ PreProcessor.prototype.preprocess = function (inputString) {
 };
 
 function createPreProcessor(variables, operators, units) {
-
   var p = new PreProcessor();
 
   p.rebuild = function () {
-    this.reservedWords = makeObject(_.flatten([
+    this.reservedWords = makeObject(flatten([
         // TODO get this from the parser.
         ["unit", "per", "test", "const", "include"],
         operators.getInfixOperatorNames(),
@@ -82,7 +85,7 @@ function createPreProcessor(variables, operators, units) {
 
 }
 
-module.exports = {
+export default {
   PreProcessor: PreProcessor,
   createEmpty: function (reservedWords) {
     return new this.PreProcessor(reservedWords);

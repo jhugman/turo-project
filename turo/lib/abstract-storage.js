@@ -1,6 +1,4 @@
-'use strict';
-
-var _ = require('underscore');
+import _ from 'lodash';
 
 /////////////////////////////////////////////////////////////////////////
 function AbstractStorage () {
@@ -13,18 +11,17 @@ function AbstractStorage () {
 }
 
 _.extend(AbstractStorage.prototype, {
-
   hasDocument: function (id) {
     return this.getDocument(id);
   },
 
-  isLoadingDocument: function (id) {
+  isLoadingDocument(id) {
     return this._state.isLoading[id];
   },
 
   // func (id: String, evaluator: (id, string, cb) -> Void, cb)
   // Should write to cache, for availability elsewhere
-  loadDocument: function (id, evaluator, callback) {
+  loadDocument(id, evaluator, callback) {
     var self = this,
         listeners = self._state.isLoading[id];
 
@@ -69,7 +66,6 @@ _.extend(AbstractStorage.prototype, {
   getDocument: function (id) {
     return this._state.documents[id];
   },
-
 });
 
-module.exports = AbstractStorage;
+export default AbstractStorage;

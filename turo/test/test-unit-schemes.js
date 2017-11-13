@@ -1,14 +1,11 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import units_table from '../lib/units-table.js';
+import output from '../lib/to-source';
 
-var units_table = require("../lib/units-table.js"),
-    Units = units_table.UnitsTable,
-    Dimension = units_table.Dimension,
-    output = require("../lib/to-source");
-
+const { test, plan } = tap;
+const { UnitsTable, Dimension } = units_table;
 
 test("Unit schemes", function (t) {
   var units = new Units(),

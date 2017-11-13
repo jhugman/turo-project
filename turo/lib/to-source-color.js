@@ -1,9 +1,6 @@
-"use strict";
-var _ = require("underscore"),
-    colors = require('colors'),
-
-    toSource = require("./to-source");
-
+import _ from 'lodash';
+import colors from 'colors';
+import toSource from './to-source';
 
 var COLOR_DISPLAY = _.defaults({
     /********
@@ -27,7 +24,7 @@ var COLOR_DISPLAY = _.defaults({
     }
 }, toSource.stringDisplay);
 
-module.exports = {
+export default {
   toString: toSource.createToString(COLOR_DISPLAY),
   display: COLOR_DISPLAY,
   displayImpliedParentheses: function (bool) {

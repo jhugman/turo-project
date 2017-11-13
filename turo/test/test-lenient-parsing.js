@@ -1,10 +1,9 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import turo from '../lib/turo';
+import lang from '../lib/language-model';
 
-var turo = require("../lib/turo");
+const { test, plan } = tap;
 
 turo.lenientParser = true;
 

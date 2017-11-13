@@ -1,9 +1,7 @@
-var _ = require('underscore');
-
-var async = require('async');
+import _ from 'lodash';
+import async from 'async';
 
 //////////////////////////////////////////////////////////////////////////
-
 var visitor = {
   visitImportStatement: function (node, context) {
     var documentId = node.ast;
@@ -18,7 +16,6 @@ var visitor = {
 
   },
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 function DocumentHelper (storage) {
@@ -85,4 +82,4 @@ _.extend(DocumentHelper.prototype, {
 
 });
 
-module.exports = DocumentHelper;
+export default DocumentHelper;

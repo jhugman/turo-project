@@ -1,10 +1,10 @@
-"use strict";
-var _ = require("underscore");
-
+import _ from 'lodash';
+import out from './to-source'
+import ast from './ast';
+import unitSchemes from './unit-schemes';
 /**
  * A series of objects that will build up to units
  */
-
 function Dimension (initial) {
   if (typeof initial === "string") {
     this.dimensions = {};
@@ -457,8 +457,6 @@ _.extend(CompoundUnit.prototype, {
 
       return new CompoundUnit(unitTable, newSimpleUnits);
     }
-
-    var out = require("./to-source");
 
     /*
      * reducingUnit - the remaining unit needed to be factored.
@@ -1028,19 +1026,13 @@ _.extend(CompoundUnit.prototype, {
   },
 
   accept: function (visitor) {
-    return require("./ast").acceptVisitor(this, visitor, visitor.visitUnit, arguments);
+    ast.acceptVisitor(this, visitor, visitor.visitUnit, arguments);
   }
 
 });
 
 
-
-
-var UnitSchemeHelper = require("./unit-schemes").UnitSchemeHelper;
-
-
-
-
+var UnitSchemeHelper = unitSchemes.UnitSchemeHelper;
 
 /*********************************************
   Units table.
@@ -1220,7 +1212,7 @@ _.extend(UnitsTable.prototype, {
 
 });
 
-module.exports = {
+export default {
   UnitsTable: UnitsTable,
   CompoundUnit: CompoundUnit,
 

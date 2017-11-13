@@ -1,6 +1,5 @@
-var _ = require("underscore"),
-    turoNumber = require('./turo-number');
-
+import _ from 'lodash';
+import turoNumber from './turo-number';
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 function extend (self, extension) {
@@ -135,18 +134,17 @@ function BinaryNode (left, right, literal) {
   this.right = right;
   this.literal = literal;
 }
+
 BinaryNode.prototype = new ASTNode({
   accept: function (visitor) {
     return acceptVisitor(this, visitor, visitor.visitBinaryOperator, arguments, this.left, this.right);
   }
 });
+
 BinaryNode.prototype.constructor = BinaryNode;
 
 defineOffsetProperties(BinaryNode.prototype, 'left', 'right');
 defineClone(BinaryNode);
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 
 function UnaryOperationNode (operand, literal, isPrefix) {
   this.value = operand;
@@ -291,6 +289,7 @@ VariableDefinition.prototype = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 function ValueNode (value, unit, valueType) {
+  console.log('value node', value, unit, valueType);
   if (value && value.valueType) {
     this.turoNumber = value;
   } else {
@@ -392,7 +391,7 @@ function UnparsedText (text, line, offset, lastLineNum) {
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-module.exports = {
+export default {
   IdentifierNode: IdentifierNode,
   NumberNode: IntegerNode,
   BinaryNode: BinaryNode,

@@ -1,8 +1,6 @@
-'use strict';
-
-var _ = require('underscore'),
-    output = require('../to-source'),
-    evaluator = require('../evaluator');
+import _ from 'lodash';
+import output from '../to-source';
+import evaluator from '../evaluator';
 
 function TuroStatement (id, node, info, updateId) {
   this._id = id;
@@ -124,4 +122,4 @@ _.extend(TuroStatement.prototype, {
   },
 });
 
-module.exports = TuroStatement;
+export default TuroStatement;

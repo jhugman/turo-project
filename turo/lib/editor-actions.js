@@ -1,6 +1,4 @@
-'use strict';
-
-var _ = require('underscore');
+import _ from 'lodash';
 
 function EditorActions (doc, editToken) {
   this.doc = doc;
@@ -182,5 +180,4 @@ EditorActions.addEditTokenProperties({
 
 //////////////////////////////////////////////////////////////
 
-module.exports = EditorActions;
-
+export default EditorActions;

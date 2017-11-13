@@ -1,5 +1,4 @@
-
-var _ = require("underscore");
+import _ from 'lodash';
 
 var PATTERN = /[()]/g;
 
@@ -37,7 +36,7 @@ PreProcessor.prototype.preprocess = function (inputString) {
   return inputString.replace(PATTERN, replacer) + stack.join("");
 };
 
-module.exports = {
+export default {
   PreProcessor: PreProcessor,
   createEmpty: function () {
     return new this.PreProcessor();

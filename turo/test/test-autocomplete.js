@@ -1,24 +1,11 @@
-"use strict";
-var tap = require("tap"),
-  test = tap.test,
-  plan = tap.plan,
-  _ = require("underscore");
+import tap from 'tap';
+import _ from 'lodash';
+import ac from '../lib/autocomplete';
+import parser from '../lib/parser';
 
-
-var ac = require("../lib/autocomplete");
-
-
-// { name: 'SyntaxError',
-  // expected: [ '"("', 'number', 'variable' ],
-  // found: 'B',
-  // message: 'Expected "(", number or variable but "B" found.',
-  // offset: 4,
-  // line: 1,
-  // column: 5 }
-
+const { test, plan } = tap;
 
 var stubParser = {
-
   expect: function () {
     this.expected = _.toArray(arguments);
   },
@@ -81,8 +68,7 @@ test("Tab complete", function (t) {
 });
 
 test("Create keyboard", function (t) {
-  var parser = require("../lib/parser"),
-      predictor = new ac.TokenPredictor(parser,
+      var predictor = new ac.TokenPredictor(parser,
         {
           digits: true,
           point: true,

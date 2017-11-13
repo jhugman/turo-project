@@ -1,6 +1,4 @@
-'use strict';
-
-var _ = require('underscore');
+import _ from 'lodash';
 
 /**
  * The scope is a super set of files and function and block scopes.
@@ -262,7 +260,7 @@ _.extend(Scope.prototype, {
 });
 
 
-module.exports = {
+export default {
   Scope: Scope,
 
   newScope: function (id, unitsTable) {

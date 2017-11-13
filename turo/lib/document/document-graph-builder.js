@@ -1,6 +1,6 @@
-"use strict";
-var _ = require("underscore"),
-    DepGraph = require('dependency-graph').DepGraph;
+import _ from 'lodash';
+import depGraph from 'dependency-graph';
+const { DepGraph } = depGraph;
 
 var statics;
 
@@ -224,7 +224,7 @@ var graphNodeAdder = new GraphNodeAdder(),
     identifierUpdater = new IdentifierUpdateVisitor(),
     identifierRemover = new IdentifierRemovalVisitor();
 
-module.exports = {
+export default {
 
   emptyGraph: function () {
     return {

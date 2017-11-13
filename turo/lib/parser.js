@@ -1,7 +1,6 @@
-'use strict';
-var _ = require('underscore'),
-    theParser = require('./parser-generated.js'),
-    lang = require('./language-model');
+import _ from 'lodash';
+import theParser from './parser-generated';
+import lang from './language-model';
 
 function TuroParser (scope) {
   this.parseContext = {
@@ -31,4 +30,4 @@ Object.defineProperties(TuroParser.prototype, {
 var instance = new TuroParser(lang.newScope());
 instance.Parser = TuroParser;
 
-module.exports = instance;
+export default instance;

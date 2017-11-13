@@ -1,11 +1,8 @@
-'use strict';
-var _ = require('underscore');
-
-var graphBuilder = require('./document-graph-builder'),
-    TuroStatement = require('./turo-statement');
+import _ from 'lodash'
+import graphBuilder from './document-graph-builder';
+import TuroStatement from './turo-statement';
 
 //////////////////////////////////////////////////////////////////////
-
 var State = {
   OK: 0,
   UNKNOWN: 1,
@@ -13,7 +10,6 @@ var State = {
 };
 
 //////////////////////////////////////////////////////////////////////
-
 var nextDocumentId = 0;
 
 function DocumentModel (documentId, overwriteExistingDefinitions) {
@@ -309,4 +305,4 @@ Object.defineProperties(DocumentModel.prototype, {
 
 DocumentModel.State = State;
 
-module.exports = DocumentModel;
+export default DocumentModel;

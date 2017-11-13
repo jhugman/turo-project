@@ -1,10 +1,9 @@
-'use strict';
+import tap from 'tap';
+import _ from 'lodash';
+import $turo from '../lib/turo';
+import graphBuilder from '../lib/document/document-graph-builder';
 
-var test = require('tap').test,
-    _ = require('underscore');
-
-var $turo = require('../lib/turo'),
-    graphBuilder = require('../lib/document/document-graph-builder');
+const { test, plan } = tap;
 
 var turo, doc;
 

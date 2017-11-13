@@ -1,20 +1,18 @@
-"use strict";
+import _ from 'lodash';
+import ast from './ast';
+import _parser from './parser';
 
-var _ = require("underscore"),
-    ast = require("./ast"),
-    acceptVisitor = ast.acceptVisitor,
-    VariableDefinition = ast.VariableDefinition;
+const { acceptVisitor, VariableDefinition } = ast;
 
 /**
  * Variables
  */
 function Variables (parser, definitions) {
-  this.parser = parser || require("./parser");
+  this.parser = parser || _parser;
   this.definitions = definitions || {};
 }
 
 Variables.prototype = {
-
   add: function (identifier, definitionNode) {
     var definition = new VariableDefinition(identifier, definitionNode);
     this.definitions[identifier] = definition;
@@ -29,15 +27,13 @@ Variables.prototype = {
   getVariableNames: function () {
     return _.keys(this.definitions);
   },
-
 };
 
-module.exports = {
+export default {
   Variables: Variables,
   VariableDefinition: VariableDefinition,
 
   // TODO: rename these classes usages elsewhere.
   Context: Variables,
   Statement: VariableDefinition
-
 };

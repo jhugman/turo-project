@@ -1,10 +1,7 @@
-'use strict';
-
-var EditorActions = require('../editor-actions'),
-    autocomplete = require('../autocomplete');
+import EditorActions from '../editor-actions';
+import autocomplete from '../autocomplete';
 
 Object.defineProperties(EditorActions.prototype, {
-
 });
 
 EditorActions.extend({

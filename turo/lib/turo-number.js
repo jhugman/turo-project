@@ -1,14 +1,11 @@
-'use strict';
-
-var _ = require('underscore');
-
-var output = require('./to-source.js');
+import _ from 'lodash';
+import output from './to-source';
+import precision from './precision-hacks';
 
 var noUnits = null;
 
 //////////////////////////////////////////////////////
 
-var precision = require("./precision-hacks");
 var MAX_SF = 14;
 
 function createNumberLiteral (num, precisionDigits, precisionType) {
@@ -32,6 +29,7 @@ function createNumberLiteral (num, precisionDigits, precisionType) {
 // TuroNumber constructor.
 //////////////////////////////////////////////////////
 function TuroNumber (number, unit, valueType, original) {
+  console.log('heyo', number, unit, valueType)
   if (!this) {
     return new TuroNumber(number, unit, valueType, original);
   }
@@ -130,7 +128,7 @@ recycle = function (turoNumber) {
 };
 //////////////////////////////////////////////////////
 
-module.exports = {
+export default {
   TuroNumber: TuroNumber,
   newInstance: newInstance,
   recycle: recycle,

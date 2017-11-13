@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-"use strict";
-var optimist = require("optimist"),
-    fs = require("fs"),
-    _ = require("underscore");
+import optimist from 'optimist';
+import fs from 'fs';
+import _ from 'lodash';
+import EditableDocument from './editable-document';
+import Storage from './local-file-storage';
+import readline from 'readline';
 
-fs.existsSync = fs.existsSync || require("path").existsSync;
-
+var theDocument;
 
 var argv = optimist
     .usage('Usage: $0 {OPTIONS}')
@@ -39,9 +40,6 @@ var argv = optimist
     })
     .argv;
 
-var EditableDocument = require('./editable-document'),
-    Storage = require('./local-file-storage'),
-    theDocument;
 
 EditableDocument.storage = new Storage();
 
@@ -58,7 +56,6 @@ var predictor, // = require("./autocomplete").create(turo),
 var PROMPT = " >> ",
     PROMPT_PADDING = "... ";
 
-var readline = require('readline');
 var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,

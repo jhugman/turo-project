@@ -1,13 +1,17 @@
-var _ = require("underscore"),
-    ast = require("./ast"),
-    turoNumber = require('./turo-number');
+import extend from 'lodash/extend';
+import keys from 'lodash/keys';
+import isFunction from 'lodash/isFunction';
+import isArray from 'lodash/isArray';
+import ast from './ast';
+import turoNumber from './turo-number';
+import init from './operators/all';
 
 function Operator(options) {
     if (options) {
-        _.extend(this, options);
+        extend(this, options);
     }
 }
-_.extend(Operator.prototype, {
+extend(Operator.prototype, {
     evaluate: function(x, y, result, ctx) {
         return this.evaluatorFunction(x, y, result, ctx);
     },
@@ -22,7 +26,7 @@ _.extend(Operator.prototype, {
 //////////////////////////////////////////////////
 function BinaryOperation (options) {
     if (options) {
-        _.extend(this, options);
+        extend(this, options);
     }
 }
 
@@ -81,7 +85,7 @@ BinaryOperation.prototype = new Operator({
 
 function UnaryOperation (options) {
     if (options) {
-        _.extend(this, options);
+        extend(this, options);
     }
 }
 
@@ -158,12 +162,12 @@ function Operators(table, prefs) {
     this._postfixOperatorNames = {};
 }
 
-_.extend(Operators.prototype, {
+extend(Operators.prototype, {
 
     _cacheGetOperatorNames: function (operatorType) {
       var key = "__cache_" + operatorType;
       if (!this[key]) {
-        this[key] = _.keys(this["_" + operatorType + "OperatorNames"]);
+        this[key] = keys(this["_" + operatorType + "OperatorNames"]);
       }
       return this[key];
     },
@@ -198,9 +202,9 @@ _.extend(Operators.prototype, {
     },
 
     addInfixOperator: function(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
-        if (_.isArray(unitCalculator)) {
+        if (isArray(unitCalculator)) {
             unitCalculator.unshift(new BinaryOperation());
-            unitCalculator = _.extend.apply(_, unitCalculator);
+            unitCalculator = Object.assign({}, unitCalculator);
             evaluatorFunction = undefined;
         }
 
@@ -225,9 +229,9 @@ _.extend(Operators.prototype, {
 
     _addUnaryOperator: function (literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
         var op;
-        if (_.isArray(unitCalculator)) {
+        if (isArray(unitCalculator)) {
             unitCalculator.unshift(new UnaryOperation());
-            var allProperties = _.extend.apply(_, unitCalculator);
+            var allProperties = Object.assign({}, unitCalculator);
             evaluatorFunction = undefined;
             op = new UnaryOperation(allProperties);
         } else {
@@ -241,7 +245,7 @@ _.extend(Operators.prototype, {
 
     _addOperator: function(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
         var op;
-        if (_.isFunction(evaluatorFunction)) {
+        if (isFunction(evaluatorFunction)) {
             op = new Operator({
                 unitCalculatorDeprecated: unitCalculator,
                 evaluatorFunction: evaluatorFunction
@@ -250,7 +254,7 @@ _.extend(Operators.prototype, {
             op = unitCalculator;
         }
 
-        _.extend(op, {
+        extend(op, {
             literal: literal,
             lValueType: lValueType,
             rValueType: rValueType,
@@ -274,17 +278,10 @@ _.extend(Operators.prototype, {
 });
 
 function createDefaultOperators (prefs) {
-    var init = require("./operators/all.js");
-
     return init(new Operators(undefined, prefs || {}));
-
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-module.exports = {
+export default {
     Operators: Operators,
     defaultOperators: createDefaultOperators(),
     createDefaultOperators: createDefaultOperators

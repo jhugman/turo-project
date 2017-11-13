@@ -12,6 +12,7 @@ function Operator(options) {
         extend(this, options);
     }
 }
+
 extend(Operator.prototype, {
     evaluate: function(x, y, result, ctx) {
         return this.evaluatorFunction(x, y, result, ctx);
@@ -24,6 +25,7 @@ extend(Operator.prototype, {
         }
     },
 });
+
 //////////////////////////////////////////////////
 function BinaryOperation (options) {
     if (options) {
@@ -267,11 +269,6 @@ extend(Operators.prototype, {
     },
 
     findOperator: function(literal, lNode, rNode) {
-        console.log('find operator', this.table);
-        console.log('literal', literal);
-        console.log('lNode', lNode);
-        console.log('rNode', rNode);
-
         return this.table[makeKey(lNode, literal, rNode)];
     },
 

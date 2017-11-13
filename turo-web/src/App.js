@@ -10,15 +10,15 @@ import turo from 'turo';
 // import Turo from 'turo';
 
 const t = new turo.Turo();
-t.resetScope();
-t.include('fundamental');
+ t.reset();
+// t.include('fundamental');
 // const { EditableDocument: doc } = turo;
 
-const text = `100m`;
+const text = "area = 2 m * 2m";
 
-const res = t.evaluate(text, 'EditorText');
-console.log('res', res);
-console.log('value', res.value())
+const res = turo.evaluate(text);
+console.log(res);
+console.log('value', 'boom', res.valueToString())
 
 class Statement extends Component {
   render() {

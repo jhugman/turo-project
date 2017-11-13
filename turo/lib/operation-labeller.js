@@ -30,8 +30,6 @@ extend(OperationLabellerVisitor.prototype, {
       return;
     }
 
-    console.log('context', context);
-    console.log('context.operators', context.operators);
     operator = context.operators.findOperator(node.literal, lType, rType);
 
     if (!operator) {

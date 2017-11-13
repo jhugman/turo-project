@@ -1,1 +1,0 @@
-module.exports = require('./to-editable-html-web-webview-cordova');

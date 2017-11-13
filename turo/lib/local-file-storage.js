@@ -16,13 +16,11 @@ extend(LocalFileStorage.prototype, {
 
   resolveLocation(id, baseLocation, callback) {
     var location = files[id] ? id : null
-    console.log('resolve location', location);
     callback(location, this);
     return location;
   },
 
   loadString(location, callback) {
-    console.log('loadstring', location, files[location]);
     if (!location) {
       callback('NO_DOCUMENT');
     }

@@ -17,6 +17,9 @@ test("Result convenience methods", function (t) {
   var m = turo.evaluate("unit m : Length");
   var r = turo.evaluate("2 * 2 m");
 
+
+  console.log('value??', r.valueToString());
+
   t.equal(r.identifier(), undefined);
   t.equal(r.identifierToString(), "");
   t.equal(r.expressionToString(), "2*2 m");

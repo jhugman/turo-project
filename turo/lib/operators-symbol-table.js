@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import extend from 'lodash/extend';
 import keys from 'lodash/keys';
 import isFunction from 'lodash/isFunction';
@@ -204,7 +205,7 @@ extend(Operators.prototype, {
     addInfixOperator: function(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
         if (isArray(unitCalculator)) {
             unitCalculator.unshift(new BinaryOperation());
-            unitCalculator = Object.assign({}, unitCalculator);
+            unitCalculator = extend.apply(_, unitCalculator);
             evaluatorFunction = undefined;
         }
 
@@ -266,6 +267,11 @@ extend(Operators.prototype, {
     },
 
     findOperator: function(literal, lNode, rNode) {
+        console.log('find operator', this.table);
+        console.log('literal', literal);
+        console.log('lNode', lNode);
+        console.log('rNode', rNode);
+
         return this.table[makeKey(lNode, literal, rNode)];
     },
 

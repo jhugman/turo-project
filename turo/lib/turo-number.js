@@ -29,7 +29,6 @@ function createNumberLiteral (num, precisionDigits, precisionType) {
 // TuroNumber constructor.
 //////////////////////////////////////////////////////
 function TuroNumber (number, unit, valueType, original) {
-  console.log('heyo', number, unit, valueType)
   if (!this) {
     return new TuroNumber(number, unit, valueType, original);
   }

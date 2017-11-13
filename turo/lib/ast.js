@@ -289,7 +289,6 @@ VariableDefinition.prototype = {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 function ValueNode (value, unit, valueType) {
-  console.log('value node', value, unit, valueType);
   if (value && value.valueType) {
     this.turoNumber = value;
   } else {

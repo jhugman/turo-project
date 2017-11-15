@@ -20,7 +20,11 @@ body {
 }
 
 .statements {
-  width: 100%;
+  width: 60%;
+}
+
+.results {
+  width: 40%;
 }
 
 .statement__content {
@@ -29,7 +33,7 @@ body {
 }
 
 .statement__result {
-  width: 50%;
+  width: 100%;
   padding: .5em 1em;
   border-left: 1px solid #ccc;
 }

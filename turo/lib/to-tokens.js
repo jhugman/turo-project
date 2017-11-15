@@ -60,7 +60,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   bracketStart: function (node, tokens, context) {
     var bracketCount = context.bracketCount || 0,
-        token = t('bracketStart', '(', node.offsetFirst);
+        token = t('bracketStart', '(', node._offsetLiteralFirst);
     bracketCount ++;
     context.bracketCount = bracketCount;
     
@@ -187,9 +187,8 @@ _.extend(ToSourceVisitor.prototype, {
   visitInteger: function (node, tokens, context) {
     var display = this.display;
     this.errorStart(node, tokens, context);
-    console.log('this an integer', node, tokens);
     if (context.editable) {
-      var offset = node.offsetFirst;
+      var offset = node._offsetLiteralFirst;
       _.each(node.literal.split(''), function (char_) {
         tokens.push(t('number', char_, offset, '1'));
         offset++;
@@ -229,7 +228,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   visitIdentifier: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
-    var token = t('identifier', node.name, node.offsetFirst, 'x');
+    var token = t('identifier', node.name, node._offsetLiteralFirst, 'x');
     token.isConstant = node.isConstant;
     tokens.push(token);
     this.printUnit(node, tokens, context);
@@ -240,10 +239,10 @@ _.extend(ToSourceVisitor.prototype, {
   visitVariableDefinition: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     if (node.isConstant) {
-      t.push(t('statement', 'const', node.offsetFirst, 'kwd'));
+      t.push(t('statement', 'const', node._offsetLiteralFirst, 'kwd'));
     }
 
-    tokens.push(t('identifier', node.identifier, node.offsetFirst, 'x'));
+    tokens.push(t('identifier', node.identifier, node._offsetLiteralFirst, 'x'));
     tokens.push(t('equal', '=', node._offsetLiteralFirst, '='));
     if (node.ast) {
       node.ast.accept(this, tokens, context);
@@ -259,12 +258,12 @@ _.extend(ToSourceVisitor.prototype, {
     var unit = node.ast;
     if (unit.definitionUnit) {
       tokens.push(t('number', '' + unit.definitionMultiple.bottom, undefined, '1'));
-      tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
+      tokens.push(t('unit', unit.name, unit._offsetLiteralFirst, 'm'));
       tokens.push(t('equal', '=', node._offsetLiteralFirst, '='));
       tokens.push(t('number', '' + unit.definitionMultiple.top, undefined, '1'));
       unit.definitionUnit.accept(this, tokens, context);
     } else {
-      tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
+      tokens.push(t('unit', unit.name, unit._offsetLiteralFirst, 'm'));
       tokens.push(t('keyword', 'as a unit of', node._offsetLiteralFirst, 'kwd'));
       tokens.push(t('dimension', unit.getDimension().shortName, node._offsetLiteralFirst, 'm'));
     }
@@ -361,7 +360,7 @@ _.extend(ToSourceVisitor.prototype, {
   },
 
   visitIncludeStatement: function (node, tokens, context) {
-    t.push(t('statement', 'include', node.offsetFirst, 'kwd'));
+    t.push(t('statement', 'include', node._offsetLiteralFirst, 'kwd'));
     t.push(t('string', '"' + node.ast + '"', 0, '"'));
   },
 
@@ -376,7 +375,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   visitUnitLiteral: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
-    tokens.push(t('unitLiteral', node.literal, node.offsetFirst, 'm'));
+    tokens.push(t('unitLiteral', node.literal, node._offsetLiteralFirst, 'm'));
     this.errorEnd(node, tokens, context);
   },
 

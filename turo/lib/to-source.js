@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import tokenizer from './to-tokens';
+import { toTokenArray, tokensFromKey } from './to-tokens';
 
 var defaultFormatting = {
   'm/': '', // unit followed by unit per.
@@ -86,7 +86,6 @@ var STRING_DISPLAY = {
 
 //////////////////////////////////////////////////////////////////////////////////
 
-var toTokenArray = tokenizer.toTokenArray;
 
 function findCursor (tokens, cursorPosition) {
   var offset = 0,
@@ -182,7 +181,6 @@ function joinTokenArray(tokens, display, context) {
 //////////////////////////////////////////////////////////////////////////////////
 
 var createToString = function (display) {
-  
   return function toString (node, literals, prefs) {
     var context = {}, 
         padding;
@@ -255,7 +253,7 @@ export default {
   // (tokens, display, context)
   joinTokenArray: joinTokenArray,
 
-  toTokensFromKey: tokenizer.tokensFromKey,
+  toTokensFromKey: tokensFromKey,
 
   displayImpliedParentheses: function (bool) {
     this.alwaysDisplayParens = !!bool;

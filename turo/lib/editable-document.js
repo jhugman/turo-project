@@ -120,10 +120,10 @@ extend(EditableDocument.prototype, {
     var isReady;
 
     this.documentHelper.evaluate(
-      firstParseNode, 
+      firstParseNode,
       function (err, doc) {
         isReady = syncEval(err, doc);
-      }.bind(this), 
+      }.bind(this),
       context
     );
 
@@ -136,9 +136,9 @@ extend(EditableDocument.prototype, {
 
     // Here's where turo the calculator starts.
     var nodes = this.parser.parse(string + '\n', 'EditorText').lines;
-    
+
     model.batchUpdate(nodes, scope);
-    
+
     var statements = model.statementsInWrittenOrder;
     _.each(statements, function (s) {
       var node = s.node,
@@ -169,16 +169,20 @@ extend(EditableDocument.prototype, {
     }.bind(this));
   },
 
-  _evalStatementSync: function (id, string, callback) {
+  getStatement(id) {
+    return this._state.model.getStatement(id);
+  },
+
+  _evalStatementSync(id, string, callback) {
     var scope = this.scope,
         // XXX scope should come from the statement/node itself, not document.
         // TODO the parser should be dealing with this.
         model = this._state.model;
 
     var nodes = this.parser.parse(string + '\n', 'EditorText').lines;
-    
+
     var statements = model.interactiveUpdate(id, nodes[0], scope);
-    
+
     // Now, to keep the document text updated, we add the text to the statement.
 
     // We cannot rely on 'statements' containing the statement with id=id.
@@ -210,6 +214,7 @@ extend(EditableDocument.prototype, {
     };
   },
 
+  // TODO: wtf is an editToken?
   findStatementForEditToken: function (editToken) {
     var model = this._state.model;
 
@@ -323,7 +328,7 @@ statics = {
 
   loadEditableDocument: function (documentId, imports, cb) {
     var theDocument = new EditableDocument(documentId);
-    
+
     function evaluator(id, string, cb) {
       var doc;
       if (documentId === id) {

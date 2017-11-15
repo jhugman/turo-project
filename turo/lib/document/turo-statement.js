@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import output from '../to-source';
+import { toTokenArray } from '../to-tokens';
 import evaluator from '../evaluator';
 
 function TuroStatement (id, node, info, updateId) {
@@ -22,20 +23,26 @@ function TuroStatement (id, node, info, updateId) {
 }
 
 Object.defineProperties(TuroStatement.prototype, {
+  tokens: {
+    get() {
+      return this.toTokens();
+    }
+  },
+
   id: {
-    get: function () {
+    get() {
       return this._id;
     }
   },
 
   errors: {
-    get: function () {
+    get() {
       return this._errors;
     }
   },
 
   expression: {
-    get: function () {
+    get() {
       var node = this._node;
       if (node.definition) {
         return node.definition;
@@ -45,25 +52,25 @@ Object.defineProperties(TuroStatement.prototype, {
   },
 
   identifier: {
-    get: function () {
+    get() {
       return this._node.identifier;
     }
   },
 
   info: {
-    get: function () {
+    get() {
       return this._info;
     }
   },
 
   node: {
-    get: function () {
+    get() {
       return this._node;
     }
   },
 
   currentValue: {
-    get: function () {
+    get() {
       if (this._currentValue) {
         return this._currentValue;
       }
@@ -73,30 +80,34 @@ Object.defineProperties(TuroStatement.prototype, {
   },
 
   text: {
-    get: function () {
+    get() {
       return this._info.text;
     },
   },
 });
 
 _.extend(TuroStatement.prototype, {
-  isParseable: function () {
+  isParseable () {
     return !!(this.node.accept);
   },
 
-  hasErrors: function () {
+  hasErrors() {
     return this._errors && this._errors.length;
   },
 
-  valueToString: function (display, prefs) {
+  toTokens() {
+    return toTokenArray(this.node);
+  },
+
+  valueToString (display, prefs) {
     return output.toStringWithDisplay(this.currentValue, display, prefs);
   },
 
-  expressionToString: function (display, prefs) {
+  expressionToString (display, prefs) {
     return output.toStringWithDisplay(this.expression, display, prefs);
   },
 
-  verboseToString: function (display, prefs) {
+  verboseToString (display, prefs) {
     var t = [
       output.toStringWithDisplay(this.node, display, prefs),
       '=',
@@ -106,11 +117,11 @@ _.extend(TuroStatement.prototype, {
     return t.join(' ');
   },
 
-  errorToString: function (display) {
+  errorToString (display) {
 
   },
 
-  reevaluate: function () {
+  reevaluate () {
     if (!this.isParseable()) {
       return;
     }

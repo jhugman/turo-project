@@ -328,6 +328,7 @@ extend(Turo.prototype, {
     if (!parseRule) {
       string = this.cleanString(string);
     }
+
     parser.turo = this;
     parser.inputLength = originalInput.length;
 
@@ -363,6 +364,15 @@ extend(Turo.prototype, {
 });
 
 // Not sure where to put this, tbh.
+
+export {
+  EditorActions,
+  EditableDocument,
+  Storage,
+  toSource,
+  Turo,
+  Error,
+}
 
 export default extend(new Turo(), {
   Turo: Turo,

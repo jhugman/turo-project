@@ -382,6 +382,8 @@ defineClone(EditorLinesNode);
 function UnparsedText (text, line, offset, lastLineNum) {
   this.text = text;
   this.lineFirst = line;
+  // this.accept must be true so we can add it to the dep graph
+  this.accept = () => {};
   this.offsetFirst = offset;
   this.statementOffsetFirst = offset;
   this.statementOffsetLast = offset + text.length;

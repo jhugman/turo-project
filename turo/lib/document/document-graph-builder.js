@@ -297,7 +297,7 @@ export default {
     }
 
     if (deleteToken && deleteToken.defId !== newDefId) {
-        
+
       // The oldNode was a definition of some sort,
       // and not the same as the new one.
       // Some of the rest of the document may now be in error.
@@ -317,7 +317,7 @@ export default {
       // - remove id -> defId (in nav graph)
       // graph.execution.removeDependency(defId, id);
       // graph.navigation.removeDependency(defId, id);
-      
+
       // we should also remove all refId to this statement.
       // refId -> id
       // this.removeDependencies(graph.execution, id);

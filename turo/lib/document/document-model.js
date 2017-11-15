@@ -88,6 +88,7 @@ _.extend(DocumentModel.prototype, {
       offsetFirst: node.statementOffsetFirst,
       offsetLast: node.statementOffsetLast,
     };
+    // console.log('insert node', id, node, info);
     var s = new TuroStatement(id, node, info);
     statementMap[id] = s;
 
@@ -187,19 +188,19 @@ _.extend(DocumentModel.prototype, {
   /**
    * Update the statement with the given id with the newly parsed AST.
    * The cascade in evaluation order will be returned.
-   * 
-   * Some effort is made to ensure that the right thing happens. 
    *
-   * However, callers should check model.state following a call to 
-   * this method. 
+   * Some effort is made to ensure that the right thing happens.
    *
-   * If the model.state is a States.INVALID, callers should cause 
-   * a reparse of the document, and call this.batchUpdate() as 
+   * However, callers should check model.state following a call to
+   * this method.
+   *
+   * If the model.state is a States.INVALID, callers should cause
+   * a reparse of the document, and call this.batchUpdate() as
    * soon as possible.
    */
   interactiveUpdate: function (id, node) {
     // calculate the side effects.
-    
+
     var g = this._state.graph,
         statementMap = this._state.statementMap,
         s = statementMap[id];
@@ -222,7 +223,7 @@ _.extend(DocumentModel.prototype, {
       id,     // The id of the statement we're editing
       oldNode,// The previous AST node for this statement
       node,   // The new AST node for this statement
-      this._nodeFinder.bind(this), 
+      this._nodeFinder.bind(this),
               // Finds the AST for a given statement id
       this.overwriteExistingDefinitions
               // true - filter obsolete definitions from the cascade (a.k.a. repl mode)
@@ -232,7 +233,7 @@ _.extend(DocumentModel.prototype, {
     // Use the graph builder's feedback to determine if the whole document needs re parsing.
     // We may be declaring a brand new variable, and some unparseable lines could now be parsed.
     this._state.state = cascade.documentNeedsReparse ? State.INVALID : State.UNKNOWN;
-    
+
     var updatedIds = this._cascade(cascade, statementMap);
 
     var evaluatedStatements = this._finalReturn(updatedIds),

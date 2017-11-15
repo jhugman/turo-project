@@ -31,7 +31,7 @@ _.extend(DocumentHelper.prototype, {
     var toImport = _.keys(context.toImport),
         evaluator = context.documentEvaluator,
         doc = context.document;
-    
+
     return this._doLoading(toImport, doc, doc.scope, evaluator, callback);
   },
 

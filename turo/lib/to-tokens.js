@@ -4,12 +4,15 @@ function t(displayType, literal, offset, shortType, shortTypeAlpha) {
   if (shortTypeAlpha && literal.match(/^\w+$/)) {
     shortType = shortTypeAlpha;
   }
+
   if (offset === undefined) {
     offset = -1;
   }
+
   if (literal === undefined) {
     literal = '';
   }
+
   return {
     literal: literal,
     displayType: displayType,
@@ -184,6 +187,7 @@ _.extend(ToSourceVisitor.prototype, {
   visitInteger: function (node, tokens, context) {
     var display = this.display;
     this.errorStart(node, tokens, context);
+    console.log('this an integer', node, tokens);
     if (context.editable) {
       var offset = node.offsetFirst;
       _.each(node.literal.split(''), function (char_) {
@@ -191,7 +195,7 @@ _.extend(ToSourceVisitor.prototype, {
         offset++;
       });
     } else {
-      tokens.push(t('number', node.literal, node._offsetFirstLiteral, '1'));
+      tokens.push(t('number', node.literal, node._offsetLiteralFirst, '1'));
     }
     this.printUnit(node, tokens, context, node.value);
     this.errorEnd(node, tokens, context);
@@ -209,9 +213,9 @@ _.extend(ToSourceVisitor.prototype, {
         valueString = turoValue.literal || (value + '');
 
     if (turoValue.valueType === 'number')  {
-      tokens.push(t('number', valueString, node._offsetFirstLiteral, '1'));
+      tokens.push(t('number', valueString, node._offsetLiteralFirst, '1'));
     } else {
-      tokens.push(t(turoValue.valueType, valueString, node._offsetFirstLiteral, 'x'));
+      tokens.push(t(turoValue.valueType, valueString, node._offsetLiteralFirst, 'x'));
     }
     var valueTypeMethod = this[turoValue.valueType + 'ValueType'];
     if (valueTypeMethod) {
@@ -394,19 +398,19 @@ _.extend(ToSourceVisitor.prototype, {
 
 var visitor = new ToSourceVisitor();
 
-export default {
-  toTokenArray: function (node, context, optionalTokens) {
-    var tokens = optionalTokens || [];
-    context = context || {};
-    if (!node) {
-      return tokens;
-    }
-    if (node.accept) {
-      node.accept(visitor, tokens, context);
-    } else if (node.valueType) {
-      visitor.tokenizeTuroNumber(node, tokens, context, {});
-    }
+const toTokenArray = function (node, context, optionalTokens) {
+  var tokens = optionalTokens || [];
+  context = context || {};
+  if (!node) {
     return tokens;
-  },
-  tokensFromKey: tokensFromKey,
+  }
+
+  if (node.accept) {
+    node.accept(visitor, tokens, context);
+  } else if (node.valueType) {
+    visitor.tokenizeTuroNumber(node, tokens, context, {});
+  }
+  return tokens;
 };
+
+export { toTokenArray, tokensFromKey };

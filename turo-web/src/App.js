@@ -1,34 +1,54 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import { EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
+import React, { Component, PureComponent } from 'react';
+import { CompositeDecorator, CharacterMetadata, ContentState, ContentBlock, genKey, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
 import Immutable from 'immutable';
+import { UPDATE_STATEMENT } from './constants';
+import Result from './Result';
+import exampleDoc from './basic';
+
 import './App.css';
+import { connect } from 'react-redux';
 
-// import turoApp from 'turo-model';
 import Editor from 'draft-js-plugins-editor';
-import turo from 'turo';
-// import Turo from 'turo';
+import { EditableDocument } from 'turo';
 
-const t = new turo.Turo();
-t.reset();
-t.include('app');
-// const { EditableDocument: doc } = turo;
+function findWithRegex(regex, contentBlock, callback) {
+  const text = contentBlock.getText();
+  let matchArr, start;
+  while ((matchArr = regex.exec(text)) !== null) {
+    start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+  }
+}
 
-const text = "200m * 2";
+class NumberComp extends PureComponent {
+  render() {
+    return (<span>{this.props.children}</span>)
+  }
+}
 
-const res = turo.evaluate(text);
-console.log(res);
-console.log('value', 'boom', res.valueToString())
+const handleStrategy = (contentBlock, callback) => {
+  console.log(contentBlock);
+}
+
+const compositeDecorator = new CompositeDecorator([
+  {
+    strategy: handleStrategy,
+    component: NumberComp,
+  }
+]);
+
+const st1 = `boing = 5m`;
+const st2 = `boing + 10m`;
 
 class Statement extends Component {
   render() {
-    // console.log('hey tis a custom block')
-    // console.log(this.props.children.props.block.getText());
-
+    const id = this.props.children.key;
     return (
-      <div className='MyCustomBlock'>
-        {/* here, this.props.children contains a <section> container, as that was the matching element */}
-        {this.props.children}
+      <div className='statement'>
+        <div className='statement__content'>
+          {/* here, this.props.children contains a <section> container, as that was the matching element */}
+          {this.props.children}
+        </div>
       </div>
     );
   }
@@ -42,12 +62,46 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(
   })
 );
 
-// const model = turoApp.calculator.model;
+class Results extends Component {
+  render() {
+    return (<div className='results'>
+      {this.props.doc.statements.map(stat => <Result key={stat.id} id={stat.id} />)}
+    </div>);
+  }
+}
 
 class App extends Component {
-  state = {
-    editorState: EditorState.createEmpty()
-  };
+  constructor(props) {
+    super(props);
+
+    this.doc = EditableDocument.create(genKey());
+    this.doc.import('app');
+
+    this.doc.evaluateDocument(exampleDoc);
+    const blockMap = this.doc.statements.map(statement => {
+      console.log('statement', statement.toTokens());
+
+      this.props.onUpdateStatement(statement);
+
+      return new ContentBlock({
+        data: {
+          tokens: statement.tokens
+        },
+        key: statement.id,
+        characterList: Immutable.List().setSize(statement.text.length).map(() => new CharacterMetadata()),
+        text: statement.text,
+        type: 'unstyled',
+        depth: 0,
+      });
+    });
+
+    this.state = {
+      editorState: EditorState.createWithContent(
+        ContentState.createFromBlockArray(blockMap),
+        compositeDecorator
+      ),
+    }
+  }
 
   onChange = (editorState) => {
     const contentState = editorState.getCurrentContent();
@@ -55,24 +109,33 @@ class App extends Component {
     const blockKey = editorState.getSelection().getFocusKey();
     const currentBlockText = contentState.getBlockForKey(blockKey).getText();
     const index = blockMap.keySeq().findIndex(key => key === blockKey)
-    // const stat = model.putStatement(currentBlockText, null, index);
 
-    // console.log('text', currentBlockText);
-    // console.log('result', stat);
+    this.props.onUpdateStatement(this.doc.evaluateStatement(blockKey, currentBlockText)[0]);
+
     this.setState({ editorState })
   };
 
+  handlePastedText = (text, html, editorState) => {
+  }
+
   render() {
     return (
-      <div className="App">
-        <Editor
-          editorState={this.state.editorState}
-          blockRenderMap={blockRenderMap}
-          onChange={this.onChange}
-        />
+      <div className='editor'>
+        <div className='statements'>
+          <Editor
+            editorState={this.state.editorState}
+            blockRenderMap={blockRenderMap}
+            onChange={this.onChange}
+          />
+        </div>
+        <Results doc={this.doc} />
       </div>
     );
   }
 }
 
-export default App;
+const mapDispatchToProps = dispatch => ({
+  onUpdateStatement: payload => dispatch({ type: UPDATE_STATEMENT, payload })
+});
+
+export default connect(null, mapDispatchToProps)(App);

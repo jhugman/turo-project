@@ -2,6 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Rubik', sans-serif;
+  color: #666;
   line-height: 1.5em;
   padding: 1em;
   font-size: 1.5em;
@@ -42,4 +43,22 @@ body {
   display: inline-block;
   height: 1em;
   content: ' '
+}
+
+.token--number {
+  color: #389E8C;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.token--operator {
+  color: #4E3F4D;
+}
+
+.token--unit {
+  color: #F38D2E;
+  font-weight: bold;
+}
+
+.token--identifier {
+  color: #0AC6D6;
 }

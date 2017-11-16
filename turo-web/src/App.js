@@ -1,44 +1,18 @@
 import React, { Component, PureComponent } from 'react';
-import { CompositeDecorator, CharacterMetadata, ContentState, ContentBlock, genKey, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
+import { CompositeDecorator, Modifier, Editor, CharacterMetadata, ContentState, ContentBlock, genKey, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
 import Immutable from 'immutable';
+import get from 'lodash/get';
 import { UPDATE_STATEMENT } from './constants';
 import Result from './Result';
 import exampleDoc from './basic';
+import decorator from './decorator';
 
 import './App.css';
 import { connect } from 'react-redux';
 
-import Editor from 'draft-js-plugins-editor';
+// import Editor from 'draft-js-plugins-editor';
 import { EditableDocument } from 'turo';
 
-function findWithRegex(regex, contentBlock, callback) {
-  const text = contentBlock.getText();
-  let matchArr, start;
-  while ((matchArr = regex.exec(text)) !== null) {
-    start = matchArr.index;
-    callback(start, start + matchArr[0].length);
-  }
-}
-
-class NumberComp extends PureComponent {
-  render() {
-    return (<span>{this.props.children}</span>)
-  }
-}
-
-const handleStrategy = (contentBlock, callback) => {
-  console.log(contentBlock);
-}
-
-const compositeDecorator = new CompositeDecorator([
-  {
-    strategy: handleStrategy,
-    component: NumberComp,
-  }
-]);
-
-const st1 = `boing = 5m`;
-const st2 = `boing + 10m`;
 
 class Statement extends Component {
   render() {
@@ -62,6 +36,8 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(
   })
 );
 
+
+
 class Results extends Component {
   render() {
     return (<div className='results'>
@@ -79,18 +55,15 @@ class App extends Component {
 
     this.doc.evaluateDocument(exampleDoc);
     const blockMap = this.doc.statements.map(statement => {
-      console.log('statement', statement.toTokens());
-
       this.props.onUpdateStatement(statement);
 
       return new ContentBlock({
-        data: {
+        data: Immutable.Map({
           tokens: statement.tokens
-        },
+        }),
         key: statement.id,
         characterList: Immutable.List().setSize(statement.text.length).map(() => new CharacterMetadata()),
         text: statement.text,
-        type: 'unstyled',
         depth: 0,
       });
     });
@@ -98,24 +71,39 @@ class App extends Component {
     this.state = {
       editorState: EditorState.createWithContent(
         ContentState.createFromBlockArray(blockMap),
-        compositeDecorator
+        decorator
       ),
     }
   }
 
   onChange = (editorState) => {
     const contentState = editorState.getCurrentContent();
+    const selection = editorState.getSelection();
     const blockMap = contentState.getBlockMap();
-    const blockKey = editorState.getSelection().getFocusKey();
+    const blockKey = selection.getFocusKey();
     const currentBlockText = contentState.getBlockForKey(blockKey).getText();
     const index = blockMap.keySeq().findIndex(key => key === blockKey)
+    const statement = get(this.doc.evaluateStatement(blockKey, currentBlockText), 0);
 
-    this.props.onUpdateStatement(this.doc.evaluateStatement(blockKey, currentBlockText)[0]);
+    if (statement) this.props.onUpdateStatement(statement);
 
-    this.setState({ editorState })
+    const newEditorState = EditorState.push(
+      editorState,
+      Modifier.setBlockData(
+        contentState,
+        selection,
+        Immutable.Map({ tokens: statement ? statement.tokens : [] })
+      )
+    );
+
+    this.setState({ editorState: newEditorState })
   };
 
   handlePastedText = (text, html, editorState) => {
+  }
+
+  handleKeyCommand = command => {
+    return 'not-handled';
   }
 
   render() {
@@ -123,6 +111,7 @@ class App extends Component {
       <div className='editor'>
         <div className='statements'>
           <Editor
+            handleKeyCommand={this.handleKeyCommand}
             editorState={this.state.editorState}
             blockRenderMap={blockRenderMap}
             onChange={this.onChange}

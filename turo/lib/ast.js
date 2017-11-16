@@ -46,7 +46,7 @@ function defineOffsetProperties (_prototype, offsetFirstChild, offsetLastChild) 
   Object.defineProperties(_prototype, {
     offsetFirst: {
       enumerable: true,
-      get: function () {
+      get() {
         if (this._offsetFirst === undefined && this[offsetFirstChild]) {
           this._offsetFirst = this[offsetFirstChild].offsetFirst;
         }
@@ -55,7 +55,7 @@ function defineOffsetProperties (_prototype, offsetFirstChild, offsetLastChild) 
     },
     offsetLast: {
       enumerable: true,
-      get: function () {
+      get() {
         if (this._offsetLast === undefined) {
           // HACK. This should be done when parsing, and explicitly in visitors. Not here.
           var rightmost = this.unitNode || this[offsetLastChild];
@@ -77,7 +77,7 @@ function defineRecursiveProperty (_prototype, propertyName, childProperty) { // 
       args = _.toArray(arguments).splice(2);
 
   Object.defineProperty(_prototype, propertyName, {
-    set: function (value) {
+    set(value) {
       var self = this;
       self[privateProperty] = value;
       _.each(args, function (childName) {
@@ -88,7 +88,7 @@ function defineRecursiveProperty (_prototype, propertyName, childProperty) { // 
       });
     },
 
-    get: function () {
+    get() {
       return this[privateProperty];
     }
   }); 
@@ -136,7 +136,7 @@ function BinaryNode (left, right, literal) {
 }
 
 BinaryNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitBinaryOperator, arguments, this.left, this.right);
   }
 });
@@ -153,7 +153,7 @@ function UnaryOperationNode (operand, literal, isPrefix) {
 }
 
 UnaryOperationNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitUnaryOperation, arguments, this.value);
   }
 });
@@ -169,7 +169,7 @@ function ParensNode (ast) {
 }
 
 ParensNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitParens, arguments, this.ast);
   }
 });
@@ -183,7 +183,7 @@ function UnitLiteralNode (unit, literal) {
 }
 
 UnitLiteralNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitUnitLiteral, arguments);
   }
 });
@@ -201,7 +201,7 @@ function UnitPowerNode (unitNode, numberNode) {
 }
 
 UnitPowerNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitUnitPower, arguments, this.unitNode, this.exponent);
   }
 });
@@ -233,7 +233,7 @@ function UnitMultOp (literal, left, right) {
 }
 
 UnitMultOp.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitUnitMultOp, arguments, this.left, this.right);
   }
 });
@@ -248,7 +248,7 @@ function IntegerNode (string) {
   this.setValue(string);
 }
 IntegerNode.prototype = new ASTNode({
-  setValue: function (string) {
+  setValue(string) {
     if (typeof string === 'number') {
       this.value = string;
       this.literal = "" + string;
@@ -263,7 +263,7 @@ IntegerNode.prototype = new ASTNode({
     this._value = this.value;
   },
 
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitInteger, arguments);
   }
 });
@@ -282,7 +282,7 @@ function VariableDefinition (identifier, definition, value) {
 }
 
 VariableDefinition.prototype = {
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitVariableDefinition, arguments, this.ast);
   },
 };
@@ -297,16 +297,16 @@ function ValueNode (value, unit, valueType) {
 }
 
 ValueNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitTuroValue, arguments);
   }
 });
 Object.defineProperties(ValueNode.prototype, {
   unit: {
-    set: function (u) {
+    set(u) {
       this.turoNumber.unit = u;
     },
-    get: function () {
+    get() {
       return this.turoNumber.unit;
     }
   },
@@ -327,7 +327,7 @@ function IdentifierNode (string, scope) {
 }
 
 IdentifierNode.prototype = new ASTNode({
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor.visitIdentifier, arguments);
   }
 });
@@ -348,7 +348,7 @@ function StatementNode (statementType, ast) {
 
 StatementNode.prototype = new ASTNode();
 _.extend(StatementNode.prototype, {
-  accept: function (visitor) {
+  accept(visitor) {
     return acceptVisitor(this, visitor, visitor[this.visitorMethodName], arguments, this.ast);
   }
 });
@@ -361,7 +361,7 @@ function EditorLinesNode (lines) {
 }
 
 _.extend(EditorLinesNode.prototype = new ASTNode(), {
-  accept: function (visitor) {
+  accept(visitor) {
 
     var args = arguments;
     if (visitor.visitEditorLines) {
@@ -393,32 +393,32 @@ function UnparsedText (text, line, offset, lastLineNum) {
 
 
 export default {
-  IdentifierNode: IdentifierNode,
+  IdentifierNode,
   NumberNode: IntegerNode,
-  BinaryNode: BinaryNode,
-  StatementNode: StatementNode,
-  UnaryOperationNode: UnaryOperationNode,
-  ParensNode: ParensNode,
-  UnitLiteralNode: UnitLiteralNode,
-  UnitMultOp: UnitMultOp,
-  UnitPowerNode: UnitPowerNode,
-  EditorLinesNode: EditorLinesNode,
-  UnparsedText: UnparsedText,
+  BinaryNode,
+  StatementNode,
+  UnaryOperationNode,
+  ParensNode,
+  UnitLiteralNode,
+  UnitMultOp,
+  UnitPowerNode,
+  EditorLinesNode,
+  UnparsedText,
   TuroValueNode: ValueNode,
   Error: TuroError,
-  VariableDefinition: VariableDefinition,
+  VariableDefinition,
 
-  addError: addError,
+  addError,
 
-  number: function (i) {
+  number(i) {
     return new IntegerNode(i);
   },
 
-  integer: function (i) {
+  integer(i) {
     return new IntegerNode(i);
   },
 
-  valueNode: function (value, unit, valueType) {
+  valueNode(value, unit, valueType) {
     return new ValueNode(value, unit, valueType);
   },
   acceptVisitor: acceptVisitor

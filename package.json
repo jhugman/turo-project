@@ -7,5 +7,8 @@
   "license": "MIT",
   "devDependencies": {
     "babel-preset-react-app": "^3.1.0"
+  },
+  "scripts": {
+    "install-all": "cd turo && yarn && cd ../turo-web && yarn && cd .."
   }
 }

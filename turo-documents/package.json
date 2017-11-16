@@ -1,0 +1,42 @@
+{
+  "name": "turo-docs",
+  "version": "1.1.0",
+  "description": "Documentation and configuration for the turo language.",
+  "main": "build/index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "rimraf build && webpack && cp documents/* build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhugman/turo-docs.git"
+  },
+  "keywords": [
+    "turo",
+    "turo-lang"
+  ],
+  "author": "@jhugman",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/jhugman/turo-docs/issues"
+  },
+  "homepage": "https://github.com/jhugman/turo-docs",
+  "browserify": {
+    "transform": [
+      "brfs"
+    ]
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "raw-loader": "^0.5.1",
+    "resolve": "^1.1.6",
+    "rimraf": "^2.6.2",
+    "uglifyjs-webpack-plugin": "^0.4.6",
+    "webpack": "^3.6.0"
+  }
+}

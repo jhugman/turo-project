@@ -1,43 +1,10 @@
 {
   "name": "turo-server",
-  "version": "0.0.0",
-  "description": "Server for turo!",
-  "homepage": "http://trailsjs.io",
-  "author": {
-    "name": "Julian Krispel",
-    "email": "julian@reactrocket.com",
-    "url": "https://github.com/trailsjs"
-  },
+  "version": "1.0.0",
   "main": "index.js",
-  "keywords": [
-    "",
-    "trails",
-    "trailsjs"
-  ],
+  "license": "MIT",
   "dependencies": {
-    "trailpack-footprints": "^2.0.0",
-    "trailpack-hapi": "^2.2.0",
-    "trailpack-repl": "v2-latest",
-    "trailpack-router": "v2-latest",
-    "trailpack-waterline": "^2.0.0-rc2",
-    "trails": "v2-latest",
-    "winston": "^2.3"
-  },
-  "devDependencies": {
-    "eslint": "^2.11",
-    "eslint-config-trails": "^2",
-    "mocha": "^2.5",
-    "supertest": "^1.2"
-  },
-  "scripts": {
-    "test": "eslint . && mocha"
-  },
-  "engines": {
-    "node": ">= 4.0.0"
-  },
-  "eslintConfig": {
-    "extends": "trails"
-  },
-  "repository": "juliankrispel/turo-server",
-  "private": true
+    "knex": "^0.14.0",
+    "pg": "^7.4.0"
+  }
 }

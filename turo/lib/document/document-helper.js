@@ -42,8 +42,6 @@ _.extend(DocumentHelper.prototype, {
   _doLoading: function (toImport, doc, scope, evaluator, callback) {
     var storage = this._storage;
 
-    console.log('do loading', toImport);
-
     var toLoad = _.filter(toImport,
       function (id) {
         return !storage.hasDocument(id);

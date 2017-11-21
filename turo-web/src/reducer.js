@@ -1,25 +1,45 @@
+import { EditorState, ContentState, genKey } from 'draft-js';
+import { handleActions } from 'redux-actions';
+import { EditableDocument } from 'turo';
 import {
-  UPDATE_STATEMENTS,
-  UPDATE_STATEMENT
+  CREATE_DOCUMENT,
+  AUTOSAVE_DOCUMENT,
+  FETCH_DOCUMENT,
+  UPDATE_EDITOR_STATE,
 } from './constants';
+import decorator from './decorator';
 
 const initialState = {
-  statements: {}
+  title: 'Untitled',
+  turoDoc: null,
+  editorState: null,
 };
 
-export default (state = initialState, action) => {
-  switch (action.type) {
-    case UPDATE_STATEMENTS:
-      return {
-        statements: action.payload
-      };
-    case UPDATE_STATEMENT:
-      console.log(action.payload);
-      return {
-        statements: {
-          ...state.statements,
-          [action.payload.id]: action.payload
-        }
-      };
-  }
+const createTuroDoc = (text) => {
+  const turoDoc = EditableDocument.create(genKey());
+  turoDoc.import('app');
+  turoDoc.evaluateDocument(text);
+  return turoDoc;
 }
+
+const initDoc = (state, {
+  payload: { id, title, document: text }
+}) => ({
+  ...state,
+  title,
+  id,
+  turoDoc: createTuroDoc(text),
+  editorState: EditorState.createWithContent(
+    ContentState.createFromText(text),
+    // decorator
+  )
+});
+
+export default handleActions({
+  [`${FETCH_DOCUMENT}_FULFILLED`]: initDoc,
+  [`${CREATE_DOCUMENT}_FULFILLED`]: initDoc,
+  [UPDATE_EDITOR_STATE]: (state, { payload: editorState }) => ({
+    ...state,
+    editorState,
+  }),
+}, initialState);

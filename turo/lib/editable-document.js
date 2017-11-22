@@ -56,7 +56,7 @@ extend(EditableDocument.prototype, {
    * @param callback - func (err, doc)
    * @return boolean - true iff the import completed synchronously
    */
-  import: function (id, callback) {
+  import (id, callback) {
     var toImport = id;
     if (!_.isArray(id)) {
       toImport = [id];
@@ -70,7 +70,7 @@ extend(EditableDocument.prototype, {
     return this.documentHelper.import(toImport, scope, statics.createEditableDocument, callback);
   },
 
-  _freshScope: function () {
+  _freshScope () {
     return this.scope.fresh();
   },
 
@@ -89,7 +89,7 @@ extend(EditableDocument.prototype, {
    *
    * @return isReady, if the no asynchronous activity is needed.
    */
-  evaluateDocument: function (string, callback, optionalDocumentEvaluator) {
+  evaluateDocument (string, callback, optionalDocumentEvaluator) {
     var scope = this._freshScope();
     this.scope = scope;
     return this._firstParseEval(string, optionalDocumentEvaluator, function (err) {
@@ -101,11 +101,11 @@ extend(EditableDocument.prototype, {
     }.bind(this));
   },
 
-  reeevaluateDocument: function (callback) {
+  reeevaluateDocument (callback) {
     return this._evalDocumentSync(this.text, callback);
   },
 
-  _firstParseEval: function (string, optionalDocumentEvaluator, syncEval) {
+  _firstParseEval (string, optionalDocumentEvaluator, syncEval) {
     var firstParseNode = this.parser.parse(string + '\n', 'DocumentFirstParse');
 
     var context = {
@@ -130,7 +130,7 @@ extend(EditableDocument.prototype, {
     return isReady;
   },
 
-  _evalDocumentSync: function (string, callback) {
+  _evalDocumentSync (string, callback) {
     var scope = this.scope,
         model = this._state.model;
 
@@ -156,7 +156,7 @@ extend(EditableDocument.prototype, {
     return this;
   },
 
-  evaluateStatement: function (id, string, callback) {
+  evaluateStatement (id, string, callback) {
     if (!callback) {
       callback = statics.noCallback;
     }
@@ -206,7 +206,7 @@ extend(EditableDocument.prototype, {
   //   updateResultLines: ['resultLines']
   // },
 
-  createEditTokenForCursor: function (offset, line, column) {
+  createEditTokenForCursor (offset, line, column) {
     return {
       offset: offset,
       line: line,
@@ -215,7 +215,7 @@ extend(EditableDocument.prototype, {
   },
 
   // TODO: wtf is an editToken?
-  findStatementForEditToken: function (editToken) {
+  findStatementForEditToken (editToken) {
     var model = this._state.model;
 
     if (editToken.id) {
@@ -243,63 +243,63 @@ extend(EditableDocument.prototype, {
 ///////////////////////////////////////////////////////////////////////////////
 Object.defineProperties(EditableDocument.prototype, {
   scope: {
-    get: function () {
+    get () {
       return this._state.scope;
     },
-    set: function (newValue) {
+    set (newValue) {
       this._state.scope = newValue;
       this.parser.scope = newValue;
     },
   },
 
   importScope: {
-    get: function () {
+    get () {
       return this._state.importScope;
     },
-    set: function (parentScope) {
+    set (parentScope) {
       this.scope.parent = parentScope;
       this._state.importScope = parentScope;
     },
   },
 
   id: {
-    get: function () {
+    get () {
       return this._state.id;
     }
   },
   
   model: {
-    get: function () {
+    get () {
       return this._state.model;
     },
   },
 
   statements: {
-    get: function () {
+    get () {
       return this.model.statementsInWrittenOrder;
     },
   },
 
   units: {
-    get: function () {
+    get () {
       return statics.units;
     },
   },
 
   overwriteExistingDefinitions: {
-    set: function (newValue) {
+    set (newValue) {
       this._state.model.overwriteExistingDefinitions = !!newValue;
     },
   },
 
   lineByLineMode: {
-    set: function (newValue) {
+    set (newValue) {
       this.overwriteExistingDefinitions = newValue;
     }
   },
 
   text: {
-    get: function () {
+    get () {
       var text = this._state.text;
       if (text) {
         return text;
@@ -316,7 +316,7 @@ Object.defineProperties(EditableDocument.prototype, {
 
 ///////////////////////////////////////////////////////////////////////////////
 statics = {
-  createEditableDocument: function (id, string, cb) {
+  createEditableDocument (id, string, cb) {
     var theDocument = new EditableDocument(id),
         isReady;
 
@@ -326,7 +326,7 @@ statics = {
     return theDocument;
   },
 
-  loadEditableDocument: function (documentId, imports, cb) {
+  loadEditableDocument (documentId, imports, cb) {
     var theDocument = new EditableDocument(documentId);
 
     function evaluator(id, string, cb) {
@@ -358,7 +358,7 @@ statics = {
   // to be in the same scope. For complexity reasons.
   units: new Units(),
 
-  noCallback: function () {},
+  noCallback () {},
 };
 
 /**

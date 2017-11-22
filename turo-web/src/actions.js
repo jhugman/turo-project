@@ -5,7 +5,8 @@ import {
   FETCH_DOCUMENT,
   UPDATE_EDITOR_STATE,
   UPDATE_DOCUMENT,
-  CREATE_DOCUMENT
+  UPDATE_DOCUMENT_TITLE,
+  CREATE_DOCUMENT,
 } from './constants';
 
 const headers = new Headers({ 'Content-Type': "application/json" });
@@ -26,6 +27,8 @@ export const createDocument = createAction(
     { method: 'POST', body: JSON.stringify(body), headers }
   ).then(res => res.json())
 );
+
+export const updateDocument = createAction(UPDATE_DOCUMENT);
 
 export const autosaveDocument = createAction(
   AUTOSAVE_DOCUMENT,

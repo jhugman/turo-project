@@ -8,7 +8,6 @@ import exampleDoc from './basic';
 import debounce from 'lodash/debounce';
 import * as actions from './actions';
 import { Redirect } from 'react-router-dom'
-
 import { connect } from 'react-redux';
 
 class Statement extends Component {
@@ -34,41 +33,34 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(
 );
 
 class App extends Component {
-  autosaveDocument = debounce((doc) => this.props.autosaveDocument(doc), 500);
+  autosaveDocument = debounce((doc) => {
+    const contentState = doc.editorState.getCurrentContent();
+
+    // check if cached contentState is the same, don't fire autosave if it is
+    if (
+      this.cachedTitle !== doc.title ||
+      Immutable.is(contentState, this.cachedContent) === false
+    ) {
+      this.cachedTitle = doc.title;
+      this.cachedContent = contentState;
+      return this.props.autosaveDocument(doc);
+    }
+  }, 500);
+
+  keyBindingFn = event => {
+    console.log('hey')
+  }
 
   onChange = (editorState) => {
-    // const contentState = editorState.getCurrentContent();
-    // const selection = editorState.getSelection();
-    // const blockMap = contentState.getBlockMap();
-    // const blockKey = selection.getFocusKey();
-    // const currentBlockText = contentState.getBlockForKey(blockKey).getText();
-    // const index = blockMap.keySeq().findIndex(key => key === blockKey)
-    // const statement = get(this.doc.evaluateStatement(blockKey, currentBlockText), 0);
-
-    // if (statement) this.props.updateStatement(statement);
-
-    // const newEditorState = EditorState.push(
-    //   editorState,
-    //   Modifier.setBlockData(
-    //     contentState,
-    //     selection,
-    //     Immutable.Map({ tokens: statement ? statement.tokens : [] })
-    //   )
-    // );
-
-    // this.setState({ editorState: newEditorState })
-
     const { id, title } = this.props;
 
-    console.log('hey there auto save', this.props);
+    this.props.updateEditorState(editorState);
 
     this.autosaveDocument({
       id,
       title,
       editorState
     });
-
-    this.props.updateEditorState(editorState);
   };
 
   handlePastedText = (text, html, editorState) => {
@@ -76,6 +68,18 @@ class App extends Component {
 
   handleKeyCommand = command => {
     return 'not-handled';
+  }
+
+  onChangeTitle = ({ target: { value: title } }) => {
+    this.props.updateDocument({ title });
+
+    const { id, editorState } = this.props;
+
+    this.autosaveDocument({
+      id,
+      title,
+      editorState
+    });
   }
 
   componentWillMount() {
@@ -90,23 +94,28 @@ class App extends Component {
   }
 
   render() {
-    console.log('yo', this.props);
     if (!this.props.id) {
-      console.log('render loading');
       return <div className='loading'>Loading ...</div>
     } else if (this.props.id && !this.props.match.params.id) {
-      console.log('render redirect');
       return <Redirect to={{ pathname: `/${this.props.id}` }} />
     } else {
       return (
-        <div className='editor'>
-          <div className='statements'>
-            <Editor
-              handleKeyCommand={this.handleKeyCommand}
-              editorState={this.props.editorState}
-              blockRenderMap={blockRenderMap}
-              onChange={this.onChange}
-            />
+        <div className="document">
+          <div className="top-bar">
+            <input type="text" value={this.props.title} onChange={this.onChangeTitle} />
+          </div>
+
+          <div className='editor'>
+            <div className='statements'>
+              <Editor
+                placeholder="Type in some statements for your turo doc"
+                handleKeyCommand={this.handleKeyCommand}
+                editorState={this.props.editorState}
+                blockRenderMap={blockRenderMap}
+                onChange={this.onChange}
+              />
+            </div>
+            <Results statements={this.props.turoDoc.statements} />
           </div>
         </div>
       );

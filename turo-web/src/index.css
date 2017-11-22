@@ -4,7 +4,6 @@ body {
   font-family: 'Rubik', sans-serif;
   color: #666;
   line-height: 1.5em;
-  padding: 1em;
   font-size: 1.5em;
 }
 
@@ -18,6 +17,7 @@ body {
 
 .editor {
   display: flex;
+  min-height: 100vh;
 }
 
 .statements {
@@ -26,17 +26,12 @@ body {
 
 .results {
   width: 40%;
+  border-left: 1px solid #eee;
 }
 
-.statement__content {
+.statement__content, .statement__result {
   width: 100%;
-  padding: .5em 1em;
-}
-
-.statement__result {
-  width: 100%;
-  padding: .5em 1em;
-  border-left: 1px solid #ccc;
+  padding: .3em .5em;
 }
 
 .statement__result > span:after {
@@ -61,4 +56,16 @@ body {
 
 .token--identifier {
   color: #0AC6D6;
+}
+
+.top-bar {
+  display: flex;
+}
+
+.top-bar input {
+  padding: .5em;
+  border: none;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 1em;
+  width: 100%;
 }

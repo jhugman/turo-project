@@ -1,5 +1,7 @@
 import React from 'react';
 import { CompositeDecorator } from 'draft-js';
+import store from './store';
+import { docStore } from './reducer';
 
 const tokens = [
   {
@@ -25,13 +27,15 @@ const createComp = ({ className }) => props => (<span className={className}>
 </span>);
 
 const createStrategy = ({ token }) => (contentBlock, callback) => {
-  if (!contentBlock.data || !contentBlock.data.get('tokens')) return ;
-  const length = contentBlock.getText();
-  const tokens = contentBlock.data.get('tokens')
-    .filter(tok => tok.displayType === token)
+  if (!docStore.turoDoc) return ;
+  const statement = docStore.turoDoc.evaluateStatement(contentBlock.key, contentBlock.getText())[0];
+  if (!statement || !statement.tokens) return ;
+  const textLength = contentBlock.getText().length;
+  const tokens = statement.tokens.filter(tok => tok.displayType === token);
 
   tokens.forEach(token => {
-    const end = token.startOffset + token.literal.length;
+    let end = token.startOffset + token.literal.length;
+    end = end > textLength ? textLength : end;
     callback(token.startOffset, end)
   });
 }
@@ -43,6 +47,4 @@ const decorators = tokens.map(token => {
   }
 });
 
-const compositeDecorator = new CompositeDecorator(decorators);
-
-export default compositeDecorator;
+export default new CompositeDecorator(decorators);

@@ -23,6 +23,9 @@ import './precision-hacks';
 const { UnitsTable: Units } = unitsTable
 const { Context: Variables } = variablesSymbolTable;
 
+const boing = {hel: 'yo'};
+if  ("hel" in boing) {console.log("THIS IS WORKING"); }
+
 EditableDocument.storage = new Storage();
 
 var MAX_SF = 14;

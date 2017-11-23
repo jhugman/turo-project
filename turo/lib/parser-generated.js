@@ -476,10 +476,10 @@ export default (function(){
         }
         return result0;
       }
-      
+
       function parse_FirstParseStatement() {
         var result0;
-        
+
         result0 = parse_ImportStatement();
         if (result0 === null) {
           result0 = parse_FirstParseUnitDefinition();
@@ -489,11 +489,11 @@ export default (function(){
         }
         return result0;
       }
-      
+
       function parse_FirstParseUnitDefinition() {
         var result0, result1, result2, result3, result4, result5;
         var pos0, pos1, pos2;
-        
+
         pos0 = clone(pos);
         pos1 = clone(pos);
         if (input.substr(pos.offset, 4) === "unit") {
@@ -725,11 +725,11 @@ export default (function(){
         }
         return result0;
       }
-      
+
       function parse_PaddedStatement() {
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = clone(pos);
         pos1 = clone(pos);
         result0 = parse__();
@@ -761,11 +761,11 @@ export default (function(){
         }
         return result0;
       }
-      
+
       function parse_Statement() {
         var result0;
         var pos0;
-        
+
         pos0 = clone(pos);
         result0 = parse_RawStatement();
         if (result0 !== null) {
@@ -779,10 +779,10 @@ export default (function(){
         }
         return result0;
       }
-      
+
       function parse_RawStatement() {
         var result0;
-        
+
         result0 = parse_UnitDefinitionStatement();
         if (result0 === null) {
           result0 = parse_IncludeStatement();

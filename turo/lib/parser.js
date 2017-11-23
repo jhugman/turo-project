@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import theParser from './parser-generated';
+import theParser from './grammar';
 import lang from './language-model';
 
 function TuroParser (scope) {
@@ -8,9 +8,14 @@ function TuroParser (scope) {
   };
 }
 
+theParser._parse = theParser.parse;
 TuroParser.prototype = theParser;
 
 _.extend(TuroParser.prototype, {
+  parse: function (node, startRule) {
+    const options = startRule ? { startRule } : {};
+    return this._parse(node, options);
+  },
   reset: function () {
     this.parseContext.scope = this.parseContext.scope.fresh();
   }

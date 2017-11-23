@@ -2,21 +2,16 @@
  * Initialization, and some utility functions
  */
 {
-  var helper = require('../lib/parser-helper.js');
-  var ast = require("../lib/ast");
+  const helper = require('./parser-helper.js').default;
+  const ast = require('./ast').default;
+  const turo = require('./turo').default;
 
-  var self = this,
-      turo = this.turo || {};
-      emitter = this.emitter,
-      units = turo.units ||
-              this.units, // for backwards compat.
-      operators = turo.operators || this.operators,
-      testWriter = turo.writer ||
-                  this.testWriter, // for backwards compat.
-      inputLength = this.inputLength || input.length,
-      parseContext = this.parseContext;
-
-      
+  const self = this;
+  const units = turo.units;
+  const operators = turo.operators || this.operators;
+  const testWriter = turo.writer;
+  const inputLength = this.inputLength || input.length;
+  const parseContext = this.parseContext;
 
   this.reservedWords = ["unit", "per", "const", "include", "unit", "let"];
 }
@@ -50,10 +45,14 @@ EditorText
 EditorTextLine
   = nbsp node:Statement lineEnd:RestOfLine
     {
+      const { offset, line } = location().start;
+
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
     {
+      const { offset, line } = location().start;
+
       return helper.decorateStatement(null, line, offset, lineEnd);
     }
 
@@ -67,10 +66,12 @@ DocumentFirstParse
 DocumentLineFirstParse
   = nbsp node:FirstParseStatement lineEnd:RestOfLine
     {
+      const { offset, line }  = location().start;
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
     {
+      const { offset, line }  = location().start;
       return helper.decorateStatement(null, line, offset, lineEnd);
     }
 
@@ -116,9 +117,10 @@ RestOfLine
       };
     }
 
-CR 
+CR
   = [\r\n]
     {
+      const { offset, line } = location().start;
       return [offset, line];
     }
 
@@ -248,6 +250,8 @@ UnitExpression =
   optionalPer:(UnitPer _)?
   head:UnitMultiplier
   tail:(UnitMultiplicativeOperator UnitMultiplier)* {
+    const { offset, line } = location().start;
+
     var unitNode = head,
         op;
     for (var i=0; i<tail.length; i++) {
@@ -255,8 +259,9 @@ UnitExpression =
       unitNode = new ast.UnitMultOp(helper.infixAliases[op.opName] || op.opName, unitNode, tail[i][1]);
       helper.decorateNonTerminal(unitNode, op.offset, op.literal);
     }
-    
-    op = optionalPer[0];
+
+    op = optionalPer ? optionalPer[0] : optionalPer;
+
     if (op) {
       unitNode = new ast.UnitMultOp('/', null, unitNode);
       unitNode._offsetFirst = offset;
@@ -268,6 +273,7 @@ UnitExpression =
 UnitMultiplicativeOperator =
     _ op:UnitPer _ { return op; }
   / space:nbsp_1 { 
+      const { offset, line } = location().start;
       return {
         offset: offset,
         literal: space,
@@ -278,6 +284,8 @@ UnitMultiplicativeOperator =
 UnitPer "unitPer" 
   = literal:UnitPerLiteral 
   {
+    const { offset, line } = location().start;
+
     return {
       offset: offset,
       literal: literal,
@@ -301,6 +309,8 @@ UnitMultiplier
 RaiseToPowerOperator "unitPower"
   = literal:RaiseToPowerOperatorLiteral
   {
+    const { offset, line } = location().start;
+
     return {
       literal: literal,
       offset: offset,
@@ -313,6 +323,8 @@ RaiseToPowerOperatorLiteral
 
 UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.scope.findUnit(unitName); } {
   var node = new ast.UnitLiteralNode(parseContext.scope.findUnit(unitName), unitName);
+  const { offset, line } = location().start;
+
   return helper.decorateTerminal(node, offset, unitName);
  }
 
@@ -353,7 +365,7 @@ AssignmentLiteral "assignment" = ":"? "=" !"="
 
 ////////////////////////////////////////////////////////////////////////////////
 
-NumericalExpression = 
+NumericalExpression =
   lhs:NumbericalExpressionUnitConversion operation:(_ ComparatorLiteral _ NumbericalExpressionUnitConversion)?
   {
     if (operation) {
@@ -392,6 +404,8 @@ UnitConversion = _ op:UnitConversionNode _ unitNode:UnitExpression {
 UnitConversionNode "unitIn" = 
   "in"
   {
+    const { offset, line } = location().start;
+
     return {
       literal: 'in',
       offset: offset,
@@ -410,6 +424,8 @@ AdditiveExpression
 AdditiveOperator 
   = literal:AdditiveOperatorLiteral
   {
+    const { offset, line } = location().start;
+
     return {
       literal: literal,
       offset: offset
@@ -433,6 +449,8 @@ MultiplicativeExpression
 MultiplicativeOperator "multiplyDivide"
   = literal:MultiplicativeOperatorLiteral
   {
+    const { offset, line } = location().start;
+
     if (typeof literal !== 'string') {
       literal = literal[0];
     }
@@ -457,7 +475,7 @@ MultiplicativeOperatorLiteral
 
 ////////////////////////////////////////////////////////////////////////////////
 MultiplactionOperand
-  = node:MultiplactionOperandWithoutUnit  
+  = node:MultiplactionOperandWithoutUnit
     unitNode:UnitExpression?
     {
       if (unitNode) {
@@ -491,6 +509,8 @@ NamedBinaryOperation =
 NamedBinaryOperator "infixOp" =
   literal:NamedBinaryOperatorLiteral
   {
+    const { offset, line } = location().start;
+
     return {
       literal: literal,
       offset: offset,
@@ -524,6 +544,8 @@ NamedPrefixUnaryOperation =
 NamedPrefixOperator "prefixOp" = 
     literal:SymbolTablePrefixOperator 
     {
+      const { offset, line } = location().start;
+
       return {
         literal: literal,
         offset: offset
@@ -546,7 +568,7 @@ SymbolTablePrefixOperator
 ////////////////////////////////////////////////////////////////////////////////
 
 NamedPostfixUnaryOperation =
-     value: NamedPrefixUnaryOperation
+  value: NamedPrefixUnaryOperation
   postfixes: (_ NamedPostfixOperator)*
   {
     value = helper.unpackUnaryOperations(value, postfixes, false);
@@ -557,6 +579,8 @@ NamedPostfixUnaryOperation =
 NamedPostfixOperator "postfixOp" =
     literal:SymbolTablePostfixOperator
     {
+      const { offset, line } = location().start;
+
       return {
         literal: literal,
         offset: offset
@@ -580,10 +604,14 @@ SymbolTablePostfixOperator "postfixOp"
 ValueOrParens
   = t:Terminal
     {
+      const { offset, line } = location().start;
+
       return helper.decorateTerminal(t, offset, t.literal || t.name);
     }
   / po:ParensOpen _ expression:NumericalExpression _ pc:ParensClose
-    { 
+    {
+      const { offset, line } = location().start;
+
       var parens = new ast.ParensNode(expression);
       parens.inBrackets = true;
       expression._og_offsetFirst = expression.offsetFirst;
@@ -600,6 +628,8 @@ ParensOpen "parensOpen"
 ParensClose "parensClose"
   = ")" 
   {
+    const { offset, line } = location().start;
+
     return {offset: offset};
   }
 
@@ -649,22 +679,23 @@ NumberLiteralString = sign:AdditiveOperatorLiteral? valueNode:NumberLiteralFromP
   valueNode.exponent = exp;
   valueNode.number = valueNode.literal;
   valueNode.sign = sign;
-  
-  var literal = sign + valueNode.literal; 
+
+  var literal = sign ? sign : '' + valueNode.literal;
   if (exp) {
     literal += 'e' + exp;
   }
+
   valueNode.literal = literal;
   return valueNode;
 }
 
-NumberLiteralFromParts = 
+NumberLiteralFromParts =
   whole:NumberWholePart decimal:NumberDecimalPart?
     {
       return {
         mantissa: decimal,
         integerPart: whole,
-        literal: whole + decimal
+        literal: whole + (decimal ? decimal : '')
       }
     }
   / decimal:NumberDecimalPart
@@ -682,6 +713,8 @@ NumberWholePart = digits:Digits {
 
 Digits "digits" = digits:[0-9]+ {
   // this is helpful for knowing if we have EOF e.g. keyboard, autocomplete
+  const { offset, line } = location().start;
+
   self.lastDigitOffset = offset + digits.length;
   return digits.join("");
 }
@@ -701,8 +734,10 @@ ExponentSign "exponent" =
 
 ////////////////////////////////////////////////////////////////////////////////
 
-IntegerNode = number:IntegerString { 
+IntegerNode = number:IntegerString {
   var node = new ast.NumberNode(number);
+  const { offset, line } = location().start;
+
   return helper.decorateTerminal(node, offset, number);
 }
 
@@ -713,7 +748,7 @@ IntegerLiteral = string:IntegerString {
 }
 
 IntegerString = sign:AdditiveOperatorLiteral? digits:NumberWholePart {
-  return sign + digits;
+  return (sign ? sign : '') + digits;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

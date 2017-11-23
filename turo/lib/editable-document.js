@@ -109,7 +109,7 @@ extend(EditableDocument.prototype, {
     var firstParseNode = this.parser.parse(string + '\n', 'DocumentFirstParse');
 
     var context = {
-      string: string,
+      string,
       documentEvaluator: optionalDocumentEvaluator || statics.createEditableDocument,
       scope: this.scope,
       document: this,
@@ -126,7 +126,6 @@ extend(EditableDocument.prototype, {
       }.bind(this),
       context
     );
-
     return isReady;
   },
 

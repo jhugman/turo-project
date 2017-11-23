@@ -83,7 +83,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.turo'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.turo', '.pegjs'],
     alias: {
       'turo': path.join(__dirname, '../../turo'),
       'turo-model': path.join(__dirname, '../../turo-model'),
@@ -116,6 +116,7 @@ module.exports = {
         exclude: [
           /\.html$/,
           /\.(js|jsx)$/,
+          /\.pegjs$/,
           /\.css$/,
           /\.json$/,
           /\.bmp$/,
@@ -144,6 +145,20 @@ module.exports = {
           limit: 10000,
           name: 'static/media/[name].[hash:8].[ext]',
         },
+      },
+      {
+        test: /\.pegjs$/,
+        loader: require.resolve('pegjs-loader'),
+        options: {
+          allowedStartRules: [
+            'DocumentFirstParse',
+            'EditorText',
+            'Statement',
+            'NumberLiteral',
+            'PaddedStatement',
+            'EditorText'
+          ],
+        }
       },
       // Process JS with Babel.
       {

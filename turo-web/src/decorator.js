@@ -28,8 +28,9 @@ const createComp = ({ className }) => props => (<span className={className}>
 
 const createStrategy = ({ token }) => (contentBlock, callback) => {
   if (!docStore.turoDoc) return ;
-  const statement = docStore.turoDoc.evaluateStatement(contentBlock.key, contentBlock.getText())[0];
-  if (!statement || !statement.tokens) return ;
+  let statement = docStore.turoDoc.evaluateStatement(contentBlock.key, contentBlock.getText());
+  if (!statement || !statement[0].tokens) return ;
+  statement = statement[0];
   const textLength = contentBlock.getText().length;
   const tokens = statement.tokens.filter(tok => tok.displayType === token);
 

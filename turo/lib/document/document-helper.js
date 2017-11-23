@@ -56,7 +56,7 @@ _.extend(DocumentHelper.prototype, {
     }
 
     async.map(
-      toLoad, 
+      toLoad,
       function (documentId, cb) {
         storage.loadDocument(documentId, evaluator, cb);
       },

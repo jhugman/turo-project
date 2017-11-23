@@ -129,7 +129,6 @@ defineClone(ASTNode);
 
 
 function BinaryNode (left, right, literal) {
-  //extend(this, extension);
   this.left = left;
   this.right = right;
   this.literal = literal;

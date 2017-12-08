@@ -256,19 +256,23 @@ _.extend(ToSourceVisitor.prototype, {
   visitUnitDefinitionStatement: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     var unit = node.ast;
-    if (unit.definitionUnit) {
-      tokens.push(t('number', '' + unit.definitionMultiple.bottom, undefined, '1'));
-      tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
-      tokens.push(t('equal', '=', node._offsetLiteralFirst, '='));
-      tokens.push(t('number', '' + unit.definitionMultiple.top, undefined, '1'));
-      unit.definitionUnit.accept(this, tokens, context);
-    } else {
-      tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
-      tokens.push(t('keyword', 'as a unit of', node._offsetLiteralFirst, 'kwd'));
-      tokens.push(t('dimension', unit.getDimension().shortName, node._offsetLiteralFirst, 'm'));
+
+    if (unit) {
+      if (unit.definitionUnit) {
+        tokens.push(t('number', '' + unit.definitionMultiple.bottom, undefined, '1'));
+        tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
+        tokens.push(t('equal', '=', node._offsetLiteralFirst, '='));
+        tokens.push(t('number', '' + unit.definitionMultiple.top, undefined, '1'));
+        unit.definitionUnit.accept(this, tokens, context);
+      } else {
+        tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
+        tokens.push(t('keyword', 'as a unit of', node._offsetLiteralFirst, 'kwd'));
+        tokens.push(t('dimension', unit.getDimension().shortName, node._offsetLiteralFirst, 'm'));
+      }
+
+      this.errorEnd(node, tokens, context);
     }
-    
-    this.errorEnd(node, tokens, context);
+
     return tokens;
   },
 

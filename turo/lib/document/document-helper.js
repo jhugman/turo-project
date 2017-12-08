@@ -3,17 +3,9 @@ import async from 'async';
 
 //////////////////////////////////////////////////////////////////////////
 var visitor = {
-  visitImportStatement: function (node, context) {
+  visitImportStatement(node, context) {
     var documentId = node.ast;
     context.toImport[documentId] = true;
-  },
-
-  visitVariableDeclaration: function (node, context) {
-
-  },
-
-  visitUnitDefinition: function (node, context) {
-
   },
 };
 
@@ -24,7 +16,7 @@ function DocumentHelper (storage) {
 
 _.extend(DocumentHelper.prototype, {
 
-  evaluate: function (rootNode, callback, context) {
+  evaluate(rootNode, callback, context) {
     context.toImport = {};
     rootNode.accept(visitor, context);
 
@@ -35,17 +27,16 @@ _.extend(DocumentHelper.prototype, {
     return this._doLoading(toImport, doc, doc.scope, evaluator, callback);
   },
 
-  import: function (toImport, scope, evaluator, callback) {
+  import(toImport, scope, evaluator, callback) {
     return this._doLoading(toImport, scope, scope, evaluator, callback);
   },
 
-  _doLoading: function (toImport, doc, scope, evaluator, callback) {
+  _doLoading(toImport, doc, scope, evaluator, callback) {
     var storage = this._storage;
 
-    var toLoad = _.filter(toImport,
-      function (id) {
-        return !storage.hasDocument(id);
-      }
+    var toLoad = _.filter(
+      toImport,
+      (id) => !storage.hasDocument(id)
     );
 
     if (_.isEmpty(toLoad)) {
@@ -57,21 +48,19 @@ _.extend(DocumentHelper.prototype, {
 
     async.map(
       toLoad,
-      function (documentId, cb) {
-        storage.loadDocument(documentId, evaluator, cb);
-      },
-      function (err, results) {
+      (documentId, cb) => storage.loadDocument(documentId, evaluator, cb),
+      (err, results) => {
         this._finishLoading(toImport, scope);
         callback(null, doc);
-      }.bind(this)
+      }
     );
 
     return false;
   },
 
-  _finishLoading: function (toImport, currentScope) {
+  _finishLoading(toImport, currentScope) {
     var storage = this._storage;
-    _.each(toImport, function (id) {
+    toImport.forEach(id => {
       var doc = storage.getDocument(id);
       // Note: this is where the document is imported 
       // into the current scope. It is the only place 

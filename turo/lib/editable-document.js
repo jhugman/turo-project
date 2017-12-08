@@ -92,13 +92,13 @@ extend(EditableDocument.prototype, {
   evaluateDocument (string, callback, optionalDocumentEvaluator) {
     var scope = this._freshScope();
     this.scope = scope;
-    return this._firstParseEval(string, optionalDocumentEvaluator, function (err) {
+    return this._firstParseEval(string, optionalDocumentEvaluator, (err) => {
       if (err) {
         callback(err);
         return false;
       }
       return this._evalDocumentSync(string, callback);
-    }.bind(this));
+    });
   },
 
   reeevaluateDocument (callback) {
@@ -121,9 +121,9 @@ extend(EditableDocument.prototype, {
 
     this.documentHelper.evaluate(
       firstParseNode,
-      function (err, doc) {
+      (err, doc) => {
         isReady = syncEval(err, doc);
-      }.bind(this),
+      },
       context
     );
     return isReady;
@@ -139,7 +139,7 @@ extend(EditableDocument.prototype, {
     model.batchUpdate(nodes, scope);
 
     var statements = model.statementsInWrittenOrder;
-    _.each(statements, function (s) {
+    _.each(statements, s => {
       var node = s.node,
           first = node.statementOffsetFirst,
           last = node.statementOffsetLast;
@@ -159,13 +159,13 @@ extend(EditableDocument.prototype, {
     if (!callback) {
       callback = statics.noCallback;
     }
-    return this._firstParseEval(string, undefined, function (err) {
+    return this._firstParseEval(string, undefined, (err) => {
       if (err) {
         callback(err);
         return false;
       }
       return this._evalStatementSync(id, string, callback);
-    }.bind(this));
+    });
   },
 
   getStatement(id) {
@@ -304,7 +304,7 @@ Object.defineProperties(EditableDocument.prototype, {
         return text;
       }
 
-      text = _.map(this.model.statementsInWrittenOrder, function (s) {
+      text = _.map(this.model.statementsInWrittenOrder, (s) => {
         return s.info.text || '';
       }).join('\n');
 
@@ -343,7 +343,8 @@ statics = {
     // 1. Load the imports.
     // 2. Load the file we've been asked to get.
     // But: the file we're loading may be importing files that have been written 
-    // with the same implicit imports (i.e. user generated files), so they have to have the same imports.
+    // with the same implicit imports (i.e. user generated files),
+    // so they have to have the same imports.
     theDocument.import(
       imports, 
       function thenLoadAndEvaluateDocument () {

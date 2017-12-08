@@ -43,7 +43,7 @@ var newInstance, recycle;
 //////////////////////////////////////////////////////
 _.extend(TuroNumber.prototype, {
 
-  _init: function (number, unit, valueType, parent) {
+  _init (number, unit, valueType, parent) {
     this.number = number;
     this.valueType = valueType;
     this.unit = unit || noUnits;
@@ -54,17 +54,17 @@ _.extend(TuroNumber.prototype, {
     return this;
   },
 
-  prepareLiteral: function (prefs) {
+  prepareLiteral (prefs) {
     this.setPrecision(prefs.precisionDigits, prefs.precisionType);
   },
 
-  setPrecision: function (precisionDigits, precisionType) {
+  setPrecision (precisionDigits, precisionType) {
     if (_.isNumber(this.number)) {
       this.literal = createNumberLiteral(this.number, precisionDigits, precisionType);
     }
   },
 
-  convert: function (newUnit) {
+  convert (newUnit) {
     if (this._original) {
       // we use the original, to not lose 
       // accuracy.
@@ -78,7 +78,7 @@ _.extend(TuroNumber.prototype, {
     );
   },
 
-  toString: function (display, prefs) {
+  toString (display, prefs) {
     this.prepareLiteral(prefs);
     return output.toString(this, display, prefs);
   },
@@ -87,19 +87,19 @@ _.extend(TuroNumber.prototype, {
 
 Object.defineProperties(TuroNumber.prototype, {
   number: {
-    get: function () {
+    get () {
       return this._value;
     },
-    set: function (v) {
+    set (v) {
       this._value = v;
     },
   },
 
   value: {
-    get: function () {
+    get () {
       return this._value;
     },
-    set: function (v) {
+    set (v) {
       this._value = v;
     },
   },

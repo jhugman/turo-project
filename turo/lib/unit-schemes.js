@@ -9,7 +9,7 @@ function UnitSchemeHelper () {
 
 _.extend(UnitSchemeHelper.prototype, {
 
-  addUnit: function (unit, additionalSchemes) {
+  addUnit (unit, additionalSchemes) {
     var self = this,
         unitSchemes = additionalSchemes || unit.getUnitSchemes();
 
@@ -45,7 +45,7 @@ _.extend(UnitSchemeHelper.prototype, {
 
   },
 
-  _addUnitToScheme: function (table, unit) {
+  _addUnitToScheme (table, unit) {
     var dimension = unit.getDimension(),
         dimensionName = dimension.shortName,
         units;
@@ -61,7 +61,7 @@ _.extend(UnitSchemeHelper.prototype, {
     delete this._keyboardCache;
   },
 
-  getUnitSchemes: function () {
+  getUnitSchemes () {
 
     if (!this._keyboardCache) {
       this._keyboardCache = {};
@@ -72,7 +72,7 @@ _.extend(UnitSchemeHelper.prototype, {
     return this._keyboardCache.unitSchemes;
   },
 
-  getDimensions: function (unitScheme) {
+  getDimensions (unitScheme) {
     var self = this;
     if (!this._keyboardCache) {
       this._keyboardCache = {};
@@ -91,7 +91,7 @@ _.extend(UnitSchemeHelper.prototype, {
     return table[unitScheme];
   },
 
-  getUnitNames: function (unitScheme, dimension) {
+  getUnitNames (unitScheme, dimension) {
     if (!unitScheme) {
       return _.pluck(this._noScheme[dimension], "name");
     }
@@ -121,7 +121,7 @@ _.extend(UnitSchemeHelper.prototype, {
     return table[dimension];
   },
 
-  findClosestUnit: function (srcUnit, unitScheme, dimensionName) {
+  findClosestUnit (srcUnit, unitScheme, dimensionName) {
 
 
     var abs = function (n) {

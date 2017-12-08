@@ -19,6 +19,7 @@ export default {
       number, number, bool,
       makeMixin(
         function (l, r) {
+          console.log('bool', l, r);
           return l < r;
         },
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits

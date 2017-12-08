@@ -13,7 +13,7 @@ function acceptVisitor (node, visitor, method, args, fallbacks) {
   if (method) {
     args[0] = node;
     return method.apply(visitor, args);
-  } 
+  }
 
   if (visitor.visitNonMatchingChildren) {
     if (_.isArguments(args)) {
@@ -25,10 +25,10 @@ function acceptVisitor (node, visitor, method, args, fallbacks) {
     // visitNonMatchingChildren: function (parent, childNames, args...)
   }
 
-  if (fallbacks) {  
+  if (fallbacks) {
     fallbacks = _.toArray(arguments);
     fallbacks.splice(0, 4);
-    
+
     // otherwise, we have no idea what to do with the return values.
     _.each(fallbacks, function (child) {
       if (child.accept) {
@@ -36,7 +36,6 @@ function acceptVisitor (node, visitor, method, args, fallbacks) {
       }
     });
     // and we drop them on the floor.
-    
   }
 }
 

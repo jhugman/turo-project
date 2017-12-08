@@ -14,9 +14,12 @@ export default {
   registerOperators(ops) {
 
     ops.addPrefixOperator(
-      'sinh', number, number,
+      'sinh',
+      number, number,
       makeMixin(
         function (x) {
+          console.log('hello dude', x);
+
           if (Math.sinh) {
             return Math.sinh(x);
           } else {

@@ -1,4 +1,6 @@
-import _ from 'lodash';
+import toArray from 'lodash/toArray';
+import isFunction from 'lodash/isFunction';
+import chain from 'lodash/chain';
 import turoNumber from '../turo-number';
 
 const NO_UNITS = null;
@@ -12,8 +14,8 @@ function isDimensionless (operandValue) {
 }
 
 function makeMixin (simpleValueCalculator) {
-  var list = _.toArray(arguments);
-  if (_.isFunction(simpleValueCalculator)) {
+  var list = toArray(arguments);
+  if (isFunction(simpleValueCalculator)) {
     list.unshift();
     list.push({
       simpleValueCalculator: simpleValueCalculator
@@ -22,9 +24,7 @@ function makeMixin (simpleValueCalculator) {
   return list;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 function checkDivideByZero (leftNode, leftValue, rightNode, rightValue, ctx) {
   if (rightValue.number === 0) {
     ctx.reportError('DIVIDE_BY_ZERO', rightNode);
@@ -45,7 +45,7 @@ function checkPercentNoUnits (operandNode, operandValue, ctx) {
 
 var mixins = {
   binaryMatchingUnits: {
-    preflightCheck: function (leftNode, leftValue, rightNode, rightValue, ctx) {
+    preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {
       if (isDimensionless(leftValue)) {
           if (isDimensionless(rightValue)) {
               return true;
@@ -66,26 +66,26 @@ var mixins = {
       return true;
     },
 
-    prepareRight: function (leftValue, rightValue) {
+    prepareRight (leftValue, rightValue) {
       if (isDimensionless(leftValue)) {
         return rightValue;
       }
       return rightValue.convert(leftValue.unit);
     },
 
-    unitCalculator: function (leftValue, rightValue) {
+    unitCalculator (leftValue, rightValue) {
       return leftValue.unit || null;
     },
   },
 
   binaryReturnNoUnits: {
-    unitCalculator: function (leftValue, rightValue) {
+    unitCalculator (leftValue, rightValue) {
       return null;
     }
   },
 
   binaryAnyUnits: {
-    turoValueCalculator: function (leftValue, rightValue) {
+    turoValueCalculator (leftValue, rightValue) {
       var calculatedUnit = this.unitCalculator(leftValue, rightValue);
       var simpleValue = this.simpleValueCalculator(leftValue.value, rightValue.value);
       if (calculatedUnit) {
@@ -103,30 +103,30 @@ var mixins = {
             this.returnValueType
         );
     },
-    preflightCheck: function (leftNode, leftValue, rightNode, rightValue, ctx) {
+    preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {
       return true;
     },
   },
 
   unaryIdentity: {
-    preflightCheck: function (leftNode, leftValue, ctx) {
+    preflightCheck (leftNode, leftValue, ctx) {
       // check for units being incompatable.
       // report unit errors.
       return true;
     },
 
-    turoValueCalculator: function (operand) {
+    turoValueCalculator (operand) {
       var simpleValue = this.simpleValueCalculator(operand.value);
       return turoNumber.newInstance(simpleValue, operand.unit, this.returnValueType);
     },
 
-    simpleValueCalculator: function (x) {
+    simpleValueCalculator (x) {
       return x;
     }
   },
 
   binaryDivideUtils: {
-    nodeCalculator: function (leftNode, rightNode, ctx) {
+    nodeCalculator (leftNode, rightNode, ctx) {
         var leftValue = ctx.evaluate(leftNode, ctx),
             rightValue = ctx.evaluate(rightNode, ctx);
         if (!this.performPreflightCheck(leftNode, leftValue, rightNode, rightValue, ctx)) {
@@ -144,7 +144,7 @@ var mixins = {
         return this.turoValueCalculator(leftValue, rightValue, ctx);
     },
     preflightCheck: checkDivideByZero,
-    unitCalculator: function (leftValue, rightValue) {
+    unitCalculator (leftValue, rightValue) {
       if (isDimensionless(leftValue)) {
         return rightValue.unit;
       }
@@ -156,10 +156,10 @@ var mixins = {
   },
 
   unitsUtils: {
-    canDimensionsIntegerDivide: function (value, num) {
+    canDimensionsIntegerDivide (value, num) {
       var canDo = true;
       var dimensions = value.unit.getDimension().dimensions;
-      _.chain(dimensions).values().each(function (d) {
+      chain(dimensions).values().each(function (d) {
         canDo = canDo && ((d % num) === 0);
       });
       return canDo;
@@ -167,7 +167,7 @@ var mixins = {
   },
 
   unaryAngleToDimensionless: {
-    preflightCheck: function (operandNode, operandValue, ctx) {
+    preflightCheck (operandNode, operandValue, ctx) {
       // check for units being incompatable.
       // report unit errors.
       if (isDimensionless(operandValue) ||
@@ -178,33 +178,35 @@ var mixins = {
       return ctx.reportError('DIMENSION_MISMATCH', operandNode);
     },
 
-    turoValueCalculator: function (operandValue, ctx) {
+    turoValueCalculator (operandValue, ctx) {
+      console.trace('turoValueCalculator 2', ctx);
       var simpleValue = this.simpleValueCalculator(this.toRadians(operandValue, ctx).value);
       return turoNumber.newInstance(simpleValue, NO_UNITS, this.returnValueType);
     },
   },
 
   trigUtils: {
-    getDefaultAngleUnit: function (ctx) {
+    getDefaultAngleUnit (ctx) {
       var prefs = ctx.prefs,
           units = ctx.units,
           unit = units.unitSchemes.getUnitNames(prefs.unitScheme, 'Angle')[0];
+      console.log('get default angle unit', ctx);
       return units.getUnit(unit);
     },
 
-    isRadians: function (unit) {
+    isRadians (unit) {
       return unit.name === 'radians';
     },
 
-    fromRadians: function (operandValue, ctx) {
+    fromRadians (operandValue, ctx) {
       if (isDimensionless(operandValue)) {
         operandValue = turoNumber.newInstance(
-          operandValue.number, 
-          this.getRadians(ctx), 
+          operandValue.number,
+          this.getRadians(ctx),
           operandValue.valueType
         );
       }
-      
+
       var preferredUnit = this.getDefaultAngleUnit(ctx);
       if (!this.isRadians(preferredUnit)) {
         operandValue = operandValue.convert(preferredUnit);
@@ -213,14 +215,17 @@ var mixins = {
       return operandValue;
     },
 
-    toRadians: function (operandValue, ctx) {
+    toRadians (operandValue, ctx) {
       if (isDimensionless(operandValue)) {
+        console.log('dimension less?', ctx);
         operandValue = turoNumber.newInstance(
-          operandValue.number, 
-          this.getDefaultAngleUnit(ctx), 
+          operandValue.number,
+          this.getDefaultAngleUnit(ctx),
           operandValue.valueType
         );
       }
+
+      console.log('to radians', operandValue);
 
       if (!this.isRadians(operandValue.unit)) {
         operandValue = operandValue.convert(this.getRadians(ctx));
@@ -229,13 +234,13 @@ var mixins = {
       return operandValue;
     },
 
-    getRadians: function (ctx) {
+    getRadians (ctx) {
       return ctx.units.getUnit('radians');
     },
   },
 
   unaryDimensionlessToAngle: {
-    preflightCheck: function (operandNode, operandValue, ctx) {
+    preflightCheck (operandNode, operandValue, ctx) {
       // check for units being incompatable.
       // report unit errors.
       if (isDimensionless(operandValue)) {
@@ -245,7 +250,8 @@ var mixins = {
       return ctx.reportError('DIMENSION_MISMATCH', operandNode);
     },
 
-    turoValueCalculator: function (operandValue, ctx) {
+    turoValueCalculator (operandValue, ctx) {
+      console.log('turoValueCalculator');
       var calculatedUnit = this.unitCalculator(operandValue, ctx),
           simpleValue = this.simpleValueCalculator(this.toRadians(operandValue, ctx).value),
           resultValue = turoNumber.newInstance(simpleValue, this.getRadians(ctx), this.returnValueType);
@@ -253,7 +259,7 @@ var mixins = {
       return this.fromRadians(resultValue, ctx);
     },
 
-    unitCalculator: function (operandValue, ctx) {
+    unitCalculator (operandValue, ctx) {
       if (isDimensionless(operandValue)) {
         return this.getDefaultAngleUnit(ctx);
       }
@@ -262,12 +268,12 @@ var mixins = {
   },
 
   binaryNoUnits: {
-    turoValueCalculator: function (leftValue, rightValue) {
+    turoValueCalculator (leftValue, rightValue) {
       var simpleValue = this.simpleValueCalculator(leftValue.value, rightValue.value);
       return turoNumber.newInstance(simpleValue, NO_UNITS, this.returnValueType);
     },
 
-    preflightCheck: function (leftNode, leftValue, rightNode, rightValue, ctx) {
+    preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {
       var ok = true;
       if (!isDimensionless(leftValue)) {
         ok = false;
@@ -284,11 +290,11 @@ var mixins = {
   },
 
   binaryPercentNoUnits: {
-    preflightCheck: function (leftNode, leftValue, rightNode, rightValue, ctx) {
+    preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {
       return checkPercentNoUnits(leftNode, leftValue, ctx) && 
               checkPercentNoUnits(rightNode, rightValue, ctx);
     },
-    unitCalculator: function (leftValue, rightValue) {
+    unitCalculator (leftValue, rightValue) {
       if (leftValue.valueType !== 'percent') {
         return leftValue.unit;
       } else {
@@ -298,11 +304,11 @@ var mixins = {
   },
 
   binaryPercentDivide: {
-    preflightCheck: function () {
+    preflightCheck () {
       return mixins.binaryPercentNoUnits.preflightCheck.apply(null, arguments) ||
         checkDivideByZero.apply(null, arguments);
     },
-    unitCalculator: function (leftValue, rightValue) {
+    unitCalculator (leftValue, rightValue) {
       if (leftValue.valueType !== 'percent') {
         return leftValue.unit;
       }
@@ -313,12 +319,12 @@ var mixins = {
   },
 
   unaryNoUnits: {
-    turoValueCalculator: function (leftValue) {
+    turoValueCalculator (leftValue) {
       var simpleValue = this.simpleValueCalculator(leftValue.value);
       return turoNumber.newInstance(simpleValue, NO_UNITS, this.returnValueType);
     },
 
-    preflightCheck: function (leftNode, leftValue, ctx) {
+    preflightCheck (leftNode, leftValue, ctx) {
       var ok = true;
       if (!isDimensionless(leftValue)) {
         ok = false;

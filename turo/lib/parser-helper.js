@@ -37,6 +37,9 @@ function decorateNonTerminal(node, offset, string) {
 
 function decorateStatement (node, line, offset, lineEnd) {
   if (!node) {
+    if (lineEnd.text === 'undefined') {
+      console.log('boingboing', lineEnd.text, node, line, offset);
+    }
     node = new ast.UnparsedText(lineEnd.text, line, offset, lineEnd.lineLast);
   } else {
     node.textToEol = lineEnd.text;

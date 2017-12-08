@@ -18,7 +18,7 @@ function Dimension (initial) {
 }
 
 _.extend(Dimension.prototype, {
-  isEqual: function (that) {
+  isEqual (that) {
     if (!that.dimensions) {
       return;
     }
@@ -26,7 +26,7 @@ _.extend(Dimension.prototype, {
     return this._minimalContains(that) && that._minimalContains(this);
   },
 
-  _minimalContains: function (that) {
+  _minimalContains (that) {
     var i = 0,
         keys = _.keys(that.dimensions),
         max = keys.length,
@@ -48,12 +48,12 @@ _.extend(Dimension.prototype, {
     return true;
   },
 
-  isSimple: function () {
+  isSimple () {
     return this._isSimple;
     //return _.foldl(_.values(this.dimensions), function (l,r) { return l + r; }, 0) === 1;
   },
 
-  contains: function (that) {
+  contains (that) {
     var i = 0,
         keys = _.keys(that.dimensions),
         max = keys.length,
@@ -78,7 +78,7 @@ _.extend(Dimension.prototype, {
     return true;
   },
 
-  cardinality: function () {
+  cardinality () {
     return this.isSimple() ? 1 : _.chain(this.dimensions).values().reduce(function (p, q) {
       return p + (q > 0 ? q : -q);
     }, 0).value();
@@ -95,43 +95,43 @@ function Multiple (top, bottom) {
 }
 
 _.extend(Multiple.prototype, {
-  set: function (t, b) {
+  set (t, b) {
     this.top = t || 1;
     this.bottom = b || 1;
   },
 
-  times: function (that) {
+  times (that) {
     return new Multiple(this.top * that.top, this.bottom * that.bottom);
   },
 
-  _times: function (that) {
+  _times (that) {
     this.top *= that.top;
     this.bottom *= that.bottom;
     return this;
   },
 
-  divide: function (that) {
+  divide (that) {
     return new Multiple(this.top * that.bottom, this.bottom * that.top);
   },
 
-  _divide: function (that) {
+  _divide (that) {
     this.top *= that.bottom;
     this.bottom *= that.top;
     return this;
   },
 
-  value: function (x) {
+  value (x) {
     x = x || 1;
     return x * this.top / this.bottom;
   },
 
-  toString: function () {
+  toString () {
     return "[" + this.top + ", " + this.bottom + "]";
   }
 });
 
 _.extend(Multiple, {
-  container: function (name) {
+  container (name) {
     var container = {};
     if (_.isString(name)) {
       container[name] = new Multiple();
@@ -139,11 +139,11 @@ _.extend(Multiple, {
     return container;
   },
 
-  one: function () {
+  one () {
     return new Multiple(1, 1);
   },
 
-  quantity: function (value) {
+  quantity (value) {
     var one = new Multiple();
     one.top = value;
     return one;
@@ -206,7 +206,7 @@ function CompoundUnit (table, constituentUnits, dimension) {
 }
 
 _.extend(CompoundUnit.prototype, {
-  getDimension: function () {
+  getDimension () {
     if (this._dimension) {
       return this._dimension;
     }
@@ -233,7 +233,7 @@ _.extend(CompoundUnit.prototype, {
   // schemes should be mutable.
   // addUnitScheme("imperial")
   // if scheme is currently _mixed, then it should be replaced
-  getUnitSchemes: function () {
+  getUnitSchemes () {
 
     if (this._unitSchemes_user) {
       return this._unitSchemes_user;
@@ -294,7 +294,7 @@ _.extend(CompoundUnit.prototype, {
     return this._unitSchemes;
   },
 
-  addUnitScheme: function (label) {
+  addUnitScheme (label) {
     var userSchemes = this._unitSchemes_user;
     if (!userSchemes) {
       userSchemes = this._unitSchemes_user = [ label ];
@@ -306,14 +306,14 @@ _.extend(CompoundUnit.prototype, {
     // because we don't know what else is going to happen.
   },
 
-  isDimensionless: function () {
+  isDimensionless () {
     if (typeof this._isDimensionless === 'undefined') {
       this.getDimension();
     }
     return this._isDimensionless;
   },
 
-  getSimpleUnits: function () {
+  getSimpleUnits () {
     if (this.simpleUnits) {
       return this.simpleUnits;
     } else if (this.name) {
@@ -327,11 +327,11 @@ _.extend(CompoundUnit.prototype, {
     }
   },
 
-  matchesDimensions: function (destinationUnit) {
+  matchesDimensions (destinationUnit) {
     return this.getDimension().isEqual(destinationUnit.getDimension());
   },
 
-  cardinality: function () {
+  cardinality () {
     if (this._cardinality) {
       return this._cardinality;
     }
@@ -348,7 +348,7 @@ _.extend(CompoundUnit.prototype, {
     return this._cardinality;
   },
 
-  refactoredNode: function (quantity, unitScheme, useSimpleUnitsOnly) {
+  refactoredNode (quantity, unitScheme, useSimpleUnitsOnly) {
     var candidates = this._reductions(unitScheme, useSimpleUnitsOnly),
         // this is a rubbish algorithhm for choosing which candidate to move to.
         newUnit = candidates[0];
@@ -565,7 +565,7 @@ _.extend(CompoundUnit.prototype, {
     };
   })(),
 
-  _convertSimpleUnit: function (quantity, destinationUnit) {
+  _convertSimpleUnit (quantity, destinationUnit) {
     if (this.multiples && destinationUnit.name) {
       var mult = this._simpleUnitConverter(destinationUnit.name);
       return quantity._times(mult);
@@ -574,15 +574,15 @@ _.extend(CompoundUnit.prototype, {
     }
   },
 
-  _simpleUnitConverter: function (destinationUnitName) {
+  _simpleUnitConverter (destinationUnitName) {
     return this.multiples[destinationUnitName];
   },
 
-  convert: function (quantity, destinationUnit) {
+  convert (quantity, destinationUnit) {
     return this._convert(Multiple.quantity(quantity), destinationUnit).value();
   },
 
-  _convert: function (quantity, destinationUnit) {
+  _convert (quantity, destinationUnit) {
     var self = this,
         mult;
     if (_.isString(destinationUnit)) {
@@ -722,7 +722,7 @@ _.extend(CompoundUnit.prototype, {
    *
    *    mph/s => { mi: 1, h: -1, h: -1 }
    */
-  _convertToDimensionDimensionalityMap: function (node, dimensionMultiplier) {
+  _convertToDimensionDimensionalityMap (node, dimensionMultiplier) {
     var currentMap, multiplier;
 
     node = node || {
@@ -776,7 +776,7 @@ _.extend(CompoundUnit.prototype, {
     return node;
   },
 
-  isEqual: function (other) {
+  isEqual (other) {
     return _.isEqual(this.getSimpleUnits(), other.getSimpleUnits());
   },
 
@@ -792,7 +792,7 @@ _.extend(CompoundUnit.prototype, {
   // kph / s => km/h s => km/s^2
   // N h / cm^2 => kg m/s^2 * h / cm^2 => kg / s cm^2
   // A multiple is also provided to translate the old unit into the new unit.
-  simplify: function () {
+  simplify () {
 
     // TODO guard that this is not a simple unit.
     var node = this._simplifiedNode();
@@ -800,7 +800,7 @@ _.extend(CompoundUnit.prototype, {
     return node;
   },
 
-  _simplifiedNode: function () {
+  _simplifiedNode () {
     var self = this,
         multiplier = Multiple.one(),
         unit,
@@ -979,7 +979,7 @@ _.extend(CompoundUnit.prototype, {
     };
   },
 
-  _removeZeroDimensions: function (object) {
+  _removeZeroDimensions (object) {
     _.each(object, function (i, key) {
       if (!object[key]) {
         delete object[key];
@@ -987,7 +987,7 @@ _.extend(CompoundUnit.prototype, {
     });
   },
 
-  by: function (other) {
+  by (other) {
     // other is a compound unit
     var newCompound = _.clone(other.getSimpleUnits());
     var mySimpleUnits = this.getSimpleUnits();
@@ -998,7 +998,7 @@ _.extend(CompoundUnit.prototype, {
     return new CompoundUnit(this.unitsTable, newCompound);
   },
 
-  per: function (other) {
+  per (other) {
     var newCompound = _.clone(other.getSimpleUnits());
     _.each(newCompound, function (i, unitName) {
       newCompound[unitName] = -newCompound[unitName];
@@ -1011,7 +1011,7 @@ _.extend(CompoundUnit.prototype, {
     return new CompoundUnit(this.unitsTable, newCompound);
   },
 
-  pow: function (power) {
+  pow (power) {
     if (typeof power !== 'number') {
       throw new Error("UNIT_WITH_NON_NUMERICAL_POWER");
     }
@@ -1022,7 +1022,7 @@ _.extend(CompoundUnit.prototype, {
     return new CompoundUnit(this.unitsTable, newCompound);
   },
 
-  accept: function (visitor) {
+  accept (visitor) {
     ast.acceptVisitor(this, visitor, visitor.visitUnit, arguments);
   }
 
@@ -1047,7 +1047,7 @@ function UnitsTable (initial) {
 }
 _.extend(UnitsTable.prototype, {
 
-  addUnit: function (name, relativeTo_x, relativeTo_units, unitSchemes, dimensionName, alternatives) {
+  addUnit (name, relativeTo_x, relativeTo_units, unitSchemes, dimensionName, alternatives) {
     var unit;
     if (_.isString(relativeTo_x) && typeof relativeTo_units === 'undefined') {
       unit = this._addUnitWithDimension(name, relativeTo_x);
@@ -1080,7 +1080,7 @@ _.extend(UnitsTable.prototype, {
     return unit;
   },
 
-  addUnitAliases: function (unit, aliases) {
+  addUnitAliases (unit, aliases) {
 
     if (aliases.length === 0) {
       return;
@@ -1100,7 +1100,7 @@ _.extend(UnitsTable.prototype, {
     unit.alternatives = aliases;
   },
 
-  addUnitSchemes: function (unit, schemes) {
+  addUnitSchemes (unit, schemes) {
     _.each(schemes, function (scheme) {
       unit.addUnitScheme(scheme);
     });
@@ -1108,12 +1108,12 @@ _.extend(UnitsTable.prototype, {
 
   },
 
-  _addUnitWithDimension: function (name, dimension) {
+  _addUnitWithDimension (name, dimension) {
     this.units[name] = new CompoundUnit(this, name, new Dimension(dimension));
     return this.units[name];
   },
 
-  _addUnitRelativeToAnotherUnit: function (name, t, b, other) {
+  _addUnitRelativeToAnotherUnit (name, t, b, other) {
     var self = this;
     if (typeof other === 'string') {
       other = this.getUnit(other);
@@ -1157,13 +1157,13 @@ _.extend(UnitsTable.prototype, {
     return unit;
   },
 
-  _addUnitFromExistingUnit: function (name, unit) {
+  _addUnitFromExistingUnit (name, unit) {
     unit.name = name;
     this.units[name] = unit;
     return unit;
   },
 
-  createUnitScheme: function (unitSchemeName, units) {
+  createUnitScheme (unitSchemeName, units) {
     var self = this;
     _.each(units, function (unit) {
       if (typeof unit === "string") {
@@ -1182,20 +1182,20 @@ _.extend(UnitsTable.prototype, {
     // but destroy the cache if we change anything.
   },
 
-  getUnit: function (name) {
+  getUnit (name) {
     return this._bigTable[name];
   },
 
-  getUnitNames: function () {
+  getUnitNames () {
     return _.keys(this.units);
   },
 
-  getDimension: function (name) {
+  getDimension (name) {
     // TODO this should return the Dimension object.
     return this.getUnit(name).getDimension();
   },
 
-  convert: function (num, src, dest) {
+  convert (num, src, dest) {
     // TODO this should check for getUnit being falsey.
     var srcUnit = _.isString(src) ? this.getUnit(src) : src,
         dstUnit = _.isString(dest) ? this.getUnit(dest) : dest;

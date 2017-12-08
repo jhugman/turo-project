@@ -36,35 +36,31 @@ var nextId = (function () {
 
 
 function Scope (parent, id, unitsTable) {
-  
   this.parent = parent;
   this._unitsTable = unitsTable;
-
   this.id = id || nextId();
-  
   this._init();
-
   this._nextChildId = 0;
 }
 
 _.extend(Scope.prototype, {
   
-  _init: function () {
+  _init() {
     this._variables = {};
     this._units = {};
     this._includes = {};
   },
 
-  getInclude: function (name) {
+  getInclude(name) {
     return this._includes[name];
   },
 
-  addInclude: function (name, scope) {
+  addInclude(name, scope) {
     this._includes[name] = scope;
     return scope;
   },
 
-  findInclude: function (name) {
+  findInclude(name) {
     return this._findFirst(this.getInclude, arguments);
   },
 
@@ -75,32 +71,28 @@ _.extend(Scope.prototype, {
 _.extend(Scope.prototype, {
   // Units
   ////////
-  getUnit: function (name) {
+  getUnit(name) {
     return this._units[name];
   },
 
-  findUnit: function (name) {
+  findUnit(name) {
     var unit = this._findFirst(this.getUnit, arguments);
     return unit;
   },
 
-  _addUnit: function (name, value) {
-    if (name) {
-      this._units[name] = value;
-    }
+  _addUnit(name, value) {
+    if (name) this._units[name] = value;
   },
 
-  addUnit: function (unit, name, alternatives) {
-    if (name) {
-      this._addUnit(name, unit);
-    }
-    _.each(alternatives, function (n) {
-      this._addUnit(n, unit);
-    }.bind(this));
+  addUnit(unit, name, alternatives) {
+    if (name) this._addUnit(name, unit);
+
+    (alternatives || []).forEach((n) => this._addUnit(n, unit));
+
     return unit;
   },
 
-  getAvailableUnits: function () {
+  getAvailableUnits() {
     return this._getMineAndAncestors(
       function () {
         return _.keys(this._units);
@@ -112,7 +104,7 @@ _.extend(Scope.prototype, {
 
 Object.defineProperties(Scope.prototype, {
   units: {
-    get: function () {
+    get() {
       if (this._unitsTable) {
         return this._unitsTable;
       }
@@ -130,19 +122,19 @@ Object.defineProperties(Scope.prototype, {
 _.extend(Scope.prototype, {
   
 
-  getVariableDefinition: function (name) {
+  getVariableDefinition(name) {
     return this._variables[name];
   },
 
-  findVariable: function (name) {
+  findVariable(name) {
     return this._findFirst(this.getVariableDefinition, arguments);
   },
 
-  findScopeWithVariable: function (name) {
+  findScopeWithVariable(name) {
     return this._findScopeWith(this.getVariableDefinition, arguments);
   },
 
-  addVariable: function (name, value) {
+  addVariable(name, value) {
     this._variables[name] = value;
     if (value) {
       value.definingScope = this;
@@ -150,11 +142,11 @@ _.extend(Scope.prototype, {
     return value;
   },
 
-  deleteVariable: function (name) {
+  deleteVariable(name) {
     delete this._variables[name];
   },
 
-  getAvailableVariables: function () {
+  getAvailableVariables() {
     return this._getMineAndAncestors(
       function () {
         return _.keys(this._variables);
@@ -168,14 +160,14 @@ _.extend(Scope.prototype, {
 
 _.extend(Scope.prototype, {
 
-  _findFirst: function (thisArrayFunction, args) {
+  _findFirst(thisArrayFunction, args) {
     var scope = this._findScopeWith(thisArrayFunction, args, {});
     if (scope) {
       return thisArrayFunction.apply(scope, args);
     }
   },
 
-  _findScopeWith: function (thisAccessFunction, args, seen) {
+  _findScopeWith(thisAccessFunction, args, seen) {
     var scope,
         value; 
 
@@ -192,7 +184,7 @@ _.extend(Scope.prototype, {
     return this._findShadowedScopeWith(thisAccessFunction, args, seen);
   },
 
-  _findShadowedScopeWith: function (thisArrayFunction, args, seen) {
+  _findShadowedScopeWith(thisArrayFunction, args, seen) {
     var found;
     var includedScopes = _.values(this._includes);
     _.find(includedScopes, function (scope) {
@@ -206,7 +198,7 @@ _.extend(Scope.prototype, {
     return found;
   },
 
-  _getMineAndAncestors: function (thisMethod, args, seen) {
+  _getMineAndAncestors(thisMethod, args, seen) {
     seen = seen || {};
     if (seen[this.id]) {
       return [];
@@ -232,7 +224,7 @@ _.extend(Scope.prototype, {
 
 _.extend(Scope.prototype, {
 
-  invalidateParentLookups: function () {
+  invalidateParentLookups() {
     // TODO, when caching becomes necessary.
     return this;
   },
@@ -242,7 +234,7 @@ _.extend(Scope.prototype, {
 ////////////////////////////////////////////////////////////////////
 
 _.extend(Scope.prototype, {
-  newScope: function (id) {
+  newScope(id) {
     if (!id) {
       id = this.id + '/' + this._nextChildId;
       this._nextChildId ++;
@@ -250,11 +242,11 @@ _.extend(Scope.prototype, {
     return new Scope(this, id);
   },
 
-  fresh: function () {
+  fresh() {
     return new Scope(this.parent, this.id);
   },
 
-  popScope: function () {
+  popScope() {
     return this.parent;
   },
 });
@@ -263,7 +255,7 @@ _.extend(Scope.prototype, {
 export default {
   Scope: Scope,
 
-  newScope: function (id, unitsTable) {
+  newScope(id, unitsTable) {
     return new Scope(undefined, id, unitsTable);
   },
 };

@@ -20,7 +20,10 @@ api.post('/', (req, res) => {
 api.get('/:id', (req, res) => {
   db.fetchDocument(req.params.id)
   .then(doc => res.json(doc[0]))
-  .catch(err => res.status(500).json({ err }));
+  .catch(err => {
+    console.log('yo', err);
+    res.status(500).json({ err })
+  });
 });
 
 api.put('/:id', (req, res) => {

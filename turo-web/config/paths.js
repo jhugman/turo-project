@@ -48,7 +48,6 @@ module.exports = {
   appPackageJson: resolveApp('package.json'),
   appSrc: [
     resolveApp('src'),
-    resolveApp('../turo-model/lib'),
     resolveApp('../turo/lib'),
     resolveApp('../turo-documents/lib')
   ],

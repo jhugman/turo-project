@@ -12,7 +12,6 @@ function equal(t, a, b) {
 }
 
 test("conversion from units", function (t) {
-
   var units = new Units();
 
   var milliseconds = units.addUnit("milliseconds", "time"),

@@ -23,6 +23,7 @@ const createTuroDoc = editorState => {
   turoDoc.import('app');
   content.getBlockMap().forEach(block => turoDoc.evaluateStatement(block.key, block.text));
   docStore.turoDoc = turoDoc;
+  window.doc = turoDoc;
   return turoDoc;
 }
 

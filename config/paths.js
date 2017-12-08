@@ -45,11 +45,9 @@ module.exports = {
   appIndexJs: resolveApp('src/index.js'),
   appPackageJson: resolveApp('package.json'),
   appSrc: [
-    resolveApp('src'),
-    resolveApp('../turo-model/lib'),
-    resolveApp('../turo/lib'),
-    resolveApp('../turo/test'),
-    resolveApp('../turo-documents/lib')
+    resolveApp('turo/lib'),
+    resolveApp('turo/test'),
+    resolveApp('turo-documents/lib')
   ],
   yarnLockFile: resolveApp('yarn.lock'),
   testsSetup: resolveApp('src/setupTests.js'),

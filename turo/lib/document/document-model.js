@@ -88,7 +88,6 @@ _.extend(DocumentModel.prototype, {
       offsetFirst: node.statementOffsetFirst,
       offsetLast: node.statementOffsetLast,
     };
-    // console.log('insert node', id, node, info);
     var s = new TuroStatement(id, node, info);
     statementMap[id] = s;
 

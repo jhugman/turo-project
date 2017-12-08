@@ -9,7 +9,7 @@ module.exports = {
   target: 'node',
 
   resolve: {
-    extensions: ['.js', '.json', '.jsx', '.turo'],
+    extensions: ['.js', '.json', '.jsx', '.turo', '.pegjs'],
     alias: {
       'turo': path.join(__dirname, '../turo'),
       'turo-model': path.join(__dirname, '../turo-model'),
@@ -47,6 +47,21 @@ module.exports = {
           // cacheDirectory: true,
         },
       },
+      {
+        test: /\.pegjs$/,
+        loader: require.resolve('pegjs-loader'),
+        options: {
+          allowedStartRules: [
+            'DocumentFirstParse',
+            'EditorText',
+            'Statement',
+            'NumberLiteral',
+            'PaddedStatement',
+            'EditorText'
+          ],
+        }
+      },
+
     ]
   },
  

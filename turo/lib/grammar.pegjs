@@ -8,7 +8,7 @@
 
   const self = this;
   const units = turo.units;
-  const operators = turo.operators || this.operators;
+  const operators = turo.operators;
   const testWriter = turo.writer;
   const inputLength = this.inputLength || input.length;
   const parseContext = this.parseContext;
@@ -47,6 +47,7 @@ EditorTextLine
     {
       const { offset, line } = location().start;
 
+
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
@@ -67,6 +68,7 @@ DocumentLineFirstParse
   = nbsp node:FirstParseStatement lineEnd:RestOfLine
     {
       const { offset, line }  = location().start;
+
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
@@ -111,7 +113,7 @@ RestOfLine
   = text:[^\r\n]* eol:CR
     {
       return {
-        text: text.join(''),
+        text: (text || []).join(''),
         offsetLast: eol[0],
         lineLast: eol[1],
       };
@@ -344,7 +346,7 @@ ImportStatement = "import" __ filename:StringLiteral {
 ////////////////////////////////////////////////////////////////////////////////
 
 StringLiteral = "\"" string:[^"]* "\"" {
-  return string.join("");
+  return (string || []).join("");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -657,7 +659,7 @@ SpecialUnitLiteral =
 ////////////////////////////////////////////////////////////////////////////////
 
 IdentifierLiteral "identifier"
-  = !(KeywordLiteral __) head:IdentifierStart tail:IdentifierPart* { return head + tail.join(""); }
+  = !(KeywordLiteral __) head:IdentifierStart tail:IdentifierPart* { return head + (tail || []).join(""); }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -716,7 +718,7 @@ Digits "digits" = digits:[0-9]+ {
   const { offset, line } = location().start;
 
   self.lastDigitOffset = offset + digits.length;
-  return digits.join("");
+  return (digits || []).join("");
 }
 
 NumberDecimalPart = DecimalPoint digits:Digits {
@@ -810,7 +812,7 @@ UnicodeConnectorPunctuation
 
 UnicodeEscapeSequence
   = "u" digits:(HexDigit HexDigit HexDigit HexDigit) {
-      digits = digits.join('');
+      digits = (digits || []).join('');
       return String.fromCharCode(parseInt(digits, 16));
     }
 

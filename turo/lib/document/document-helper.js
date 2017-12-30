@@ -50,6 +50,9 @@ _.extend(DocumentHelper.prototype, {
       toLoad,
       (documentId, cb) => storage.loadDocument(documentId, evaluator, cb),
       (err, results) => {
+        if (err) {
+          callback(err, doc);
+        }
         this._finishLoading(toImport, scope);
         callback(null, doc);
       }

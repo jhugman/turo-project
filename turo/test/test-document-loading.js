@@ -16,7 +16,7 @@ function file (relative) {
 
 test('simple load', function (t) {
   EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
-  EditableDocument.load('./loaded-from-disk', 'app', function (err, doc) {
+  EditableDocument.load('./loaded-from-disk', [], function (err, doc) {
     t.ok(doc, 'document exists');
     t.equal(path.basename(doc.id), 'loaded-from-disk', 'filename correct');
     t.equal(doc.statements[1].valueToString(undefined, prefs), '4.2 m', 'evaluating properly');
@@ -26,7 +26,7 @@ test('simple load', function (t) {
 
 test('importing load', function (t) {
   EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
-  EditableDocument.load('./importing', 'app', function (err, doc) {
+  EditableDocument.load('./importing', [], function (err, doc) {
     t.ok(doc, 'document exists');
     t.equal(path.basename(doc.id), 'importing', 'filename correct');
     t.equal(doc.statements[2].valueToString(undefined, prefs), '2.1 m', 'evaluating properly');
@@ -34,3 +34,12 @@ test('importing load', function (t) {
   });
 });
 
+test('simple load with implicit imports of all units', function (t) {
+  EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
+  EditableDocument.load('./loaded-from-disk', 'app', function (err, doc) {
+    t.ok(doc, 'document exists');
+    t.equal(path.basename(doc.id), 'loaded-from-disk', 'filename correct');
+    t.equal(doc.statements[1].valueToString(undefined, prefs), '4.2 m', 'evaluating properly');
+    t.end();
+  });
+});

@@ -36,6 +36,10 @@ _.extend(AbstractStorage.prototype, {
     this.resolveLocation(id, undefined, function (location, layer) {
       // loads doc
       layer.loadString(location, function (err, string) {
+        if (err) {
+          callback(err, null)
+          return
+        }
         // evaluates doc
         evaluator(
           id,

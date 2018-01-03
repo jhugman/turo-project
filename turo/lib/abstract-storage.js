@@ -45,6 +45,12 @@ _.extend(AbstractStorage.prototype, {
           id,
           string,
           function (err, doc) {
+            if (err) {
+              delete self._state.isLoading[id];
+              console.error(`Error loading ${id}: ${err}`)
+              callback(err);
+              return;
+            }
             doc.location = location;
             self._state.documents[id] = doc;
             _.each(listeners, function (cb) {

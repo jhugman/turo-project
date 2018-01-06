@@ -51,6 +51,11 @@ _.extend(Scope.prototype, {
     this._includes = {};
   },
 
+  clone() {
+    let clone = new Scope(this.parent, this.id, this._unitsTable);
+    return Object.assign(clone, this);
+  },
+
   getInclude(name) {
     return this._includes[name];
   },

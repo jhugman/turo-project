@@ -334,7 +334,7 @@ statics = {
         doc = theDocument;
       } else {
         doc = new EditableDocument(id);
-        doc.importScope = _.clone(theDocument.importScope);
+        doc.importScope = theDocument.importScope.clone();
       }
       doc.evaluateDocument(string, cb, evaluator);
     }

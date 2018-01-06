@@ -52,6 +52,7 @@ _.extend(DocumentHelper.prototype, {
       (err, results) => {
         if (err) {
           callback(err, doc);
+          return;
         }
         this._finishLoading(toImport, scope);
         callback(null, doc);

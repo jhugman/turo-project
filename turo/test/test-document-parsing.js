@@ -45,7 +45,7 @@ function parse (lines) {
 function numValidStatements (doc) {
   var count = 0;
   _.each(doc.lines, function (line) {
-    if (line.accept) {
+    if (!line.isUnparsed) {
       count ++;
     }
   });

@@ -15,14 +15,14 @@ import './test-unit-conversion-command';
 import './test-unit-evaluator';
 import './xtest-cycles';
 import './test-document-loading';
-import './test-async-evaluator';
 import './test-editable-document';
 import './test-editor-actions-basic';
+import './test-autocomplete';
+import './test-comparisons';
+import './test-document-parsing';
+import './test-async-evaluator';
 
 // Failing
-// import './test-autocomplete';
-// import './test-comparisons';
-// import './test-document-parsing';
 // import './test-grammar';
 // import './test-integration-complex-unit-conversion';
 // import './test-integration-grammar';

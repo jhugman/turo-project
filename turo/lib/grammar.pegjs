@@ -682,7 +682,7 @@ NumberLiteralString = sign:AdditiveOperatorLiteral? valueNode:NumberLiteralFromP
   valueNode.number = valueNode.literal;
   valueNode.sign = sign;
 
-  var literal = sign ? sign : '' + valueNode.literal;
+  var literal = (sign ? sign : '') + valueNode.literal;
   if (exp) {
     literal += 'e' + exp;
   }

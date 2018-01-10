@@ -12,7 +12,7 @@ theParser._parse = theParser.parse;
 TuroParser.prototype = theParser;
 
 _.extend(TuroParser.prototype, {
-  parse: function (node, startRule) {
+  parse: function (node, startRule = "PaddedStatement") {
     const options = startRule ? { startRule } : {};
     return this._parse(node, options);
   },

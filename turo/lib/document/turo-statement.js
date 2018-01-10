@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import output from '../to-source';
 import { toTokenArray } from '../to-tokens';
 import evaluator from '../evaluator';

@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import ast from "../lib/ast";
 import evaluator from "../lib/evaluator";
 

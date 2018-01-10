@@ -1,9 +1,8 @@
-import extend from 'lodash/extend';
-import each from 'lodash/each';
 import operatorSymbolTable from './operators-symbol-table';
 import operatorLabeller from './operation-labeller';
 import ast from './ast';
 import turoNumber from './turo-number';
+import {extend} from 'underscore';
 
 const { defaultOperators: operators } = operatorSymbolTable;
 
@@ -45,7 +44,7 @@ extend(EvaluatorVisitor.prototype, {
       throw "No turo object";
     }
 
-    each(node.ast, function(st) {
+    node.ast.forEach(function(st) {
       node.accept(this, context, turo);
     });
   },

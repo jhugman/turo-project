@@ -1,8 +1,3 @@
-import map from 'lodash/map';
-import extend from 'lodash/extend';
-import isArray from 'lodash/isArray';
-import each from 'lodash/each';
-import clone from 'lodash/clone';
 import DocumentModel from './document/document-model';
 import unitsTable from './units-table';
 import parser from './parser';
@@ -10,6 +5,7 @@ import DocumentHelper from './document/document-helper';
 import operatorsSymbolTable from './operators-symbol-table';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
+import { each, extend, isArray } from 'underscore';
 
 const { Parser } = parser;
 const { UnitsTable: Units } = unitsTable;
@@ -58,7 +54,7 @@ extend(EditableDocument.prototype, {
    */
   import (id, callback) {
     var toImport = id;
-    if (!_.isArray(id)) {
+    if (!isArray(id)) {
       toImport = [id];
     }
 
@@ -139,7 +135,7 @@ extend(EditableDocument.prototype, {
     model.batchUpdate(nodes, scope);
 
     var statements = model.statementsInWrittenOrder;
-    _.each(statements, s => {
+    each(statements, s => {
       var node = s.node,
           first = node.statementOffsetFirst,
           last = node.statementOffsetLast;

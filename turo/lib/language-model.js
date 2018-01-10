@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 
 /**
  * The scope is a super set of files and function and block scopes.

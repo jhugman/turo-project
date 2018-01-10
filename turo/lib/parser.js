@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import theParser from './grammar';
 import lang from './language-model';
 

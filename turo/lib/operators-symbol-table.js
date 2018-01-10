@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import extend from 'lodash/extend';
-import keys from 'lodash/keys';
-import isFunction from 'lodash/isFunction';
-import isArray from 'lodash/isArray';
+import _ from 'underscore';
+import { extend, 
+          keys,
+          isFunction,
+          isArray } from 'underscore';
 import ast from './ast';
 import turoNumber from './turo-number';
 import init from './operators/all';

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 
 function t(displayType, literal, offset, shortType, shortTypeAlpha) {
   if (shortTypeAlpha && literal.match(/^\w+$/)) {

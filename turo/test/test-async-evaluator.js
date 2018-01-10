@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import { test, plan } from 'tap';
 
 import DocumentHelper from '../lib/document/document-helper';

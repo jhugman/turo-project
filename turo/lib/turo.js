@@ -1,5 +1,5 @@
-import defaults from 'lodash/defaults';
-import extend from 'lodash/extend';
+
+import { extend, defaults } from 'underscore';
 import parser from './parser';
 import evaluator from './evaluator';
 import unitsTable from './units-table';

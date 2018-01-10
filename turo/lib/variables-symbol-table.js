@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import ast from './ast';
 import _parser from './parser';
 

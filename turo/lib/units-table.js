@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import out from './to-source'
 import ast from './ast';
 import unitSchemes from './unit-schemes';

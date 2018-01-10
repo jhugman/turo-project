@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import turo from '../lib/turo';
 import parser from '../lib/parser';
 import ast from '../lib/ast';

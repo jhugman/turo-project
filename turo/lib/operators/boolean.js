@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import turoNumber from '../turo-number';
 import mixins from './mixins';
 

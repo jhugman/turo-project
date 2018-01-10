@@ -7,7 +7,7 @@
   const turo = require('./turo').default;
 
   const self = this;
-  const units = turo.units;
+  const units = this.scope._unitsTable || turo.units;
   const operators = turo.operators;
   const testWriter = turo.writer;
   const inputLength = this.inputLength || input.length;

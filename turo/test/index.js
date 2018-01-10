@@ -21,9 +21,9 @@ import './test-autocomplete';
 import './test-comparisons';
 import './test-document-parsing';
 import './test-async-evaluator';
+import './test-grammar';
 
 // Failing
-// import './test-grammar';
 // import './test-integration-complex-unit-conversion';
 // import './test-integration-grammar';
 // import './test-integration-operation-labeller';

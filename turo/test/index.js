@@ -24,6 +24,7 @@ import './test-async-evaluator';
 import './test-grammar';
 import './test-visitors';
 import './test-units-table';
+import './test-operator-table';
 
 // Failing
 // import './test-integration-complex-unit-conversion';
@@ -32,7 +33,6 @@ import './test-units-table';
 // import './test-integration-revaluation-with-different-units';
 // import './test-integration-variable-units';
 // import './test-lenient-parsing';
-// import './test-operator-table';
 // import './test-percent-arithmetic';
 // import './test-testfile-writer';
 // import './test-trig-functions';

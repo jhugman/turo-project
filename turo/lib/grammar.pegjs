@@ -333,7 +333,6 @@ UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.
 ////////////////////////////////////////////////////////////////////////////////
 
 IncludeStatement = "include" _ filename:StringLiteral {
-  turo.include(filename);
   return new ast.StatementNode("Include", filename);
 }
 

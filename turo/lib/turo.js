@@ -264,7 +264,7 @@ extend(Turo.prototype, {
     doc.import(turoFilename);
 
     this.scope = doc.scope;
-    this.units = doc.units;
+    this.scope._unitsTable = this.units;
   },
 
   _cleanWords(string) {

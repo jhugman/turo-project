@@ -22,6 +22,8 @@ import './test-comparisons';
 import './test-document-parsing';
 import './test-async-evaluator';
 import './test-grammar';
+import './test-visitors';
+import './test-units-table';
 
 // Failing
 // import './test-integration-complex-unit-conversion';
@@ -35,6 +37,4 @@ import './test-grammar';
 // import './test-testfile-writer';
 // import './test-trig-functions';
 // import './test-unit-schemes';
-// import './test-units-table';
-// import './test-visitors';
 

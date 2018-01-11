@@ -5,7 +5,7 @@ import units_table from '../lib/units-table.js';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { UnitsTable, Dimension } = units_table;
+const { UnitsTable: Units, Dimension } = units_table;
 
 function equal(t, a, b) {
   t.equal(Math.floor(a * 1e12), Math.floor(b * 1e12), a + " === " + b + "?");
@@ -95,7 +95,7 @@ test("unit objects from units", function (t) {
 });
 
 test("compound unit dimensions", function (t) {
-  var CompoundUnit = require("../lib/units-table.js").CompoundUnit;
+  var CompoundUnit = units_table.CompoundUnit;
   var units = new Units();
 
   units.addUnit("metre", "Length");
@@ -308,8 +308,7 @@ test("advanced complex conversion", function (t) {
 });
 
 test("source visitor", function (t) {
-  var units = new Units(),
-      output = require("../lib/to-source");
+  var units = new Units();
 
   var metre = units.addUnit("metre", "Length"),
       second = units.addUnit("second", "Time"),
@@ -319,6 +318,8 @@ test("source visitor", function (t) {
       volume = metre.pow(3),
       litre = units.addUnit("litre", 0.001, metre.pow(3));
 
+
+  let string = output.toString(speed, " ");
 
   t.equal(output.toString(speed, " "), "metre/second");
   t.equal(output.toString(acceleration, " "), "metre/second^2");
@@ -332,8 +333,7 @@ test("source visitor", function (t) {
 
 test("unit simplification", function (t) {
 
-  var units = new Units(),
-      output = require("../lib/to-source");
+  var units = new Units();
 
   var metre = units.addUnit("metre", "Length"),
       second = units.addUnit("second", "Time"),
@@ -590,9 +590,6 @@ test("Unit refactoring", function (t) {
 
 
 test("Unit includes: App", function (t) {
-  var Turo = require("../lib/turo").Turo,
-      turo = new Turo();
-
   turo.include("app");
   var units = turo.units,
       unitSchemes = units.unitSchemes;

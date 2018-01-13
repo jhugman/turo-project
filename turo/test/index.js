@@ -31,10 +31,10 @@ import './test-integration-operation-labeller';
 import './test-integration-revaluation-with-different-units';
 import './test-integration-variable-units';
 import './test-percent-arithmetic';
+import './test-trig-functions';
 
 // Failing
 // import './test-lenient-parsing';
-// import './test-trig-functions';
 // import './test-unit-schemes';
 // import './test-testfile-writer';
 

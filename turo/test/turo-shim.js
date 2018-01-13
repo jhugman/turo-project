@@ -3,12 +3,19 @@ import EditableDocument from '../lib/editable-document';
 
 EditableDocument.storage = new Storage();
 
-const doc = EditableDocument.create()
-doc.import('app')
-let id = 0;
+
+let doc, id;
+
+function reset() {
+  id = 0;
+  doc = EditableDocument.create();
+  doc.import('app');
+}
+
+reset();
 
 function evaluate(string) {
   return doc.evaluateStatement(`_${id++}`, string)[0];
 }
 
-export default { evaluate }
+export default { evaluate, reset }

@@ -115,6 +115,9 @@ _.extend(TuroStatement.prototype, {
   },
 
   verboseToString (display, prefs) {
+    if (!prefs) {
+      prefs = { padding: ' '};
+    }
     var t = [
       output.toStringWithDisplay(this.node, display, prefs),
       '=',
@@ -138,6 +141,10 @@ _.extend(TuroStatement.prototype, {
 
     return currentValue;
   },
+
+  toString(display, prefs) {
+    return this.verboseToString(display, prefs);
+  }
 });
 
 export default TuroStatement;

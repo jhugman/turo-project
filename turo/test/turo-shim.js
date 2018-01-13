@@ -1,15 +1,13 @@
 import Storage from '../lib/local-file-storage';
 import EditableDocument from '../lib/editable-document';
 
-EditableDocument.storage = new Storage();
-
-
 let doc, id;
 
 function reset() {
-  id = 0;
+  EditableDocument.storage = new Storage();
   doc = EditableDocument.create();
   doc.import('app');
+  id = 0;
 }
 
 reset();

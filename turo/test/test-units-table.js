@@ -1,6 +1,5 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
 import units_table from '../lib/units-table.js';
 import output from '../lib/to-source';
 
@@ -584,24 +583,6 @@ test("Unit refactoring", function (t) {
 
   conv(100.0, mile.per(hour), "Metric", 160.9, "kph");
   conv(100.0, mph, "Metric", 160.9, "kph");
-
-  t.end();
-});
-
-
-test("Unit includes: App", function (t) {
-  turo.include("app");
-  var units = turo.units,
-      unitSchemes = units.unitSchemes;
-
-  t.equal(units.convert(1, "gallon", "litre"), 4.54609);
-  t.equal(units.convert(1, "litre", "gallon").toPrecision(5), (1/4.54609).toPrecision(5));
-
-  var ha = units.getUnit("ha"),
-      m = units.getUnit("m"),
-      kg = units.getUnit("kg");
-
-  t.equal(ha.convert(1, m.pow(2)), 10000);
 
   t.end();
 });

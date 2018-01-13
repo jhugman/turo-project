@@ -25,9 +25,9 @@ import './test-grammar';
 import './test-visitors';
 import './test-units-table';
 import './test-operator-table';
+import './test-integration-complex-unit-conversion';
 
 // Failing
-// import './test-integration-complex-unit-conversion';
 // import './test-integration-grammar';
 // import './test-integration-operation-labeller';
 // import './test-integration-revaluation-with-different-units';

@@ -202,8 +202,7 @@ extend(Operators.prototype, {
 
   addInfixOperator(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
     if (isArray(unitCalculator)) {
-      unitCalculator.unshift(new BinaryOperation());
-      unitCalculator = extend.apply(_, unitCalculator);
+      unitCalculator = Object.assign(new BinaryOperation(), ...unitCalculator);
       evaluatorFunction = undefined;
     }
 
@@ -229,8 +228,7 @@ extend(Operators.prototype, {
   _addUnaryOperator (literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
     var op;
     if (isArray(unitCalculator)) {
-      unitCalculator.unshift(new UnaryOperation());
-      var allProperties = extend.apply(_, unitCalculator);
+      var allProperties = Object.assign({}, ...unitCalculator);
       evaluatorFunction = undefined;
       op = new UnaryOperation(allProperties);
     } else {

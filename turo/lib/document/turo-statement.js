@@ -37,7 +37,7 @@ Object.defineProperties(TuroStatement.prototype, {
 
   errors: {
     get() {
-      return this._errors;
+      return this.node.errors;
     }
   },
 
@@ -88,11 +88,15 @@ Object.defineProperties(TuroStatement.prototype, {
 
 _.extend(TuroStatement.prototype, {
   isParseable () {
-    return !!(this.node.accept);
+    return !!(this.node.accept) || this.node.isUnparsed;
   },
 
   hasErrors() {
-    return this._errors && this._errors.length;
+    if (!this.isParseable()) {
+      return true;
+    }
+    let value = this.currentValue;
+    return this.errors && this.errors.length;
   },
 
   toTokens() {

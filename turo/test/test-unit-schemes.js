@@ -105,7 +105,7 @@ function contains (t, superset, subset) {
   }
 }
 
-test("Unit includes: Metric", function (t) {
+test("Unit schemes in imports: Metric", function (t) {
   var Turo = require("../lib/turo").Turo,
       turo = new Turo();
 
@@ -120,7 +120,7 @@ test("Unit includes: Metric", function (t) {
   t.end();
 });
 
-test("Unit includes: Imperial", function (t) {
+test("Unit schemes in imports: Imperial", function (t) {
   var Turo = require("../lib/turo").Turo,
       turo = new Turo();
 
@@ -136,7 +136,7 @@ test("Unit includes: Imperial", function (t) {
   t.end();
 });
 
-test("Unit includes: App", function (t) {
+test("Unit schemes in imports: app", function (t) {
   var Turo = require("../lib/turo").Turo,
       turo = new Turo();
 

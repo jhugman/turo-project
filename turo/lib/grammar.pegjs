@@ -6,10 +6,13 @@
   const ast = require('./ast').default;
   const turo = require('./turo').default;
 
-  const self = this;
-  const units = this.scope._unitsTable || turo.units;
   const operators = turo.operators;
   const testWriter = turo.writer;
+
+  const self = this;
+
+  const units = this.scope.units || turo.units;
+  
   const inputLength = this.inputLength || input.length;
   const parseContext = this.parseContext;
 
@@ -46,14 +49,11 @@ EditorTextLine
   = nbsp node:Statement lineEnd:RestOfLine
     {
       const { offset, line } = location().start;
-
-
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
     {
       const { offset, line } = location().start;
-
       return helper.decorateStatement(null, line, offset, lineEnd);
     }
 
@@ -68,7 +68,6 @@ DocumentLineFirstParse
   = nbsp node:FirstParseStatement lineEnd:RestOfLine
     {
       const { offset, line }  = location().start;
-
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine

@@ -14,7 +14,7 @@ function isDimensionless (operandValue) {
 function makeMixin (simpleValueCalculator) {
   var list = toArray(arguments);
   if (isFunction(simpleValueCalculator)) {
-    list.unshift();
+    list.shift();
     list.push({
       simpleValueCalculator: simpleValueCalculator
     });

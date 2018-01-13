@@ -174,6 +174,7 @@ extend(EditableDocument.prototype, {
         // TODO the parser should be dealing with this.
         model = this._state.model;
 
+    this.parser.scope = scope;
     var nodes = this.parser.parse(string + '\n', 'EditorText').lines;
 
     var statements = model.interactiveUpdate(id, nodes[0], scope);

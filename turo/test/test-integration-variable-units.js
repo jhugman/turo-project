@@ -46,7 +46,6 @@ test("Variable reassignment bug 2", function (t) {
 
 test("Variable with unitLiteral bug 3", function (t) {
   turo.reset();
-  turo.include('app');
   turo.evaluate("w = 80 kg");
   turo.evaluate("h = 6 ft");
   turo.evaluate("h");

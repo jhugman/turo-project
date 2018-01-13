@@ -29,9 +29,9 @@ import './test-integration-complex-unit-conversion';
 import './test-integration-grammar';
 import './test-integration-operation-labeller';
 import './test-integration-revaluation-with-different-units';
+import './test-integration-variable-units';
 
 // Failing
-// import './test-integration-variable-units';
 // import './test-lenient-parsing';
 // import './test-percent-arithmetic';
 // import './test-testfile-writer';

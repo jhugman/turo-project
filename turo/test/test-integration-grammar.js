@@ -5,6 +5,7 @@ import turo from './turo-shim';
 const { test, plan } = tap;
 
 test("Initial", function (t) {
+  turo.reset();
   turo.evaluate("person = 1");
   t.equal(turo.evaluate("person").toString(), "person = 1", "person == \"person = 1\"");
   turo.evaluate("constant = 1");

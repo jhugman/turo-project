@@ -1042,7 +1042,6 @@ function isStringOrUnit(obj) {
 function UnitsTable (initial) {
   this.units = initial || {};
   this.unitSchemes = new UnitSchemeHelper();
-  debugger;
   // Big units table, including aliases.
   this._bigTable = {};
 }

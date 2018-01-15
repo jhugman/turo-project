@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import async from 'async';
 
 //////////////////////////////////////////////////////////////////////////
@@ -50,6 +50,10 @@ _.extend(DocumentHelper.prototype, {
       toLoad,
       (documentId, cb) => storage.loadDocument(documentId, evaluator, cb),
       (err, results) => {
+        if (err) {
+          callback(err, doc);
+          return;
+        }
         this._finishLoading(toImport, scope);
         callback(null, doc);
       }

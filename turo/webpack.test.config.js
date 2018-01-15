@@ -14,7 +14,6 @@ module.exports = {
       'turo': path.join(__dirname, '../turo'),
       'turo-model': path.join(__dirname, '../turo-model'),
       'turo-documents': path.join(__dirname, '../turo-documents'),
-      'underscore': 'lodash',
       // Support React Native Web
       'react-native': 'react-native-web',
     }

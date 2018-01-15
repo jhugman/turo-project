@@ -1,9 +1,9 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import $turo from '../lib/turo';
 import graphBuilder from '../lib/document/document-graph-builder';
 import path from 'path';
-import Storage from '../lib/local-file-storage';
+import Storage from './turo-fixture-storage';
 import EditableDocument from '../lib/editable-document';
 
 const { test, plan } = tap;
@@ -16,7 +16,7 @@ function file (relative) {
 
 test('simple load', function (t) {
   EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
-  EditableDocument.load('./loaded-from-disk', 'app', function (err, doc) {
+  EditableDocument.load('loaded-from-disk', 'metric', function (err, doc) {
     t.ok(doc, 'document exists');
     t.equal(path.basename(doc.id), 'loaded-from-disk', 'filename correct');
     t.equal(doc.statements[1].valueToString(undefined, prefs), '4.2 m', 'evaluating properly');
@@ -26,7 +26,7 @@ test('simple load', function (t) {
 
 test('importing load', function (t) {
   EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
-  EditableDocument.load('./importing', 'app', function (err, doc) {
+  EditableDocument.load('importing', 'metric', function (err, doc) {
     t.ok(doc, 'document exists');
     t.equal(path.basename(doc.id), 'importing', 'filename correct');
     t.equal(doc.statements[2].valueToString(undefined, prefs), '2.1 m', 'evaluating properly');
@@ -34,3 +34,12 @@ test('importing load', function (t) {
   });
 });
 
+test('simple load with implicit imports of all units', function (t) {
+  EditableDocument.storage = new Storage(path.resolve(__dirname, 'fixtures'));
+  EditableDocument.load('loaded-from-disk', 'app', function (err, doc) {
+    t.ok(doc, 'document exists');
+    t.equal(path.basename(doc.id), 'loaded-from-disk', 'filename correct');
+    t.equal(doc.statements[1].valueToString(undefined, prefs), '4.2 m', 'evaluating properly');
+    t.end();
+  });
+});

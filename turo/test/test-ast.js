@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import tap from 'tap';
 import ast from '../lib/ast';
 import evaluator from '../lib/evaluator';

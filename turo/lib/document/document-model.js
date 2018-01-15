@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _ from 'underscore'
 import graphBuilder from './document-graph-builder';
 import TuroStatement from './turo-statement';
 

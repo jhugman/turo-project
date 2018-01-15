@@ -1,6 +1,4 @@
-import toArray from 'lodash/toArray';
-import isFunction from 'lodash/isFunction';
-import chain from 'lodash/chain';
+import { toArray, isFunction, chain } from 'underscore';
 import turoNumber from '../turo-number';
 
 const NO_UNITS = null;
@@ -16,7 +14,7 @@ function isDimensionless (operandValue) {
 function makeMixin (simpleValueCalculator) {
   var list = toArray(arguments);
   if (isFunction(simpleValueCalculator)) {
-    list.unshift();
+    list.shift();
     list.push({
       simpleValueCalculator: simpleValueCalculator
     });

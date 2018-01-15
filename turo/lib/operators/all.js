@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import basicArithmetic from './basic-arithmetic';
 import advancedArithmetic from './advanced-arithmetic';
 import trigonometry from './trigonometry';

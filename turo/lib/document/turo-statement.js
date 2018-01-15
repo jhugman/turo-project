@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import output from '../to-source';
 import { toTokenArray } from '../to-tokens';
 import evaluator from '../evaluator';
@@ -37,7 +37,7 @@ Object.defineProperties(TuroStatement.prototype, {
 
   errors: {
     get() {
-      return this._errors;
+      return this.node.errors;
     }
   },
 
@@ -88,11 +88,15 @@ Object.defineProperties(TuroStatement.prototype, {
 
 _.extend(TuroStatement.prototype, {
   isParseable () {
-    return !!(this.node.accept);
+    return !!(this.node.accept) || this.node.isUnparsed;
   },
 
   hasErrors() {
-    return this._errors && this._errors.length;
+    if (!this.isParseable()) {
+      return true;
+    }
+    let value = this.currentValue;
+    return this.errors && this.errors.length;
   },
 
   toTokens() {
@@ -111,6 +115,9 @@ _.extend(TuroStatement.prototype, {
   },
 
   verboseToString (display, prefs) {
+    if (!prefs) {
+      prefs = { padding: ' '};
+    }
     var t = [
       output.toStringWithDisplay(this.node, display, prefs),
       '=',
@@ -134,6 +141,10 @@ _.extend(TuroStatement.prototype, {
 
     return currentValue;
   },
+
+  toString(display, prefs) {
+    return this.verboseToString(display, prefs);
+  }
 });
 
 export default TuroStatement;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import optimist from 'optimist';
 import fs from 'fs';
-import _ from 'lodash';
+import _ from 'underscore';
 import EditableDocument from './editable-document';
 import Storage from './local-file-storage';
 import readline from 'readline';

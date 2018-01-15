@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import depGraph from 'dependency-graph';
 const { DepGraph } = depGraph;
 

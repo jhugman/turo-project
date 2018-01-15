@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import turoNumber from './turo-number';
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -382,6 +382,7 @@ function UnparsedText (text, line, offset, lastLineNum) {
   this.lineFirst = line;
   // this.accept must be true so we can add it to the dep graph
   this.accept = () => {};
+  this.isUnparsed = true;
   this.offsetFirst = offset;
   this.statementOffsetFirst = offset;
   this.statementOffsetLast = offset + text.length;

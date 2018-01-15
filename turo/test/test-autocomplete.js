@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import ac from '../lib/autocomplete';
 import parser from '../lib/parser';
 

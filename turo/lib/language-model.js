@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 
 /**
  * The scope is a super set of files and function and block scopes.
@@ -49,6 +49,11 @@ _.extend(Scope.prototype, {
     this._variables = {};
     this._units = {};
     this._includes = {};
+  },
+
+  clone() {
+    let clone = new Scope(this.parent, this.id, this._unitsTable);
+    return Object.assign(clone, this);
   },
 
   getInclude(name) {

@@ -1,5 +1,5 @@
-import defaults from 'lodash/defaults';
-import extend from 'lodash/extend';
+
+import { extend, defaults } from 'underscore';
 import parser from './parser';
 import evaluator from './evaluator';
 import unitsTable from './units-table';
@@ -264,7 +264,7 @@ extend(Turo.prototype, {
     doc.import(turoFilename);
 
     this.scope = doc.scope;
-    this.units = doc.units;
+    this.scope._unitsTable = this.units;
   },
 
   _cleanWords(string) {

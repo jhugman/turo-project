@@ -1,4 +1,4 @@
-import extend from 'lodash/extend';
+import {extend} from 'underscore';
 import ast from './ast';
 
 function addError (errorName, parent, context) {

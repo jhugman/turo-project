@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import extend from 'lodash/extend';
-import keys from 'lodash/keys';
-import isFunction from 'lodash/isFunction';
-import isArray from 'lodash/isArray';
+import _ from 'underscore';
+import { extend, 
+          keys,
+          isFunction,
+          isArray } from 'underscore';
 import ast from './ast';
 import turoNumber from './turo-number';
 import init from './operators/all';
@@ -202,8 +202,7 @@ extend(Operators.prototype, {
 
   addInfixOperator(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
     if (isArray(unitCalculator)) {
-      unitCalculator.unshift(new BinaryOperation());
-      unitCalculator = extend.apply(_, unitCalculator);
+      unitCalculator = Object.assign(new BinaryOperation(), ...unitCalculator);
       evaluatorFunction = undefined;
     }
 
@@ -229,8 +228,7 @@ extend(Operators.prototype, {
   _addUnaryOperator (literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
     var op;
     if (isArray(unitCalculator)) {
-      unitCalculator.unshift(new UnaryOperation());
-      var allProperties = extend.apply(_, unitCalculator);
+      var allProperties = Object.assign({}, ...unitCalculator);
       evaluatorFunction = undefined;
       op = new UnaryOperation(allProperties);
     } else {

@@ -3,7 +3,8 @@ import { CompositeDecorator } from 'draft-js';
 import store from './store';
 import { docStore } from './reducer';
 
-const tokens = [
+const tokens = [];
+[
   {
     token: 'number',
     className: 'token--number'

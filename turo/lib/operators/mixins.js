@@ -177,7 +177,6 @@ var mixins = {
     },
 
     turoValueCalculator (operandValue, ctx) {
-      console.trace('turoValueCalculator 2', ctx);
       var simpleValue = this.simpleValueCalculator(this.toRadians(operandValue, ctx).value);
       return turoNumber.newInstance(simpleValue, NO_UNITS, this.returnValueType);
     },

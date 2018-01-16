@@ -48,7 +48,7 @@ class App extends Component {
   }, 500);
 
   keyBindingFn = event => {
-    console.log('hey')
+    console.log('keyBindingFn')
   }
 
   onChange = (editorState) => {
@@ -64,9 +64,11 @@ class App extends Component {
   };
 
   handlePastedText = (text, html, editorState) => {
+    console.log('handlePastedText')
   }
 
   handleKeyCommand = command => {
+    console.log('handleKeyCommand')
     return 'not-handled';
   }
 

@@ -1,11 +1,10 @@
 import tap from 'tap';
-import _ from 'lodash';
-import turo from '../lib/turo';
+import _ from 'underscore';
 import units_table from '../lib/units-table.js';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { UnitsTable, Dimension } = units_table;
+const { UnitsTable: Units, Dimension } = units_table;
 
 test("Unit schemes", function (t) {
   var units = new Units(),
@@ -105,49 +104,3 @@ function contains (t, superset, subset) {
   }
 }
 
-test("Unit includes: Metric", function (t) {
-  var Turo = require("../lib/turo").Turo,
-      turo = new Turo();
-
-  turo.include("metric");
-  var units = turo.units,
-      unitSchemes = units.unitSchemes;
-
-  contains(t, unitSchemes.getUnitSchemes(), ["SI", "Metric"]);
-  t.deepEqual(unitSchemes.getUnitNames("SI", "Length"), ["m"]);
-  t.deepEqual(unitSchemes.getUnitNames("SI", "Mass"), ["kg"]);
-  t.deepEqual(unitSchemes.getUnitNames("Metric", "Length"), ["m", "km", "cm", "mm"]);
-  t.end();
-});
-
-test("Unit includes: Imperial", function (t) {
-  var Turo = require("../lib/turo").Turo,
-      turo = new Turo();
-
-  turo.include("imperial");
-  var units = turo.units,
-      unitSchemes = units.unitSchemes;
-
-  contains(t, unitSchemes.getUnitSchemes(), ["SI", "Imperial"]);
-
-  t.deepEqual(unitSchemes.getUnitNames("SI", "Length"), ["m"]);
-  t.deepEqual(unitSchemes.getUnitNames("Imperial", "Length"), ["yd", "ft", "inch", "mile"]);
-
-  t.end();
-});
-
-test("Unit includes: App", function (t) {
-  var Turo = require("../lib/turo").Turo,
-      turo = new Turo();
-
-  turo.include("app");
-  var units = turo.units,
-      unitSchemes = units.unitSchemes;
-
-  contains(t, unitSchemes.getUnitSchemes(), ["SI","Metric","Imperial"]);
-
-  t.deepEqual(unitSchemes.getUnitNames("SI", "Length"), ["m"]);
-  t.deepEqual(unitSchemes.getUnitNames("Imperial", "Length"), ["yd", "ft", "inch", "mile"]);
-
-  t.end();
-});

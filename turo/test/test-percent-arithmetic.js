@@ -1,21 +1,15 @@
 import tap from 'tap';
-import _ from 'lodash';
-import turo from '../lib/turo';
-
-const prefs = turo.prefs();
-turo.include("app");
+import _ from 'underscore';
+import turo from './turo-shim';
 
 const { test, plan } = tap;
 
 function eval_t (t, input, expectedOutput) {
   var result = turo.evaluate(input);
-  if (result.parseError) {
-    throw result.parseError;
-  }
-  if (result.expressionErrors()) {
-    t.fail('Problem with ' + input + ': ' + _.pluck(result.expressionErrors(), 'message'));
+  if (result.hasErrors()) {
+    t.fail('Problem with ' + input + ': ' + _.pluck(result.errors, 'message'));
   } else {
-    result = result.valueToString();
+    result = result.valueToString(undefined, {padding: ' '});
     t.equal(result, expectedOutput, input + ' = ' + result);
   }
 }

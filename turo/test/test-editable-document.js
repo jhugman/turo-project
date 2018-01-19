@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import Storage from '../lib/local-file-storage';
 import EditableDocument from '../lib/editable-document';
 

@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 
 import parser from "../lib/parser";
 import ast from "../lib/ast";
@@ -11,6 +11,14 @@ import output from "../lib/to-source";
 const { Context: Variables } = variablesSymbolTable;
 const { UnitsTable: Units } = unitsTable;
 const { test, plan } = tap;
+
+// horrible hacky way of reseting the units table. 
+// in reality this would be done by turo.
+let units;
+function resetUnits() {
+  units =parser.scope._unitsTable = new Units();
+}
+resetUnits();
 
 var operatorNames = {
   sin: true,
@@ -38,7 +46,7 @@ function i(num) {
 }
 
 function evaluate(t, string, expected) {
-  var ast = parser.parse(string);
+  var ast = parser.parse(string, "Statement");
   t.ok(ast, "AST for "+string+" exists");
   var result = evaluator.evaluate(ast);
   if (result) {
@@ -97,8 +105,10 @@ test("Unit statement", function (t) {
     });
   }
 
-  var units = parser.units = new Units(),
-      variables = parser.variables = new Variables();
+  resetUnits();
+
+  // 
+  const parseContext = parser.parseContext;;
 
 
   parse("unit metre : Length");
@@ -126,8 +136,7 @@ test("Unit statement", function (t) {
 
   // New style unit definitions
 
-  units = parser.units = new Units();
-  variables = parser.variables = new Variables();
+  resetUnits();
 
   parse("unit m (metric SI) : Length");
   parse("unit 100 cm (metric) : m");
@@ -159,8 +168,8 @@ test("Unit statement", function (t) {
 
 test("Units in expressions", function (t) {
 
-  var units = parser.units = new Units(),
-      variables = parser.scope;
+  resetUnits();
+  let variables = parser.scope;
 
   function parse(str) {
     var ast = parser.parse(str, "Statement");
@@ -205,7 +214,6 @@ test("Units in expressions", function (t) {
 });
 
 test("Unary expressions", function (t) {
-  var variables = parser.variables = new Variables();
   parser.parse("x = 1", "Statement");
 
   output.displayImpliedParentheses(true);
@@ -220,7 +228,6 @@ test("Unary expressions", function (t) {
 });
 
 test("Unary minus expressions", function (t) {
-  var variables = parser.variables = new Variables();
   parser.parse("x = 1", "Statement");
 
   output.displayImpliedParentheses(true);
@@ -237,7 +244,6 @@ test("Unary minus expressions", function (t) {
 
 
 test("Unary & Binary Operation Interactions", function (t) {
-  var variables = parser.variables = new Variables();
   parser.parse("x = 1", "Statement");
 
   output.displayImpliedParentheses(true);
@@ -259,8 +265,7 @@ test("Unary & Binary Operation Interactions", function (t) {
 });
 
 test("Variables in expressions", function (t) {
-  var units = parser.units = new Units(),
-      variables = parser.variables = new Variables();
+  resetUnits();
 
   function parse(str) {
     var ast = parser.parse(str, "PaddedStatement");
@@ -282,7 +287,7 @@ test("Number literals", function (t) {
 
   function parse (str, expected) {
     var result = parser.parse(str, "NumberLiteral");
-    t.equal(result, expected);
+    t.equal(result, expected, str);
   }
 
   parse("1", 1);
@@ -306,11 +311,7 @@ test("Number literals", function (t) {
 
 
 test('Node offsets', function (t) {
-
-
-  var variables = parser.variables = new Variables();
   var string = '1.0';
-
 
   var node = parser.parse('1.0');
   t.equal(node.offsetFirst, 0, '1.0');

@@ -6,10 +6,13 @@
   const ast = require('./ast').default;
   const turo = require('./turo').default;
 
-  const self = this;
-  const units = turo.units;
   const operators = turo.operators;
   const testWriter = turo.writer;
+
+  const self = this;
+
+  const units = this.scope.units || turo.units;
+  
   const inputLength = this.inputLength || input.length;
   const parseContext = this.parseContext;
 
@@ -46,14 +49,11 @@ EditorTextLine
   = nbsp node:Statement lineEnd:RestOfLine
     {
       const { offset, line } = location().start;
-
-
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
     {
       const { offset, line } = location().start;
-
       return helper.decorateStatement(null, line, offset, lineEnd);
     }
 
@@ -68,7 +68,6 @@ DocumentLineFirstParse
   = nbsp node:FirstParseStatement lineEnd:RestOfLine
     {
       const { offset, line }  = location().start;
-
       return helper.decorateStatement(node, line, offset, lineEnd);
     }
   / lineEnd:RestOfLine
@@ -333,7 +332,6 @@ UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.
 ////////////////////////////////////////////////////////////////////////////////
 
 IncludeStatement = "include" _ filename:StringLiteral {
-  turo.include(filename);
   return new ast.StatementNode("Include", filename);
 }
 
@@ -682,7 +680,7 @@ NumberLiteralString = sign:AdditiveOperatorLiteral? valueNode:NumberLiteralFromP
   valueNode.number = valueNode.literal;
   valueNode.sign = sign;
 
-  var literal = sign ? sign : '' + valueNode.literal;
+  var literal = (sign ? sign : '') + valueNode.literal;
   if (exp) {
     literal += 'e' + exp;
   }

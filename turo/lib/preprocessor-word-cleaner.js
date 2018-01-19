@@ -1,9 +1,9 @@
-import isFunction from 'lodash/isFunction';
-import each from 'lodash/each';
-import isArray from 'lodash/isArray';
-import isObject from 'lodash/isObject';
-import flatten from 'lodash/flatten';
-import _ from 'lodash';
+import { isFunction,
+  each, 
+  isArray, 
+  isObject, 
+  flatten } from 'underscore';
+import _ from 'underscore';
 
 var PATTERN = /([^\w\s]?)\b([a-z_]\w*)\b([^\w\s]?)/gi;
 

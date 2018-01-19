@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import turo from '../lib/turo';
 import parser from '../lib/parser';
 import ast from '../lib/ast';
@@ -13,10 +13,7 @@ const { Context: Variables } = variablesSymbolTable;
 const { UnitsTable: Units } = unitsTable;
 
 test("Expressions with units", function (t) {
-
-  var variables = parser.variables = new Variables(),
-      units = parser.units = new Units(),
-      result;
+  var result;
 
   function parse(str) {
     var node = parser.parse(str, "Statement");

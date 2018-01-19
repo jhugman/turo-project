@@ -1,12 +1,13 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import turo from '../lib/turo';
 import ast from '../lib/ast';
 import parser from '../lib/parser';
 import output from '../lib/to-source';
 import operatorSymbolTable from '../lib/operators-symbol-table';
+import turoNumber from '../lib/turo-number';
 
-const { Operators } = operatorSymbolTable;
+const { Operators, defaultOperators } = operatorSymbolTable;
 const { test, plan } = tap;
 
 test("simple", function (t) {
@@ -33,7 +34,7 @@ var inode = function (num) {
   return new ast.NumberNode(num);
 };
 
-var turoNumber = require('../lib/turo-number');
+
 var ctx = {
   evaluate: function (node) {
     return turoNumber.newInstance(node.value, node.unit, 'number');
@@ -42,7 +43,7 @@ var ctx = {
 
 test("defaultOperators", function (t) {
 
-  var ops = require("../lib/operators-symbol-table").defaultOperators,
+  var ops = defaultOperators,
       number = "number";
   var left = 1,
       right = 2,

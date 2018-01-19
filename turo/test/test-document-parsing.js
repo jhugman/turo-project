@@ -1,5 +1,5 @@
 import tap from 'tap';
-import _ from 'lodash';
+import _ from 'underscore';
 import parser from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/evaluator';
@@ -45,7 +45,7 @@ function parse (lines) {
 function numValidStatements (doc) {
   var count = 0;
   _.each(doc.lines, function (line) {
-    if (line.accept) {
+    if (!line.isUnparsed) {
       count ++;
     }
   });

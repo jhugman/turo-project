@@ -1,4 +1,4 @@
-import extend from 'lodash/extend';
+import {extend} from 'underscore';
 import * as files from 'turo-documents';
 import AbstractStorage from './abstract-storage';
 

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import colors from 'colors';
 import toSource from './to-source';
 

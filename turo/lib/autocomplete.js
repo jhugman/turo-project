@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 
 function TokenPredictor (parser, generatorMap) {
   this.generatorMap = generatorMap || {};
@@ -122,12 +122,22 @@ _.extend(TokenPredictor.prototype, {
   },
 
   _collectCompletions: function (tokenProcessor, expected, error) {
-    _.each(expected, function (tokenType) {
-      var generator = this.generatorMap[tokenType];
-      if (generator) {
-        tokenProcessor.collect(tokenType, generator, error);
-      }
-    }.bind(this));
+    const generateMap = this.generatorMap;
+    _.chain(expected)
+      .map(function (tokenType) {
+        if (_.isString(tokenType)) { 
+          return tokenType; 
+        }
+
+        return tokenType.description;
+      })
+      .each(function (tokenType) {
+        var generator = generateMap[tokenType];
+        if (generator) {
+          tokenProcessor.collect(tokenType, generator, error);
+        }
+      })
+      .value();
   },
 
   _makePrediction: function (tokenProcessor, string, dirtyString, offset) {

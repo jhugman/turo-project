@@ -1,6 +1,6 @@
 import tap from 'tap';
-import _ from 'lodash';
-import turo from '../lib/turo';
+import _ from 'underscore';
+import turo from './turo-shim';
 
 const { test, plan } = tap;
 

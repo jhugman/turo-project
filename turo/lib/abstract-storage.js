@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 
 /////////////////////////////////////////////////////////////////////////
 function AbstractStorage () {
@@ -36,11 +36,21 @@ _.extend(AbstractStorage.prototype, {
     this.resolveLocation(id, undefined, function (location, layer) {
       // loads doc
       layer.loadString(location, function (err, string) {
+        if (err) {
+          callback(err, null)
+          return
+        }
         // evaluates doc
         evaluator(
           id,
           string,
           function (err, doc) {
+            if (err) {
+              delete self._state.isLoading[id];
+              console.error(`Error loading ${id}: ${err}`)
+              callback(err);
+              return;
+            }
             doc.location = location;
             self._state.documents[id] = doc;
             _.each(listeners, function (cb) {

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _ from 'underscore';
 import output from './to-source';
 import precision from './precision-hacks';
 

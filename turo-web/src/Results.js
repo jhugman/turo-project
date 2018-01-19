@@ -7,7 +7,7 @@ class Result extends PureComponent {
     const padding = this.props.pad;
     return (
       <div>
-        { times(padding, i => ( <EmptyResult /> )) }
+        { times(padding, i => ( <EmptyResult key={this.props.id + '--' + i} /> )) }
         <div contentEditable={false} className='statement__result'>
           <span>{this.props.result}</span>
         </div>
@@ -31,7 +31,7 @@ export default class Results extends PureComponent {
   render() {
     return (<div className='results'>
       {this.props.statements.map(stat => (
-        <Result key={stat.id} result={stat.valueToString()} pad={stat.info.lineLast - stat.info.lineFirst} />
+        <Result key={stat.id} id={stat.id} result={stat.valueToString()} pad={stat.info.lineLast - stat.info.lineFirst} />
       ))}
     </div>);
   }

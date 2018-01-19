@@ -258,7 +258,7 @@ UnitExpression =
     for (var i=0; i<tail.length; i++) {
       op = tail[i][0];
       unitNode = new ast.UnitMultOp(helper.infixAliases[op.opName] || op.opName, unitNode, tail[i][1]);
-      helper.decorateNonTerminal(unitNode, op.offset, op.literal);
+      helper.decorateNonTerminal(unitNode, op.line, op.offset, op.literal);
     }
 
     op = optionalPer ? optionalPer[0] : optionalPer;
@@ -266,7 +266,7 @@ UnitExpression =
     if (op) {
       unitNode = new ast.UnitMultOp('/', null, unitNode);
       unitNode._offsetFirst = offset;
-      helper.decorateNonTerminal(unitNode, op.offset, op.literal);
+      helper.decorateNonTerminal(unitNode, op.line, op.offset, op.literal);
     }
     return unitNode;
 }
@@ -277,6 +277,7 @@ UnitMultiplicativeOperator =
       const { offset, line } = location().start;
       return {
         offset: offset,
+        line: line,
         literal: space,
         opName: '*',
       };
@@ -289,6 +290,7 @@ UnitPer "unitPer"
 
     return {
       offset: offset,
+      line: line,
       literal: literal,
       opName: '/'
     };
@@ -301,7 +303,7 @@ UnitPerLiteral
 UnitMultiplier 
   = unitNode:UnitIdentifier _ op:RaiseToPowerOperator _ num:IntegerNode { 
       var node = new ast.UnitPowerNode(unitNode, num); 
-      return helper.decorateNonTerminal(node, op.offset, op.literal);
+      return helper.decorateNonTerminal(node, op.line, op.offset, op.literal);
     }
   / unitNode:UnitIdentifier {
       return unitNode;
@@ -315,6 +317,7 @@ RaiseToPowerOperator "unitPower"
     return {
       literal: literal,
       offset: offset,
+      line: line,
     }
   }
   
@@ -326,7 +329,7 @@ UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.
   var node = new ast.UnitLiteralNode(parseContext.scope.findUnit(unitName), unitName);
   const { offset, line } = location().start;
 
-  return helper.decorateTerminal(node, offset, unitName);
+  return helper.decorateTerminal(node, line, offset, unitName);
  }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -392,7 +395,7 @@ NumbericalExpressionUnitConversion =
       var op = unitConversion[0],
           unitNode = unitConversion[1];
       node = new ast.BinaryNode(node, unitNode, op.literal);
-      helper.decorateNonTerminal(node, op.offset, op.literal); 
+      helper.decorateNonTerminal(node, op.line, op.offset, op.literal); 
     }
     return node;
   }
@@ -606,7 +609,7 @@ ValueOrParens
     {
       const { offset, line } = location().start;
 
-      return helper.decorateTerminal(t, offset, t.literal || t.name);
+      return helper.decorateTerminal(t, line, offset, t.literal || t.name);
     }
   / po:ParensOpen _ expression:NumericalExpression _ pc:ParensClose
     {
@@ -738,7 +741,7 @@ IntegerNode = number:IntegerString {
   var node = new ast.NumberNode(number);
   const { offset, line } = location().start;
 
-  return helper.decorateTerminal(node, offset, number);
+  return helper.decorateTerminal(node, line, offset, number);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

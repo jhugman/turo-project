@@ -4,8 +4,7 @@ import store from './store';
 import { docStore } from './reducer';
 
 const tokens = [];
-[
-  {
+[  {
     token: 'number',
     className: 'token--number'
   },
@@ -28,17 +27,33 @@ const createComp = ({ className }) => props => (<span className={className}>
 </span>);
 
 const createStrategy = ({ token }) => (contentBlock, callback) => {
-  if (!docStore.turoDoc) return ;
-  let statement = docStore.turoDoc.evaluateStatement(contentBlock.key, contentBlock.getText());
-  if (!statement || !statement[0].tokens) return ;
-  statement = statement[0];
-  const textLength = contentBlock.getText().length;
-  const tokens = statement.tokens.filter(tok => tok.displayType === token);
+  
+  const tokenMap = docStore.tokenMap;
+  if (!tokenMap) {
+    console.log('NO TOKEN MAP');
+    return;
+  }
 
-  tokens.forEach(token => {
-    let end = token.startOffset + token.literal.length;
-    end = end > textLength ? textLength : end;
-    callback(token.startOffset, end)
+  console.log('Decorator using tokenMap');
+
+  if (!tokenMap[contentBlock.getKey()]) {
+    console.log('Not good:', contentBlock.getKey(), "not in", Object.keys(tokenMap));
+    return;
+  }
+  
+  const text = contentBlock.getText();
+  const lineLength = text.length;
+  const unfilteredTokens = tokenMap[contentBlock.getKey()] || [];
+
+  const tokens = unfilteredTokens.filter(tok => tok.displayType === token);
+
+  console.log(`${contentBlock.getKey()} block: highlighting ${tokens.length} ${token} tokens`);
+
+  tokens.forEach(t => {
+    const start = t.startOffset;
+    const end = Math.min(start + t.literal.length, lineLength);
+    console.log('\thighlighting', text.substring(start, end));
+    callback(start, end)
   });
 }
 

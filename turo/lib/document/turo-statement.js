@@ -100,10 +100,7 @@ _.extend(TuroStatement.prototype, {
   },
 
   toTokens() {
-    return toTokenArray(this.node).map(token => ({
-      ...token,
-      startOffset: token.startOffset > -1 ? token.startOffset - this.info.offsetFirst: token.startOffset,
-    }));
+    return toTokenArray(this.node);
   },
 
   valueToString (display, prefs) {

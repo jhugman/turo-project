@@ -15,6 +15,7 @@ const initialState = {
   title: '',
   turoDoc: null,
   editorState: null,
+  tokenMap: null,
 };
 
 const createTuroDoc = editorState => {
@@ -42,25 +43,77 @@ const initDoc = (state, {
     { decorator }
   );
 
+  const tokenMap = updateTokenMap(editorState.getCurrentContent().getBlocksAsArray(), turoDoc.statements, {});
+  
   return {
     ...state,
     title,
     turoDoc,
     id,
     editorState,
+    tokenMap,
   };
 };
 
 const batchUpdateDocument = (state, editorState) => {
   const { turoDoc } = state;
-  const content = editorState.getCurrentContent();
-  const text = content.getPlainText();
-  turoDoc.evaluateDocument(text);
+  const blocks = editorState.getCurrentContent().getBlocksAsArray();
+  const text = blocks.map((block) => block.getText()).join('\n');
+
+  turoDoc.evaluateDocument(text, (err, turoDoc) => {});
+
+  const tokenMap = updateTokenMap(blocks, turoDoc.statements, {});
+
   return {
     ...state,
     editorState,
     turoDoc,
+    tokenMap,
   };
+};
+
+const updateTokenMap = (blocks, statements, tokenMap = {}) => {
+  console.log('Reducer updating tokenMap')
+  statements.forEach(s => {
+    const lines = s.text.split(/\n/g);
+
+    let currentLine = lines.shift();
+    let currentLineNum = s.info.lineFirst;
+    const block = blocks[currentLineNum - 1];
+    tokenMap[block.getKey()] = [];
+
+    let offsetFirst = s.info.offsetFirst;
+    s.tokens.forEach(t => {
+      if (t.line === undefined || t.line < 0) {
+        return;
+      }
+
+      const block = blocks[t.line - 1];
+      
+      while (t.line !== currentLineNum) {
+        currentLineNum++;
+        const block = blocks[currentLineNum - 1];
+        if (!block) {
+          return;
+        }
+        tokenMap[block.getKey()] = [];
+    
+        offsetFirst += currentLine.length;
+        currentLine = lines.shift();
+      }
+
+      const startOffset = t.startOffset > -1 ? t.startOffset - offsetFirst: t.startOffset;
+
+      const token = {
+        ...t,
+        startOffset
+      };
+      tokenMap[block.getKey()].push(token);
+    })
+
+  });
+  docStore.tokenMap = tokenMap;
+  return tokenMap;
 };
 
 const iterativeUpdateDocument = (state, editorState) => {
@@ -76,7 +129,7 @@ const iterativeUpdateDocument = (state, editorState) => {
   const startOffset = selection.getStartOffset();
   const startKey = selection.getStartKey();
 
-  const { turoDoc } = state;
+  const { turoDoc, tokenMap } = state;
 
   const blocks = editorState.getCurrentContent().getBlocksAsArray();
   let startLine;
@@ -91,8 +144,8 @@ const iterativeUpdateDocument = (state, editorState) => {
     return;
   }
 
-  let editToken = { line: startLine + 1, offset: startOffset };
-  let statement = turoDoc.findStatementForEditToken(editToken);
+  const editToken = { line: startLine + 1, offset: startOffset };
+  const statement = turoDoc.findStatementForEditToken(editToken);
 
   if (!statement) {
     return;
@@ -110,13 +163,20 @@ const iterativeUpdateDocument = (state, editorState) => {
 
   const newText = newLines.join('\n');
 
-  turoDoc.evaluateStatement(id, newText);
+  turoDoc.evaluateStatement(id, newText, (err, updatedStatements) => {
+
+  });
+
+  const newStatement = turoDoc.getStatement(id);
+  
+  updateTokenMap(blocks, [newStatement], {...tokenMap});
 
   return {
-      ...state,
-      editorState,
-      turoDoc,
-    };
+    ...state,
+    editorState,
+    turoDoc,
+    tokenMap: docStore.tokenMap,
+  };
 };
 
 const updateEditorState = (state, {

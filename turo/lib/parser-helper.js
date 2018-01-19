@@ -19,19 +19,21 @@ var unaryAliases = {
   '√': 'sqrt',
 };
 
-function decorateTerminal (node, offset, string) {
+function decorateTerminal (node, line, offset, string) {
   var last = offset + string.length - 1;
   node._offsetFirst = offset;
   node._offsetLast = last; 
   node._offsetLiteralFirst = offset;
   node._offsetLiteralLast = last;
+  node.line = line;
   return node;
 }
 
-function decorateNonTerminal(node, offset, string) {
+function decorateNonTerminal(node, line, offset, string) {
   var last = offset + string.length - 1;
   node._offsetLiteralFirst = offset;
   node._offsetLiteralLast = last;
+  node.line = line;
   return node;
 }
 
@@ -61,7 +63,7 @@ function unpackLeftBinaryOperations(head, tail) {
     op = tail[i][1];
     result = new ast.BinaryNode(result, tail[i][3], infixAliases[op.literal] || op.literal);
 
-    decorateNonTerminal(result, op.offset, op.literal);
+    decorateNonTerminal(result, op.line, op.offset, op.literal);
   }
   return result;
 }
@@ -85,12 +87,12 @@ function unpackRightBinaryOperations(head, tail) {
     } else {
       left = tail[i][3];
       result = new ast.BinaryNode(left, result, infixAliases[op.literal] || op.literal);
-      decorateNonTerminal(result, op.offset, op.literal);
+      decorateNonTerminal(result, op.line, op.offset, op.literal);
       op = tail[i][1];
     }
   }
   result = new ast.BinaryNode(head, result, infixAliases[op.literal] || op.literal);
-  return decorateNonTerminal(result, op.offset, op.literal);
+  return decorateNonTerminal(result, op.line, op.offset, op.literal);
 }
 
 function unpackUnaryOperations(current, operators, isPrefix) {
@@ -104,6 +106,7 @@ function unpackUnaryOperations(current, operators, isPrefix) {
     op = operators[i][literalIndex];
     current = new ast.UnaryOperationNode(current, unaryAliases[op.literal] || op.literal, isPrefix);
 
+    current.line = op.line;
     current._offsetLiteralFirst = op.offset;
     current._offsetLiteralLast = op.offset + op.literal.length - 1;
 

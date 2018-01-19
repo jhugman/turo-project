@@ -12,7 +12,7 @@ import decorator from './decorator';
 export const docStore = {};
 
 const initialState = {
-  title: 'Untitled',
+  title: '',
   turoDoc: null,
   editorState: null,
 };

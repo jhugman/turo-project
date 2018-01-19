@@ -102,13 +102,22 @@ class App extends Component {
       return (
         <div className="document">
           <div className="top-bar">
-            <input type="text" value={this.props.title} onChange={this.onChangeTitle} />
+            <input
+              type="text"
+              placeholder="Document Title"
+              value={this.props.title}
+              onChange={this.onChangeTitle}
+            />
+            <figure className="logo">
+              <img src="logo.png" />
+            </figure>
+
           </div>
 
           <div className='editor'>
             <div className='statements'>
               <Editor
-                placeholder="Type in some statements for your turo doc"
+                placeholder="... e.g: 1 + 2"
                 handleKeyCommand={this.handleKeyCommand}
                 editorState={this.props.editorState}
                 blockRenderMap={blockRenderMap}

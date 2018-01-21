@@ -1,5 +1,6 @@
 import React, { Component, PureComponent } from 'react';
-import { CompositeDecorator, Modifier, Editor, CharacterMetadata, ContentState, ContentBlock, genKey, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
+import { Modifier, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
+import Editor from 'draft-js-plugins-editor';
 import Immutable from 'immutable';
 import get from 'lodash/get';
 import { UPDATE_STATEMENT } from './constants';
@@ -9,6 +10,18 @@ import debounce from 'lodash/debounce';
 import * as actions from './actions';
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux';
+
+import autoCompletePlugin from './plugins/autoCompletePlugin';
+import selectionPositionPlugin from './plugins/selectionPosition';
+import Popover from './plugins/popover';
+
+const List = ({ list, onSelect}) => <ul>
+  {list.map((item, index) => (
+    <li onClick={(e) => onSelect(item)} key={index}>
+      {item.literal}
+    </li>
+  ))}
+</ul>
 
 class Statement extends Component {
   render() {
@@ -33,6 +46,20 @@ const blockRenderMap = DefaultDraftBlockRenderMap.merge(
 );
 
 class App extends Component {
+  state = {
+    selectionPosition: false,
+    list: []
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.plugins = [
+      selectionPositionPlugin(),
+      autoCompletePlugin(this.props.turoDoc)
+    ];
+  }
+
   autosaveDocument = debounce((doc) => {
     const contentState = doc.editorState.getCurrentContent();
 
@@ -51,6 +78,8 @@ class App extends Component {
     console.log('keyBindingFn')
   }
 
+  onSelectionPositionChange = selectionPosition => this.setState({ selectionPosition })
+
   onChange = (editorState) => {
     const { id, title } = this.props;
 
@@ -63,13 +92,17 @@ class App extends Component {
     });
   };
 
-  handlePastedText = (text, html, editorState) => {
-    console.log('handlePastedText')
+  onAutocomplete = tokens => {
+    console.log('auto complete yo', tokens)
+    if (tokens) {
+      this.setState({
+        list: tokens
+      });
+    }
   }
 
-  handleKeyCommand = command => {
-    console.log('handleKeyCommand')
-    return 'not-handled';
+  handlePastedText = (text, html, editorState) => {
+    console.log('handlePastedText')
   }
 
   onChangeTitle = ({ target: { value: title } }) => {
@@ -82,6 +115,10 @@ class App extends Component {
       title,
       editorState
     });
+  }
+
+  onAddToken = token => {
+    console.log('yop', token);
   }
 
   componentWillMount() {
@@ -120,11 +157,22 @@ class App extends Component {
             <div className='statements'>
               <Editor
                 placeholder="... e.g: 1 + 2"
-                handleKeyCommand={this.handleKeyCommand}
                 editorState={this.props.editorState}
+                plugins={this.plugins}
+                onSelectionPositionChange={this.onSelectionPositionChange}
+                onAutoComplete={this.onAutocomplete}
                 blockRenderMap={blockRenderMap}
                 onChange={this.onChange}
               />
+              <Popover
+                className="popover-style"
+                position={this.state.selectionPosition}
+              >
+                <List
+                  onSelect={this.onAddToken}
+                  list={this.state.list}
+                />
+              </Popover>
             </div>
             <Results statements={this.props.turoDoc.statements} />
           </div>

@@ -3,7 +3,8 @@ import { CompositeDecorator } from 'draft-js';
 import store from './store';
 import { docStore } from './reducer';
 
-const tokens = [
+const tokens = [];
+[
   {
     token: 'number',
     className: 'token--number'
@@ -31,7 +32,6 @@ const createStrategy = ({ token }) => (contentBlock, callback) => {
   let statement = docStore.turoDoc.evaluateStatement(contentBlock.key, contentBlock.getText());
   if (!statement || !statement[0].tokens) return ;
   statement = statement[0];
-  console.log('heyooo', statement.tokens);
   const textLength = contentBlock.getText().length;
   const tokens = statement.tokens.filter(tok => tok.displayType === token);
 

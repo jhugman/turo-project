@@ -21,7 +21,8 @@ const createTuroDoc = editorState => {
   const turoDoc = EditableDocument.create(genKey());
   const content = editorState.getCurrentContent();
   turoDoc.import('app');
-  content.getBlockMap().forEach(block => turoDoc.evaluateStatement(block.key, block.text));
+  const text = content.getPlainText();
+  turoDoc.evaluateDocument(text);
   docStore.turoDoc = turoDoc;
   window.doc = turoDoc;
   return turoDoc;
@@ -50,6 +51,83 @@ const initDoc = (state, {
   };
 };
 
+const batchUpdateDocument = (state, editorState) => {
+  const { turoDoc } = state;
+  const content = editorState.getCurrentContent();
+  const text = content.getPlainText();
+  turoDoc.evaluateDocument(text);
+  return {
+    ...state,
+    editorState,
+    turoDoc,
+  };
+};
+
+const iterativeUpdateDocument = (state, editorState) => {
+  // editorState works on blocks (i.e. long lines)
+  // turoDoc works on statements (i.e. multi line expressions)
+  // so for each key press, we need to find 
+  // a) which block it was in (easy)
+  // b) which statatement that corresponds to
+  // c) which other blocks does that statement correspond to.
+  // 
+  // Further compounding: blocks are not numbered sequentially.
+  const selection = editorState.getSelection();
+  const startOffset = selection.getStartOffset();
+  const startKey = selection.getStartKey();
+
+  const { turoDoc } = state;
+
+  const blocks = editorState.getCurrentContent().getBlocksAsArray();
+  let startLine;
+  for (let i=0; i < blocks.length; i++) {
+    if (blocks[i].key === startKey) {
+      startLine = i;
+      break;
+    }
+  }
+
+  if (startLine === undefined) {
+    return;
+  }
+
+  let editToken = { line: startLine + 1, offset: startOffset };
+  let statement = turoDoc.findStatementForEditToken(editToken);
+
+  if (!statement) {
+    return;
+  }
+
+  const id = statement.id;
+  const newLines = [];
+  for (let i = statement.info.lineFirst - 1; i < statement.info.lineLast; i++) {
+    const block = blocks[i];
+    if (!block) {
+      break;
+    }
+    newLines.push(block.getText());
+  } 
+
+  const newText = newLines.join('\n');
+
+  turoDoc.evaluateStatement(id, newText);
+
+  return {
+      ...state,
+      editorState,
+      turoDoc,
+    };
+};
+
+const updateEditorState = (state, {
+  payload: editorState
+}) => {
+  if (editorState.getLastChangeType() !== 'insert-characters') {
+    return batchUpdateDocument(state, editorState);
+  }
+  return iterativeUpdateDocument(state, editorState);
+}
+
 export default handleActions({
   [`${FETCH_DOCUMENT}_FULFILLED`]: initDoc,
   [`${CREATE_DOCUMENT}_FULFILLED`]: initDoc,
@@ -57,9 +135,5 @@ export default handleActions({
     ...state,
     ...payload
   }),
-  [UPDATE_EDITOR_STATE]: (state, { payload: editorState }) => ({
-    ...state,
-    editorState,
-    turoDoc: createTuroDoc(editorState),
-  }),
+  [UPDATE_EDITOR_STATE]: updateEditorState,
 }, initialState);

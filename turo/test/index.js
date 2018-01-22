@@ -18,6 +18,7 @@ import './test-document-loading';
 import './test-editable-document';
 import './test-editor-actions-basic';
 import './test-autocomplete';
+import './test-suggestions-api';
 import './test-comparisons';
 import './test-document-parsing';
 import './test-async-evaluator';

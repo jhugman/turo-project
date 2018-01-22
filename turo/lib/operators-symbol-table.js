@@ -93,7 +93,6 @@ function UnaryOperation (options) {
 
 UnaryOperation.prototype = new Operator({
   evaluate(x, ctx) {
-    console.log('hello', ctx);
     return this.nodeCalculator(x, ctx);
   },
 

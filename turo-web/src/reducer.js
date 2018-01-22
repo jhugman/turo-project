@@ -144,7 +144,7 @@ const iterativeUpdateDocument = (state, editorState) => {
     return;
   }
 
-  const editToken = { line: startLine + 1, offset: startOffset };
+  const editToken = { line: startLine + 1, column: startOffset };
   const statement = turoDoc.findStatementForEditToken(editToken);
 
   if (!statement) {

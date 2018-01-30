@@ -364,7 +364,7 @@ statics = {
     return new EditableDocument(id);
   },
 
-  loadEditableDocument (documentId, imports, cb) {
+  loadEditableDocument_withCallback (documentId, imports, cb) {
     var theDocument = new EditableDocument(documentId);
 
     function evaluator(id, string, cb) {
@@ -391,6 +391,18 @@ statics = {
       }
     );
     return theDocument;
+  },
+
+  loadEditableDocument (documentId, optionalImports) {
+    return new Promise((resolve, reject) => {
+      statics.loadEditableDocument_withCallback(documentId, optionalImports, (err, doc) => {
+        if (!err) {
+          resolve(doc);
+        } else {
+          reject(err);
+        }
+      });
+    });
   },
 
   // units requires everything 

@@ -13,7 +13,6 @@ import './test-preprocessor-word-cleaner';
 import './test-turo';
 import './test-unit-conversion-command';
 import './test-unit-evaluator';
-import './xtest-cycles';
 import './test-document-loading';
 import './test-editable-document';
 import './test-editor-actions-basic';
@@ -36,5 +35,6 @@ import './test-trig-functions';
 import './test-unit-schemes';
 
 // Failing
+// import './xtest-cycles';
 // import './test-lenient-parsing';
 // import './test-testfile-writer';

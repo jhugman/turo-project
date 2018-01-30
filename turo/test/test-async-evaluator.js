@@ -283,7 +283,7 @@ test('editable-document importing', function (t) {
 
   doc = new EditableDocument('my-2nd-doc');
 
-  doc.import('A', function (err, s) {
+  doc.import('A').then((s) => {
     scopeUnderTest = doc.scope;
     unitExists(t, 'B1Unit');
     unitExists(t, 'B2Unit');

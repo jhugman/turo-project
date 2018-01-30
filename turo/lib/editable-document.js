@@ -44,6 +44,16 @@ function EditableDocument (id) {
   this.documentHelper = new DocumentHelper(EditableDocument.storage);
 }
 
+function promiseCallback(resolve, reject) {
+  return (err, ...args) => {
+    if (!err) {
+      resolve(...args);
+    } else {
+      reject(err);
+    }
+  };
+}
+
 extend(EditableDocument.prototype, {
 
   /**
@@ -53,7 +63,7 @@ extend(EditableDocument.prototype, {
    * @param callback - func (err, doc)
    * @return boolean - true iff the import completed synchronously
    */
-  import (id, callback) {
+  import_withCallback (id, callback) {
     var toImport = id;
     if (!isArray(id)) {
       toImport = [id];
@@ -65,6 +75,12 @@ extend(EditableDocument.prototype, {
 
     var scope = this._state.importScope;
     return this.documentHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
+  },
+
+  import (id) {
+    return new Promise((resolve, reject) => {
+      this.import_withCallback(id, promiseCallback(resolve, reject));
+    });
   },
 
   _freshScope () {
@@ -384,7 +400,7 @@ statics = {
     // But: the file we're loading may be importing files that have been written 
     // with the same implicit imports (i.e. user generated files),
     // so they have to have the same imports.
-    theDocument.import(
+    theDocument.import_withCallback(
       imports, 
       function thenLoadAndEvaluateDocument () {
         EditableDocument.storage.loadDocument(documentId, evaluator, cb);

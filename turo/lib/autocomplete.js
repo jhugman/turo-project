@@ -1,5 +1,138 @@
 import _ from 'underscore';
 
+const calculatePrefix = (dirtyString, offset, error) => {
+  var substring;
+  if (offset === undefined || error.offset === undefined) {
+    substring = "";
+  } else if (error.offset === offset) {
+    // we have a valid statement up to the cursor.
+    // but the last word may still have completions.
+    var re = /\b(\w+)$/m,
+        m = re.exec(dirtyString.substring(0, offset));
+    substring = m ? m[1] : "";
+  } else if (error.offset > offset) {
+    substring = "";
+  } else {
+    substring = dirtyString.substring(error.offset, offset);
+  }
+  return substring;
+};
+
+
+class AutocompleteTokenProcessor {
+  constructor(offset, prefix, ordering) {
+    this.expectedMap = {};
+    this.offset = offset;
+    this.prefix = prefix;
+    this.ordering = ordering;
+  }
+
+  collect (tokenType, generator, error) {
+    const tokens = generator(error.scope);
+    if (tokens) {
+      this.expectedMap[tokenType] = tokens;
+    }
+  }
+
+  delivery (string, error) {
+    if (this.offset != error.offset) {
+      return [];
+    }
+    const expectedMap = this.expectedMap;
+    const ordering = this.ordering || Object.keys(expectedMap);
+    const substring = this.prefix || '';
+    const tokens = _.chain(ordering)
+      .map(function (tokenType) {
+        return _.map(expectedMap[tokenType], (literal) => {
+          return { literal, tokenType, match: substring };
+        });
+      })
+      .flatten()
+      .value();
+
+    
+    if (substring) {
+      return _.filter(tokens, function (t) {
+        return t.literal.indexOf(substring) === 0;
+      });
+    }
+
+    return tokens;
+  } 
+}
+
+class TabCompleteTokenProcessor {
+  constructor(dirtyString, offset, ordering) {
+    this.dirtyString = dirtyString;
+    this.expectedMap = {};
+    this.ordering = ordering;
+  }
+
+  collect (tokenType, generator, error) {
+    const tokens = generator(error.scope);
+    if (tokens) {
+      this.expectedMap[tokenType] = tokens;
+    }
+  }
+
+  // XXX this should go away, but the prefix calculation 
+  // is wrong, but the tests are right.
+  calculatePrefix (dirtyString, offset, error) {
+    let substring;
+    if (offset === undefined || error.offset === undefined) {
+      // we have a valid statement up to the cursor.
+      // but the last word may still have completions.
+      var re = /\b(\w+)$/m,
+          m = re.exec(dirtyString.substring(0, offset));
+      substring = m ? m[1] : "";
+    } else if (error.offset === offset) {
+      substring = "";
+    } else if (error.offset > offset) {
+      substring = "";
+    } else {
+      substring = dirtyString.substring(error.offset, offset);
+    }
+    return substring;
+  }
+
+  delivery (string, error, existing) {
+    const offset = this.offset;
+    const expectedMap = this.expectedMap;
+    const dirtyString = this.dirtyString;
+    const substring = this.calculatePrefix(dirtyString, offset, error);
+
+    const ordering = this.ordering || _.keys(expectedMap);
+    let tokens = _.chain(ordering)
+      .map(function (key) {
+        return expectedMap[key] || [];
+      })
+      .flatten()
+      .value();
+
+    if (substring) {
+      tokens = _.filter(tokens, function (t) {
+        return t.indexOf(substring) === 0;
+      });
+    }
+
+    let prefix;
+    if (!substring && dirtyString[dirtyString.length - 1] !== " " && tokens.length === 1) {
+      // this is beginning to look like a corner case.
+      prefix = " ";
+    }
+    if (prefix) {
+     tokens = _.map(tokens, function (t) {
+       return prefix + t;
+     });
+    }
+    if (existing) {
+      tokens = _.union(tokens, existing[0]);
+    }
+    return [tokens, substring];
+  }
+}
+
+
 function TokenPredictor (parser, generatorMap) {
   this.generatorMap = generatorMap || {};
   this.parser = parser;
@@ -10,76 +143,24 @@ _.extend(TokenPredictor.prototype, {
     this.generatorMap[tokenType] = fn;
   },
 
+  autocomplete: function (string, offset, ordering) {
+    const self = this,
+          tokenProcessorWithoutPrefix = new AutocompleteTokenProcessor(offset, '', ordering);
+    const tokens = self._makePrediction(tokenProcessorWithoutPrefix, string, offset);
+    const substring = calculatePrefix(string, offset, tokenProcessorWithoutPrefix.error);
+    if (substring !== '') {
+      const tokenProcessorWithPrefix = new AutocompleteTokenProcessor(offset - substring.length, substring, ordering);
+      const newTokens = self._makePrediction(tokenProcessorWithPrefix, string, offset - substring.length);
+      return {tokens: [...tokens, ...newTokens]};
+    }
+    return {tokens};
+  },
+
   tabComplete: function (string, dirtyString, offset, ordering) {
     var self = this,
-        tokenProcessor = {
-          expectedMap: {},
+        tokenProcessor = new TabCompleteTokenProcessor(dirtyString, offset, ordering);
 
-          reset: function () {
-            this.expectedMap = {};
-          },
-
-          collect: function (tokenType, generator, error) {
-            var tokens = generator(error.scope);
-            if (tokens) {
-              this.expectedMap[tokenType] = tokens;
-            }
-          },
-
-          calculatePrefix: function (dirtyString, offset, error) {
-            var substring;
-            if (offset === undefined || error.offset === undefined) {
-              // we have a valid statement up to the cursor.
-              // but the last word may still have completions.
-              var re = /\b(\w+)$/m,
-                  m = re.exec(dirtyString.substring(0, offset));
-              substring = m ? m[1] : "";
-            } else if (error.offset === offset) {
-              substring = "";
-            } else if (error.offset > offset) {
-              substring = "";
-            } else {
-              substring = dirtyString.substring(error.offset, offset);
-            }
-            return substring;
-          },
-
-          delivery: function (string, dirtyString, error, existing) {
-            var substring, prefix;
-            var expectedMap = this.expectedMap;
-
-            substring = this.calculatePrefix(dirtyString, offset, error);
-
-            var ordering = ordering || _.keys(expectedMap);
-            var tokens = _.chain(ordering)
-              .map(function (key) {
-                return expectedMap[key] || [];
-              })
-              .flatten()
-              .value();
-
-            if (substring) {
-              tokens = _.filter(tokens, function (t) {
-                return t.indexOf(substring) === 0;
-              });
-            }
-
-            if (!substring && dirtyString[dirtyString.length - 1] !== " " && tokens.length === 1) {
-              // this is beginning to look like a corner case.
-              prefix = " ";
-            }
-            if (prefix) {
-             tokens = _.map(tokens, function (t) {
-               return prefix + t;
-             });
-            }
-            if (existing) {
-              tokens = _.union(tokens, existing[0]);
-            }
-            return [tokens, substring];
-          },
-        };
-    return self._makePrediction(tokenProcessor, string, dirtyString, offset);
+    return self._makePrediction(tokenProcessor, string, offset);
   },
 
   createKeyboard: function (originalString, offset) {
@@ -111,7 +192,7 @@ _.extend(TokenPredictor.prototype, {
     };
     tokenProcessor.keyboard = {};
     parser.lastDigitOffset = undefined;
-    return this._makePrediction(tokenProcessor, originalString, originalString, offset);
+    return this._makePrediction(tokenProcessor, originalString, offset);
   },
 
   createParseError: function (string, offset) {
@@ -140,7 +221,7 @@ _.extend(TokenPredictor.prototype, {
       .value();
   },
 
-  _makePrediction: function (tokenProcessor, string, dirtyString, offset) {
+  _makePrediction: function (tokenProcessor, string, offset) {
     var self = this,
         parsedString = string,
         error;
@@ -162,13 +243,13 @@ _.extend(TokenPredictor.prototype, {
 
     tokenProcessor.error = error;
     this._collectCompletions(tokenProcessor, expected, error);
-    var retValue = tokenProcessor.delivery(string, dirtyString, error);
+    var retValue = tokenProcessor.delivery(string, error);
 
     if (tokenProcessor.reset && parsedString.match(/^\w+$/)) {
       tokenProcessor.reset();
       error = this.createParseError('');
       this._collectCompletions(tokenProcessor, error.expected, error);
-      retValue = tokenProcessor.delivery(string, dirtyString, error, retValue);
+      retValue = tokenProcessor.delivery(string, error, retValue);
     }
 
     return retValue;
@@ -182,6 +263,7 @@ _.extend(TokenPredictor.prototype, {
     } catch (e) {
       if (e.expected) {
         e.scope = this.parser.scope;
+        e.offset = (e.location) ? e.location.start.offset : 0;
         return e;
       }
       console.error("Strange error making predictions", e);
@@ -191,6 +273,7 @@ _.extend(TokenPredictor.prototype, {
   }
 });
 
+// deprecated
 function create (turo) {
   return new TokenPredictor(turo.parser, {
     variable: _.bind(turo.variables.getVariableNames, turo.variables),

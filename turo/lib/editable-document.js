@@ -6,6 +6,7 @@ import operatorsSymbolTable from './operators-symbol-table';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
 import { each, extend, isArray } from 'underscore';
+import EditorActions from './editor-actions';
 
 const { Parser } = parser;
 const { UnitsTable: Units } = unitsTable;
@@ -234,6 +235,16 @@ extend(EditableDocument.prototype, {
       return model.getStatement(id);
     }
   },
+
+  setEditPoint (token) {
+    // const {column, offset, line} = token;
+    this.editToken = token;
+    return this;
+  },
+
+  getActions () {
+    return this._editActions;
+  },
 });
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,6 +272,20 @@ Object.defineProperties(EditableDocument.prototype, {
   id: {
     get () {
       return this._state.id;
+    }
+  },
+
+  editToken: {
+    get () {
+      return this._state.editToken;
+    },
+    set (token) {
+      if (token != undefined) {
+        this._editActions = new EditorActions(this, token)
+      } else {
+        this._editActions = null;
+      }
+      this._state.editToken = token;
     }
   },
   
@@ -301,7 +326,7 @@ Object.defineProperties(EditableDocument.prototype, {
         return text;
       }
 
-      text = _.map(this.model.statementsInWrittenOrder, (s) => {
+      text = this.model.statementsInWrittenOrder.map((s) => {
         return s.info.text || '';
       }).join('\n');
 

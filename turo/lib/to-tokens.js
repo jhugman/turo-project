@@ -1,6 +1,6 @@
 import _ from 'underscore';
 
-function t(displayType, literal, offset, shortType, shortTypeAlpha) {
+function t(displayType, literal, line, offset, shortType, shortTypeAlpha) {
   if (shortTypeAlpha && literal.match(/^\w+$/)) {
     shortType = shortTypeAlpha;
   }
@@ -18,6 +18,7 @@ function t(displayType, literal, offset, shortType, shortTypeAlpha) {
     displayType: displayType,
     shortType: shortType || literal,
     startOffset: offset,
+    line: line,
   };
 }
 
@@ -41,7 +42,7 @@ function tokensFromKey(keyObj) {
   var keys = keyObj.key.split(/\b/),
       type = keyObj.type;
   var tokens = _.map(keys, function (literal) {
-    var tx = t('inserted', literal, undefined, tokenTypeToShortType[type], tokenTypeToAlphaShortType[type]);
+    var tx = t('inserted', literal, undefined, undefined, tokenTypeToShortType[type], tokenTypeToAlphaShortType[type]);
     type = '';
     return tx;
   });
@@ -60,7 +61,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   bracketStart: function (node, tokens, context) {
     var bracketCount = context.bracketCount || 0,
-        token = t('bracketStart', '(', node.offsetFirst);
+        token = t('bracketStart', '(', node.line, node.offsetFirst);
     bracketCount ++;
     context.bracketCount = bracketCount;
     
@@ -71,7 +72,7 @@ _.extend(ToSourceVisitor.prototype, {
   bracketEnd: function (node, tokens, context) {
     if (!node.isMissingParensClose) {
       var bracketCount = context.bracketCount || 0,
-          token = t('bracketEnd', ')', node.offsetLast);
+          token = t('bracketEnd', ')', node.line, node.offsetLast);
       token.bracketCount = bracketCount;
       
       bracketCount --;
@@ -94,18 +95,18 @@ _.extend(ToSourceVisitor.prototype, {
 
   errorStart: function (node, tokens, context) {
     if (node.error) {
-      tokens.push(t('errorStart'));
+      tokens.push(t('errorStart', undefined, node.line, node.offsetFirst));
     }
   },
 
   errorEnd: function (node, tokens, context) {
     if (node.error) {
-      tokens.push(t('errorEnd'));
+      tokens.push(t('errorEnd', undefined, node.line, node.offsetLast));
     }
   },
 
   percentValueType: function (insertPoint, tokens, context, value) {
-    tokens.push(t('operator', '%', insertPoint, '!', 'bang'));
+    tokens.push(t('operator', '%', undefined, insertPoint, '!', 'bang'));
   },
 
   printUnit: function (node, tokens, context, value) {
@@ -140,13 +141,13 @@ _.extend(ToSourceVisitor.prototype, {
     if (literal === "^") {
       // XXX horible hack.
       // I expect this should all go into a templating language.
-      tokens.push(t('powerStart', '^', node._offsetLiteralFirst, '^'));
+      tokens.push(t('powerStart', '^', node.line, node._offsetLiteralFirst, '^'));
       this.optionalBracketStart(node, tokens, context);
       node.right.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);
       tokens.push(t('powerEnd'));
     } else {
-      tokens.push(t('operator', literal, node._offsetLiteralFirst, '+', 'in'));
+      tokens.push(t('operator', literal, node.line, node._offsetLiteralFirst, '+', 'in'));
       this.optionalBracketStart(node, tokens, context);
       node.right.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);  
@@ -160,7 +161,7 @@ _.extend(ToSourceVisitor.prototype, {
   visitUnaryOperation: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     if (node.isPrefix) {
-      tokens.push(t('operator', node.literal, node._offsetLiteralFirst, '-', 'sqrt'));
+      tokens.push(t('operator', node.literal, node.line, node._offsetLiteralFirst, '-', 'sqrt'));
       this.optionalBracketStart(node, tokens, context);
       node.value.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);
@@ -168,7 +169,7 @@ _.extend(ToSourceVisitor.prototype, {
       this.optionalBracketStart(node, tokens, context);
       node.value.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);
-      tokens.push(t('operator', node.literal, node._offsetLiteralFirst, '!', 'bang'));
+      tokens.push(t('operator', node.literal, node.line, node._offsetLiteralFirst, '!', 'bang'));
     }
     
     this.printUnit(node, tokens, context);
@@ -190,11 +191,11 @@ _.extend(ToSourceVisitor.prototype, {
     if (context.editable) {
       var offset = node.offsetFirst;
       _.each(node.literal.split(''), function (char_) {
-        tokens.push(t('number', char_, offset, '1'));
+        tokens.push(t('number', char_, node.line, offset, '1'));
         offset++;
       });
     } else {
-      tokens.push(t('number', node.literal, node.offsetFirst, '1'));
+      tokens.push(t('number', node.literal, node.line, node.offsetFirst, '1'));
     }
     this.printUnit(node, tokens, context, node.value);
     this.errorEnd(node, tokens, context);
@@ -212,9 +213,9 @@ _.extend(ToSourceVisitor.prototype, {
         valueString = turoValue.literal || (value + '');
 
     if (turoValue.valueType === 'number')  {
-      tokens.push(t('number', valueString, node._offsetFirstLiteral, '1'));
+      tokens.push(t('number', valueString, node.line, node._offsetFirstLiteral, '1'));
     } else {
-      tokens.push(t(turoValue.valueType, valueString, node._offsetFirstLiteral, 'x'));
+      tokens.push(t(turoValue.valueType, valueString, node.line, node._offsetFirstLiteral, 'x'));
     }
     var valueTypeMethod = this[turoValue.valueType + 'ValueType'];
     if (valueTypeMethod) {
@@ -228,7 +229,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   visitIdentifier: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
-    var token = t('identifier', node.name, node.offsetFirst, 'x');
+    var token = t('identifier', node.name, node.line, node.offsetFirst, 'x');
     token.isConstant = node.isConstant;
     tokens.push(token);
     this.printUnit(node, tokens, context);
@@ -239,11 +240,11 @@ _.extend(ToSourceVisitor.prototype, {
   visitVariableDefinition: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     if (node.isConstant) {
-      t.push(t('statement', 'const', node.offsetFirst, 'kwd'));
+      t.push(t('statement', 'const', node.line, node.offsetFirst, 'kwd'));
     }
 
-    tokens.push(t('identifier', node.identifier, node.statementOffsetFirst, 'x'));
-    tokens.push(t('equal', '=', -1, '='));
+    tokens.push(t('identifier', node.identifier, node.lineFirst, node.statementOffsetFirst, 'x'));
+    tokens.push(t('equal', '=', node.lineFirst, -1, '='));
     if (node.ast) {
       node.ast.accept(this, tokens, context);
     } else if (node.definition) {
@@ -258,16 +259,17 @@ _.extend(ToSourceVisitor.prototype, {
     var unit = node.ast;
 
     if (unit) {
+      const line = node.line;
       if (unit.definitionUnit) {
-        tokens.push(t('number', '' + unit.definitionMultiple.bottom, undefined, '1'));
-        tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
-        tokens.push(t('equal', '=', node._offsetLiteralFirst, '='));
-        tokens.push(t('number', '' + unit.definitionMultiple.top, undefined, '1'));
+        tokens.push(t('number', '' + unit.definitionMultiple.bottom, line, undefined, '1'));
+        tokens.push(t('unit', unit.name, line, unit.offsetFirst, 'm'));
+        tokens.push(t('equal', '=', line, node._offsetLiteralFirst, '='));
+        tokens.push(t('number', '' + unit.definitionMultiple.top, line, undefined, '1'));
         unit.definitionUnit.accept(this, tokens, context);
       } else {
-        tokens.push(t('unit', unit.name, unit.offsetFirst, 'm'));
-        tokens.push(t('keyword', 'as a unit of', node._offsetLiteralFirst, 'kwd'));
-        tokens.push(t('dimension', unit.getDimension().shortName, node._offsetLiteralFirst, 'm'));
+        tokens.push(t('unit', unit.name, line, unit.offsetFirst, 'm'));
+        tokens.push(t('keyword', 'as a unit of', line, node._offsetLiteralFirst, 'kwd'));
+        tokens.push(t('dimension', unit.getDimension().shortName, line, node._offsetLiteralFirst, 'm'));
       }
 
       this.errorEnd(node, tokens, context);
@@ -281,7 +283,7 @@ _.extend(ToSourceVisitor.prototype, {
     if (node && node.value) {
       node.resultValueNode.accept(this, tokens, context);
     } else {
-      tokens.push(t('number', '' + node.result || '0', 0, '1'));
+      tokens.push(t('number', '' + node.result || '0', node.line, 0, '1'));
       if (node.ast.unit) {
         node.ast.unit.accept(this, tokens, context);
       }
@@ -299,7 +301,7 @@ _.extend(ToSourceVisitor.prototype, {
       node.ast.accept(this, tokens, context);
     }
 
-    tokens.push(t('equal', '=', 0, '='));
+    tokens.push(t('equal', '=', node.line, 0, '='));
     // node.value should be a node.
     this.visitResult(node, tokens, context);
 
@@ -325,7 +327,7 @@ _.extend(ToSourceVisitor.prototype, {
             name = unit.plural || name;
         }
       }
-      tokens.push(t('unitLiteral', name, 0, 'm'));
+      tokens.push(t('unitLiteral', name, -1, 0, 'm'));
     } else {
       var simpleUnits = unit.simpleUnits,
           display = this.display,
@@ -344,16 +346,16 @@ _.extend(ToSourceVisitor.prototype, {
         if (negative) {
           pow *= -1;
           if (!wasNegative) {
-            tokens.push(t('unitPer', '/', 0, '/'));
+            tokens.push(t('unitPer', '/', 0, 0, '/'));
             wasNegative = false;
           }
         }
 
         if (pow) {
-          tokens.push(t('unitLiteral', u, 0, 'm'));
+          tokens.push(t('unitLiteral', u, 0, 0, 'm'));
           if (pow !== 1) {
-            tokens.push(t('powerStart', '^', 0, '^'));
-            tokens.push(t('number', '' + pow, 0, '1'));
+            tokens.push(t('powerStart', '^', 0, 0, '^'));
+            tokens.push(t('number', '' + pow, 0, 0, '1'));
             tokens.push(t('powerEnd'));
           }
         }
@@ -364,14 +366,14 @@ _.extend(ToSourceVisitor.prototype, {
   },
 
   visitIncludeStatement: function (node, tokens, context) {
-    t.push(t('statement', 'include', node.offsetFirst, 'kwd'));
+    t.push(t('statement', 'include', node.line, node.offsetFirst, 'kwd'));
     t.push(t('string', '"' + node.ast + '"', 0, '"'));
   },
 
   visitUnitPower: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     node.unitNode.accept(this, tokens, context);
-    tokens.push(t('powerStart', '^', node._offsetLiteralFirst, '^'));
+    tokens.push(t('powerStart', '^', node.line, node._offsetLiteralFirst, '^'));
     node.exponent.accept(this, tokens, context);
     tokens.push(t('powerEnd'));
     this.errorEnd(node, tokens, context);
@@ -379,7 +381,7 @@ _.extend(ToSourceVisitor.prototype, {
 
   visitUnitLiteral: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
-    tokens.push(t('unitLiteral', node.literal, node.offsetFirst, 'm'));
+    tokens.push(t('unitLiteral', node.literal, node.line, node.offsetFirst, 'm'));
     this.errorEnd(node, tokens, context);
   },
 
@@ -390,7 +392,7 @@ _.extend(ToSourceVisitor.prototype, {
       node.left.accept(this, tokens, context);
     }
     if (node.literal === '/') {
-      tokens.push(t('unitPer', '/', node._offsetLiteralFirst, '/'));
+      tokens.push(t('unitPer', '/', node.line, node._offsetLiteralFirst, '/'));
     }
     node.right.accept(this, tokens, context);
     

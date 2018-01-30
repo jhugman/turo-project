@@ -181,7 +181,13 @@ extend(EditableDocument.prototype, {
     return this;
   },
 
-  evaluateStatement (id, string, callback) {
+  evaluateStatement (id, string) {
+    return new Promise((resolve, reject) => {
+      this.evaluateStatement_withCallback(id, string, promiseCallback(resolve, reject));
+    });
+  },
+
+  evaluateStatement_withCallback (id, string, callback) {
     if (!callback) {
       callback = statics.noCallback;
     }

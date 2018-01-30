@@ -13,7 +13,9 @@ function reset() {
 reset();
 
 function evaluate(string) {
-  return doc.evaluateStatement(`_${id++}`, string)[0];
+  // We can do this here because we know that this is a synchronous call. 
+  // Typically, clients would use the Promise based doc.evaluateStatement(id, string);
+  return doc.evaluateStatement_withCallback(`_${id++}`, string)[0];
 }
 
 export default { evaluate, reset }

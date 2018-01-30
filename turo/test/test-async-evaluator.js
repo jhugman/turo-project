@@ -278,7 +278,7 @@ test('editable-document importing', function (t) {
   var doc = new EditableDocument('my-doc');
 
   function testEvaluate (filename, cb) {
-    doc.evaluateStatement(filename, fileSource.get(filename), cb);
+    return doc.evaluateStatement(filename, fileSource.get(filename));
   }
 
   doc = new EditableDocument('my-2nd-doc');
@@ -292,7 +292,7 @@ test('editable-document importing', function (t) {
     // TODO prove that we can make a document using 
     // the imported files.
 
-    testEvaluate('newDoc', function (err) {
+    testEvaluate('newDoc').then((s) => {
       scopeUnderTest = doc.scope;
       unitExists(t, 'B1Unit');
       unitExists(t, 'B2Unit');

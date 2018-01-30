@@ -18,25 +18,15 @@ const initialState = {
   tokenMap: null,
 };
 
-const createTuroDoc = editorState => {
-  const turoDoc = EditableDocument.create(genKey());
-  const content = editorState.getCurrentContent();
-  turoDoc.import('app');
-  const text = content.getPlainText();
-  turoDoc.evaluateDocument(text);
+const initDoc = (state, { 
+  payload: { id, title, text, turoDoc }
+}) => {
   docStore.turoDoc = turoDoc;
   window.doc = turoDoc;
-  return turoDoc;
-}
 
-const initDoc = (state, {
-  payload: { id, title, document: text }
-}) => {
   let editorState = EditorState.createWithContent(
     ContentState.createFromText(text)
   );
-
-  const turoDoc = createTuroDoc(editorState);
 
   editorState = EditorState.set(
     editorState,
@@ -60,7 +50,7 @@ const batchUpdateDocument = (state, editorState) => {
   const blocks = editorState.getCurrentContent().getBlocksAsArray();
   const text = blocks.map((block) => block.getText()).join('\n');
 
-  turoDoc.evaluateDocument(text, (err, turoDoc) => {});
+  turoDoc.evaluateDocument(text, (err, turoDoc));
 
   const tokenMap = updateTokenMap(blocks, turoDoc.statements, {});
 
@@ -163,9 +153,7 @@ const iterativeUpdateDocument = (state, editorState) => {
 
   const newText = newLines.join('\n');
 
-  turoDoc.evaluateStatement(id, newText, (err, updatedStatements) => {
-
-  });
+  turoDoc.evaluateStatement(id, newText);
 
   const newStatement = turoDoc.getStatement(id);
   

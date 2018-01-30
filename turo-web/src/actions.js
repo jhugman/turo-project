@@ -9,6 +9,8 @@ import {
   CREATE_DOCUMENT,
 } from './constants';
 
+import { EditableDocument } from 'turo';
+
 const headers = new Headers({ 'Content-Type': "application/json" });
 
 const saveDocument = (id, body) => fetch(
@@ -16,16 +18,33 @@ const saveDocument = (id, body) => fetch(
   { method: 'PUT', body: JSON.stringify(body), headers }
 ).then(res => res.json());
 
+
+const initialize = (fetchPromise) => {
+  return fetchPromise
+    .then(res => res.json())
+    .then(({ id, title, document: text }) => {
+      const turoDoc = EditableDocument.create('' + id);
+      return turoDoc.import('app')
+        .then(
+          turoDoc => {
+            return turoDoc.evaluateDocument(text)
+          }
+        ).then(
+          turoDoc => ({ id, title, text, turoDoc })
+        );
+    });
+};
+
 export const updateEditorState = createAction(
   UPDATE_EDITOR_STATE
 );
 
 export const createDocument = createAction(
   CREATE_DOCUMENT,
-  body => fetch(
+  body => initialize(fetch(
     '/api',
     { method: 'POST', body: JSON.stringify(body), headers }
-  ).then(res => res.json())
+  ))
 );
 
 export const updateDocument = createAction(UPDATE_DOCUMENT);
@@ -40,5 +59,6 @@ export const autosaveDocument = createAction(
 
 export const fetchDocument = createAction(
   FETCH_DOCUMENT,
-  (id) => fetch(`/api/${id}`, { method: 'GET', headers}).then(res => res.json())
+  (id) => initialize(fetch(`/api/${id}`, { method: 'GET', headers}))
 );
+

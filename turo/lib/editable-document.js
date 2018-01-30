@@ -44,10 +44,10 @@ function EditableDocument (id) {
   this.documentHelper = new DocumentHelper(EditableDocument.storage);
 }
 
-function promiseCallback(resolve, reject) {
+function promiseCallback(resolve, reject, ...defaultArgs) {
   return (err, ...args) => {
     if (!err) {
-      resolve(...args);
+      resolve(...defaultArgs, ...args);
     } else {
       reject(err);
     }
@@ -79,7 +79,7 @@ extend(EditableDocument.prototype, {
 
   import (id) {
     return new Promise((resolve, reject) => {
-      this.import_withCallback(id, promiseCallback(resolve, reject));
+      this.import_withCallback(id, promiseCallback(resolve, reject, this));
     });
   },
 

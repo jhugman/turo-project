@@ -8,13 +8,21 @@ import lang from '../lib/language-model';
 import EditableDocument from '../lib/editable-document';
 
 const { Parser } = _parser;
+////////////////////////////////////////////////////////////////////////
+var scopeUnderTest;
+
+function unitExists (t, unitName) {
+  t.ok(scopeUnderTest.findUnit(unitName), unitName + ' exists?');
+}
+
+function unitNotExists (t, unitName) {
+  t.ok(!scopeUnderTest.findUnit(unitName), unitName + ' not exists?');
+}
 
 /////////////////////////////////////////////////////////////////////////
 var fileSource, parser, helper;
 
 function mockEvaluator (id, string, cb) {
-  console.log('Parsing document ' + id);
-  
   // one scope per id.
   var scope = lang.newScope(id);
   
@@ -140,77 +148,71 @@ test('abstract-storage', function (t) {
   });
 });
 
-// test('Test single import from turo', function (t) {
-//   var turo = newTuro();
-//   fileSource.put(
-//     'importedFile', 
-//     [
-//       'unit iU : iLength;',
-//       'const iC = 1 iU;'
-//     ]);
+test('Test single import from turo', function (t) {
+  setup();
+  fileSource.put(
+    'importedFile', 
+    [
+      'unit iU : iLength;',
+      'const iC = 1 iU;'
+    ]);
 
-//   turo.import('importedFile', function () {
-//     var m = turo.scope.findUnit('iU');
-//     t.ok(m, 'iU exists');
-//     t.end();
-//   });
+  EditableDocument.storage = fileSource;
+  const doc = new EditableDocument('my-doc');
 
-// });
+  doc.import('importedFile').then(() => {
+    var m = doc.scope.findUnit('iU');
+    t.ok(m, 'iU exists');
+    t.end();
+  });
+});
 
-// test('Recursive imports', function (t) {
-//   var turo = newTuro();
-//   fileSource
-//     .put(
-//       'importedFile2', 
-//       [
-//         'import "parentFile";',
-//         'unit i2U : 10 pU;',
-//         'const iC = 1 i2U;'
-//       ])
-//     .put(
-//       'parentFile', 
-//       [
-//         'unit pU : pLength;',
-//         'const pC = 1 pU;'
-//       ]);
+test('Recursive imports', function (t) {
+  setup();
+  fileSource
+    .put(
+      'importedFile2', 
+      [
+        'import "parentFile";',
+        'unit i2U : 10 pU;',
+        'const iC = 1 i2U;'
+      ])
+    .put(
+      'parentFile', 
+      [
+        'unit pU : pLength;',
+        'const pC = 1 pU;'
+      ]);
 
-//   turo.import('importedFile2', function () {
-//     var unit = turo.scope.findUnit('i2U');
-//     t.ok(unit, 'i2U exists');
-//     unit = turo.scope.findUnit('pU');
-//     t.ok(unit, 'pU exists');
-//     t.end();    
-//   });
-// });
+  EditableDocument.storage = fileSource;
+  const doc = new EditableDocument('my-doc');
 
-// test('DAG Recursive imports', function (t) {
-//   var turo = newTuro();
+  doc.import('importedFile2').then(() => {
+    var unit = doc.scope.findUnit('i2U');
+    t.ok(unit, 'i2U exists');
+    unit = doc.scope.findUnit('pU');
+    t.ok(unit, 'pU exists');
+    t.end();    
+  });
+});
 
-//   function unitExists (unitName) {
-//     t.ok(turo.scope.findUnit(unitName), unitName + ' exists?');
-//   }
+test('DAG Recursive imports', function (t) {
+  setup();
 
-//   turo.import('A', function () {
-//     unitExists('B1Unit');
-//     unitExists('B2Unit');
-//     unitExists('CUnit');
-//     t.end();    
-//   });
-// });
+  EditableDocument.storage = fileSource;
+  const doc = new EditableDocument('my-doc');
 
+  doc.import('A').then(() => {
+    scopeUnderTest = doc.scope;
+    unitExists(t, 'B1Unit');
+    unitExists(t, 'B2Unit');
+    unitExists(t, 'CUnit');
+    t.end();    
+  });
+});
 
-
-test('evaluateDocument', function (t) {
+test('naiveEvaluateDocument', function (t) {
   var turo = setup();
-  var scopeUnderTest;
-
-  function unitExists (unitName) {
-    t.ok(scopeUnderTest.findUnit(unitName), unitName + ' exists?');
-  }
-
-  function unitNotExists (unitName) {
-    t.ok(!scopeUnderTest.findUnit(unitName), unitName + ' not exists?');
-  }
 
   function mockEvaluate (filename, cb) {
     mockEvaluator('doc', fileSource.get(filename), cb);
@@ -218,47 +220,10 @@ test('evaluateDocument', function (t) {
 
   mockEvaluate('current', function (err, doc) {
     scopeUnderTest = doc.scope;
-    unitExists('B1Unit');
-    unitNotExists('B2Unit');
-    unitExists('CUnit');
-    mockEvaluate('current-edited', function (err, doc) {
-      scopeUnderTest = doc.scope;
-      unitNotExists('B1Unit');
-      unitExists('B2Unit');
-      unitExists('CUnit');
-      t.end();
-    });
-  });
-});
-
-
-var scopeUnderTest;
-
-function unitExists (t, unitName) {
-  t.ok(scopeUnderTest.findUnit(unitName), unitName + ' exists?');
-}
-
-function unitNotExists (t, unitName) {
-  t.ok(!scopeUnderTest.findUnit(unitName), unitName + ' not exists?');
-}
-
-test('editable-document eval document', function (t) {
-  setup();
-
-  EditableDocument.storage = fileSource;
-  
-  var doc = new EditableDocument('my-doc');
-
-  function testEvaluate (filename, cb) {
-    doc.evaluateDocument_withCallback(fileSource.get(filename), cb);
-  }
-
-  testEvaluate('current', function (err, doc) {
-    scopeUnderTest = doc.scope;
     unitExists(t, 'B1Unit');
     unitNotExists(t, 'B2Unit');
     unitExists(t, 'CUnit');
-    testEvaluate('current-edited', function (err, doc) {
+    mockEvaluate('current-edited', function (err, doc) {
       scopeUnderTest = doc.scope;
       unitNotExists(t, 'B1Unit');
       unitExists(t, 'B2Unit');
@@ -268,36 +233,53 @@ test('editable-document eval document', function (t) {
   });
 });
 
+test('editable-document eval document', function (t) {
+  setup();
+
+  EditableDocument.storage = fileSource;
+  
+  var doc = new EditableDocument('my-doc');
+
+  function testEvaluate (filename) {
+    return doc.evaluateDocument(fileSource.get(filename));
+  }
+
+  testEvaluate('current').then((doc) => {
+    scopeUnderTest = doc.scope;
+    unitExists(t, 'B1Unit');
+    unitNotExists(t, 'B2Unit');
+    unitExists(t, 'CUnit');
+  }).then(() => {
+    return testEvaluate('current-edited')
+  }).then((doc) => {
+    scopeUnderTest = doc.scope;
+    unitNotExists(t, 'B1Unit');
+    unitExists(t, 'B2Unit');
+    unitExists(t, 'CUnit');
+    t.end();
+  });
+});
+
 test('editable-document importing', function (t) {
   setup();
 
   EditableDocument.storage = fileSource;
-
-  fileSource.put('newDoc', ['1 CUnit^2']);
-  
-  var doc = new EditableDocument('my-doc');
-
-  function testEvaluate (filename, cb) {
-    return doc.evaluateStatement(filename, fileSource.get(filename));
-  }
-
-  doc = new EditableDocument('my-2nd-doc');
+  const doc = new EditableDocument('my-2nd-doc');
 
   doc.import('A').then((s) => {
     scopeUnderTest = doc.scope;
     unitExists(t, 'B1Unit');
     unitExists(t, 'B2Unit');
     unitExists(t, 'CUnit');
-
     // TODO prove that we can make a document using 
     // the imported files.
-
-    testEvaluate('newDoc').then((s) => {
+  }).then(() => {
+    return doc.evaluateStatement('_id', '1 CUnit^2');
+  }).then((s) => {
       scopeUnderTest = doc.scope;
       unitExists(t, 'B1Unit');
       unitExists(t, 'B2Unit');
       unitExists(t, 'CUnit');
       t.end();
-    });
   });
 }); 

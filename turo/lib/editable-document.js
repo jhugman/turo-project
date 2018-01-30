@@ -64,7 +64,7 @@ extend(EditableDocument.prototype, {
     }
 
     var scope = this._state.importScope;
-    return this.documentHelper.import(toImport, scope, statics.createEditableDocument, callback);
+    return this.documentHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
   },
 
   _freshScope () {
@@ -86,7 +86,7 @@ extend(EditableDocument.prototype, {
    *
    * @return isReady, if the no asynchronous activity is needed.
    */
-  evaluateDocument (string, callback, optionalDocumentEvaluator) {
+  evaluateDocument_withCallback (string, callback, optionalDocumentEvaluator) {
     var scope = this._freshScope();
     this.scope = scope;
     return this._firstParseEval(string, optionalDocumentEvaluator, (err) => {
@@ -98,6 +98,19 @@ extend(EditableDocument.prototype, {
     });
   },
 
+  evaluateDocument (string) {
+    const promise = new Promise((resolve, reject) => {
+      this.evaluateDocument_withCallback(string, (err, doc) => {
+        if (!err) {
+          resolve(doc);
+        } else {
+          reject(err);
+        }
+      });
+    });
+    return promise;
+  },
+
   reeevaluateDocument (callback) {
     return this._evalDocumentSync(this.text, callback);
   },
@@ -107,7 +120,7 @@ extend(EditableDocument.prototype, {
 
     var context = {
       string,
-      documentEvaluator: optionalDocumentEvaluator || statics.createEditableDocument,
+      documentEvaluator: optionalDocumentEvaluator || statics.createEditableDocument_withCallback,
       scope: this.scope,
       document: this,
     };
@@ -337,14 +350,18 @@ Object.defineProperties(EditableDocument.prototype, {
 
 ///////////////////////////////////////////////////////////////////////////////
 statics = {
-  createEditableDocument (id, string, cb) {
+  createEditableDocument_withCallback (id, string, cb) {
     var theDocument = new EditableDocument(id),
         isReady;
 
     if (string) {
-      isReady = theDocument.evaluateDocument(string, cb);
+      isReady = theDocument.evaluateDocument_withCallback(string, cb);
     }
     return theDocument;
+  },
+
+  createEditableDocument(id) {
+    return new EditableDocument(id);
   },
 
   loadEditableDocument (documentId, imports, cb) {
@@ -358,7 +375,7 @@ statics = {
         doc = new EditableDocument(id);
         doc.importScope = theDocument.importScope.clone();
       }
-      doc.evaluateDocument(string, cb, evaluator);
+      doc.evaluateDocument_withCallback(string, cb, evaluator);
     }
 
     // We do two things and a but here.

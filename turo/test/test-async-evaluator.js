@@ -250,7 +250,7 @@ test('editable-document eval document', function (t) {
   var doc = new EditableDocument('my-doc');
 
   function testEvaluate (filename, cb) {
-    doc.evaluateDocument(fileSource.get(filename), cb);
+    doc.evaluateDocument_withCallback(fileSource.get(filename), cb);
   }
 
   testEvaluate('current', function (err, doc) {

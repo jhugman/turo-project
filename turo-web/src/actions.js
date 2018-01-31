@@ -3,11 +3,13 @@ import {
   UPDATE_STATEMENT,
   AUTOSAVE_DOCUMENT,
   FETCH_DOCUMENT,
-  UPDATE_EDITOR_STATE,
+  BATCH_UPDATE_EDITOR_STATE,
+  ITERATIVE_UPDATE_EDITOR_STATE,
   UPDATE_DOCUMENT,
   UPDATE_DOCUMENT_TITLE,
   CREATE_DOCUMENT,
 } from './constants';
+import { findLineNumber, textForStatement } from './blocks-utils';
 
 import { EditableDocument } from 'turo';
 
@@ -35,8 +37,47 @@ const initialize = (fetchPromise) => {
     });
 };
 
-export const updateEditorState = createAction(
-  UPDATE_EDITOR_STATE
+export const batchUpdateEditorState = createAction(
+  BATCH_UPDATE_EDITOR_STATE,
+  (turoDoc, editorState) => {
+    const blocks = editorState.getCurrentContent().getBlocksAsArray();
+    const text = blocks.map((block) => block.getText()).join('\n');
+
+    return turoDoc.evaluateDocument(text)
+      .then(
+        (turoDoc) => ({ editorState, statements: turoDoc.statements, blocks })
+      );
+  }
+);
+
+export const iterativeUpdateEditorState = createAction(
+  ITERATIVE_UPDATE_EDITOR_STATE,
+  (turoDoc, editorState) => {
+    const selection = editorState.getSelection();
+    const column = selection.getStartOffset();
+    const blockKey = selection.getStartKey();
+
+    // find the line that this block corresponds to.
+    const blocks = editorState.getCurrentContent().getBlocksAsArray();
+    const line = findLineNumber(blocks, blockKey);
+    if (line === undefined) {
+      return;
+    }
+
+    // then find the statement, that corresponds to this line and column
+    const statement = turoDoc.findStatementForEditToken({ line, column });
+    if (!statement) {
+      return;
+    }
+
+    const newText = textForStatement(blocks, statement);
+
+    const id = statement.id;
+    return turoDoc.evaluateStatement(id, newText)
+      .then(
+        (statements) => ({ editorState, statements, blocks })
+      );
+  }
 );
 
 export const createDocument = createAction(

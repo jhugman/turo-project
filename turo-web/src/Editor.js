@@ -2,7 +2,6 @@ import React, { Component, PureComponent } from 'react';
 import { CompositeDecorator, Modifier, Editor, CharacterMetadata, ContentState, ContentBlock, genKey, EditorState, DefaultDraftBlockRenderMap } from 'draft-js';
 import Immutable from 'immutable';
 import get from 'lodash/get';
-import { UPDATE_STATEMENT } from './constants';
 import Results from './Results';
 import exampleDoc from './basic';
 import debounce from 'lodash/debounce';
@@ -52,9 +51,13 @@ class App extends Component {
   }
 
   onChange = (editorState) => {
-    const { id, title } = this.props;
+    const { id, title, turoDoc } = this.props;
 
-    this.props.updateEditorState(editorState);
+    if (editorState.getLastChangeType() !== 'insert-characters') {
+      this.props.batchUpdateEditorState(turoDoc, editorState);
+    } else {
+      this.props.iterativeUpdateEditorState(turoDoc, editorState);
+    }
 
     this.autosaveDocument({
       id,

@@ -20,11 +20,11 @@ class TestFixtureFileStorage extends AbstractStorage {
     //
   }
 
-  loadString (slug) {
+  loadJSON (slug) {
     const id = path.basename(slug);
     const string = files[id] || fixtures[id];
     if (string) {
-      return Promise.resolve(string);  
+      return Promise.resolve({ id: slug, title: slug, document: string });  
     } else {
       return Promise.reject('NO_DOCUMENT', slug);
     }

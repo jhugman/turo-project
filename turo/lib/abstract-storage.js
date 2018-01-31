@@ -1,27 +1,27 @@
 import _ from 'underscore';
 
 /////////////////////////////////////////////////////////////////////////
-function AbstractStorage () {
-  this._state = {
-    isLoading: {},
-    documents: {},
-  };
-  // subclasses should call this constructor
-  // with AbstractStorage.call(this) in their own constructors.
-}
+class AbstractStorage {
+  constructor () {
+    this._state = {
+      isLoading: {},
+      documents: {},
+    };
+    // subclasses should call this constructor
+    // with AbstractStorage.call(this) in their own constructors.
+  }
 
-_.extend(AbstractStorage.prototype, {
-  hasDocument: function (slug) {
+  hasDocument (slug) {
     return this.getDocument(slug);
-  },
+  }
 
-  isLoadingDocument(slug) {
+  isLoadingDocument (slug) {
     return this._state.isLoading[slug];
-  },
+  }
 
   // func (slug: String, evaluator: (slug, string, cb) -> Void, cb)
   // Should write to cache, for availability elsewhere
-  loadDocument(slug, evaluator, callback) {
+  loadDocument (slug, evaluator, callback) {
     var self = this,
         listeners = self._state.isLoading[slug];
 
@@ -33,8 +33,8 @@ _.extend(AbstractStorage.prototype, {
     listeners = [callback];
     self._state.isLoading[slug] = listeners;
 
-    this.loadString(slug)
-      .then((string) => {
+    this.loadJSON(slug)
+      .then(({ id, title, document: string }) => {
         // evaluates doc
         evaluator(
           slug,
@@ -54,20 +54,27 @@ _.extend(AbstractStorage.prototype, {
         );
       })
       .catch((err) => {
+        delete self._state.isLoading[slug];
         listeners.forEach((cb) => cb(err));
       });
     // load string,
     // create editable document with evaluate string
     // calls back with model.
-  },
+  }
 
-  loadString: function (location, callback) {
-    return Promise.reject('Unimplemented method loadString');
-  },
-
-  getDocument: function (slug) {
+  getDocument (slug) {
     return this._state.documents[slug];
-  },
-});
+  }
+
+  loadJSON (location) {
+    return Promise.reject('Unimplemented method loadJSON');
+  }
+
+  saveDocument (doc) {
+    return Promise.reject('Unimplemented method saveDocument');
+  }
+}
+
+
 
 export default AbstractStorage;

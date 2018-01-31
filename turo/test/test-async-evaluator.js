@@ -51,35 +51,33 @@ function mockEvaluator (id, string, cb) {
 }
 
 /////////////////////////////////////////////////////////////////////////
-function MockStorage () {
-  AbstractStorage.call(this);
-  this._state.mock_fs = {};
-}
+class MockStorage extends AbstractStorage {
+  constructor () {
+    super();
+    this._state.mock_fs = {};
+  }
 
-MockStorage.prototype = new AbstractStorage();
-
-_.extend(MockStorage.prototype, {
-  put: function (id, lines) {
+  put (id, lines) {
     this._state.mock_fs[id] = lines.join('\n');
     return this;
-  },
+  }
 
-  get: function (id) {
+  get (id) {
     return this._state.mock_fs[id];
-  },
+  }
 
-  loadString: function (slug) {
+  loadJSON (slug) {
     return new Promise((resolve, reject) => {
       setTimeout(
         () => {
           var string = this._state.mock_fs[slug];
-          resolve(string);
+          resolve({ id: slug, title: slug, document: string });
         },
         Math.random() * 100
       );  
     });
   }
-});
+};
 
 /////////////////////////////////////////////////////////////////////////
 function setup () {

@@ -14,7 +14,7 @@ extend(LocalFileStorage.prototype, {
     //
   },
 
-  resolveLocation(id, baseLocation, callback) {
+  resolveLocation(id, callback) {
     var location = files[id] ? id : null
     callback(location, this);
     return location;

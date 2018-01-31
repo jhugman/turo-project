@@ -33,7 +33,7 @@ _.extend(AbstractStorage.prototype, {
     listeners = [callback];
     self._state.isLoading[id] = listeners;
 
-    this.resolveLocation(id, undefined, function (location, layer) {
+    this.resolveLocation(id, function (location, layer) {
       // loads doc
       layer.loadString(location, function (err, string) {
         if (err) {

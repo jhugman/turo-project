@@ -68,7 +68,7 @@ _.extend(MockStorage.prototype, {
     return this._state.mock_fs[id];
   },
 
-  resolveLocation: function (id, baseLocation, callback) {
+  resolveLocation: function (id, callback) {
     callback(id, this);
   },
 

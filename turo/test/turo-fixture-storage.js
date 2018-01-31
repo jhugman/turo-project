@@ -20,7 +20,7 @@ class TestFixtureFileStorage extends AbstractStorage {
     //
   }
 
-  resolveLocation (id, baseLocation, callback) {
+  resolveLocation (id, callback) {
     id = path.basename(id)
     const location = (files[id] || fixtures[id]) ? id : null
     callback(location, this);

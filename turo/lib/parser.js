@@ -4,7 +4,7 @@ import lang from './language-model';
 
 function TuroParser (scope) {
   this.parseContext = {
-    scope: scope,
+    scope: scope || lang.newScope(),
   };
 }
 
@@ -32,7 +32,7 @@ Object.defineProperties(TuroParser.prototype, {
   }
 });
 
-var instance = new TuroParser(lang.newScope());
+var instance = new TuroParser();
 instance.Parser = TuroParser;
 
 export default instance;

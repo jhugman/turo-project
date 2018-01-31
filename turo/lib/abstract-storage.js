@@ -1,4 +1,5 @@
 import _ from 'underscore';
+import path from 'path';
 
 /////////////////////////////////////////////////////////////////////////
 class AbstractStorage {
@@ -75,6 +76,65 @@ class AbstractStorage {
   }
 }
 
+class CompositeStorage extends AbstractStorage {
+  constructor (jsonStores) {
+    super();
+    this.jsonStores = jsonStores;
+  }
 
+  loadJSON (slug) {
+    const generator = function* (stores) {
+      for (let store of stores) {
+        yield store;
+      }
+    }
 
-export default AbstractStorage;
+    const g = generator(this.jsonStores);
+    const tryNext = () => {
+      const next = g.next();
+
+      if (next.done) {
+        return Promise.reject('NO DOCUMENT IN ANY LOADER');
+      }
+      const store = next.value;
+
+      return store.loadJSON(slug)
+        .then(payload => {
+          debugger;
+          return payload;
+        })
+        .catch(e => tryNext());
+    };
+
+    return tryNext();
+  }
+}
+
+class DocumentLoader {
+  loadJSON (slug) {
+    return Promise.reject('Unimplemented method loadJSON');
+  }
+
+  saveDocument (doc) {
+    return Promise.reject('Unimplemented method saveDocument');
+  }
+}
+
+class BundleDocumentLoader extends DocumentLoader {
+  constructor (files) {
+    super();
+    this.files = files;
+  }
+
+  loadJSON (slug) {
+    const id = path.basename(slug);
+    const string = this.files[id];
+    if (string) {
+      return Promise.resolve({ id: slug, title: slug, document: string });  
+    } else {
+      return Promise.reject('BundleDocumentLoader: NO_DOCUMENT ' + slug);
+    }
+  }
+}
+
+export { AbstractStorage, CompositeStorage, DocumentLoader, BundleDocumentLoader };

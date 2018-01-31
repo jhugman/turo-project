@@ -1,7 +1,5 @@
-import {extend} from 'underscore';
-import * as files from 'turo-documents';
-import AbstractStorage from '../lib/abstract-storage';
-import path from 'path';
+import * as builtIn from 'turo-documents';
+import { CompositeStorage, BundleDocumentLoader } from '../lib/abstract-storage';
 
 import importing from './fixtures/importing.turo';
 import fromDisk from './fixtures/loaded-from-disk.turo';
@@ -11,24 +9,7 @@ const fixtures = {
   'loaded-from-disk': fromDisk,
 };
 
-class TestFixtureFileStorage extends AbstractStorage {
-  constructor () {
-    super();
-  }
-
-  saveDocument (doc, opts) {
-    //
-  }
-
-  loadJSON (slug) {
-    const id = path.basename(slug);
-    const string = files[id] || fixtures[id];
-    if (string) {
-      return Promise.resolve({ id: slug, title: slug, document: string });  
-    } else {
-      return Promise.reject('NO_DOCUMENT', slug);
-    }
-  }
-}
-
-export default TestFixtureFileStorage;
+export default new CompositeStorage([
+  new BundleDocumentLoader(builtIn),
+  new BundleDocumentLoader(fixtures),
+]);

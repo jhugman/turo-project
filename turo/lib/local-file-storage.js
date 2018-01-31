@@ -1,6 +1,6 @@
 import {extend} from 'underscore';
 import * as files from 'turo-documents';
-import AbstractStorage from './abstract-storage';
+import { AbstractStorage } from './abstract-storage';
 
 class LocalFileStorage extends AbstractStorage {
   constructor() {
@@ -13,7 +13,7 @@ class LocalFileStorage extends AbstractStorage {
     if (text) {
       return Promise.resolve({ id, title: slug, document: text });  
     } else {
-      return Promise.reject('NO_DOCUMENT', slug);
+      return Promise.reject('LocalFileStorage NO_DOCUMENT ' + slug);
     }
   }
 }

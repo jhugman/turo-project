@@ -2,7 +2,7 @@ import _ from 'underscore';
 import { test, plan } from 'tap';
 
 import DocumentHelper from '../lib/document/document-helper';
-import AbstractStorage from '../lib/abstract-storage';
+import { AbstractStorage } from '../lib/abstract-storage';
 import _parser from '../lib/parser';
 import lang from '../lib/language-model';
 import EditableDocument from '../lib/editable-document';

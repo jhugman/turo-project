@@ -4,8 +4,8 @@ import turo from './turo-shim';
 
 const { test, plan } = tap;
 
-test("simple2", function (t) {
-  turo.reset();
+test("simple2", async function (t) {
+  await turo.reset();
   turo.evaluate("include \"metric\"");
   turo.evaluate("r = 1 m");
   turo.evaluate("A = r");
@@ -14,8 +14,8 @@ test("simple2", function (t) {
   t.end();
 });
 
-test("area", function (t) {
-  turo.reset();
+test("area", async function (t) {
+  await turo.reset();
   turo.evaluate("include \"metric\"");
   turo.evaluate("r = 1 m");
   turo.evaluate("A = r * r");
@@ -28,8 +28,8 @@ test("area", function (t) {
   t.end();
 });
 
-test("Just expressions", function (t) {
-  turo.reset();
+test("Just expressions", async function (t) {
+  await turo.reset();
   turo.evaluate("include \"metric\"");
   turo.evaluate("r = 1 m");
   turo.evaluate("r = 1 km");
@@ -39,8 +39,8 @@ test("Just expressions", function (t) {
   t.end();
 });
 
-test("area km to m", function (t) {
-  turo.reset();
+test("area km to m", async function (t) {
+  await turo.reset();
   turo.evaluate("include \"metric\"");
 
   turo.evaluate("r = 1km");

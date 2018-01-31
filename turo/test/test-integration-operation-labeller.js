@@ -4,8 +4,8 @@ import turo from './turo-shim';
 
 const { test, plan } = tap;
 
-test("Regression", function (t) {
-  turo.reset();
+test("Regression", async function (t) {
+  await turo.reset();
   t.equal(turo.evaluate("1+2").toString(), "1 + 2 = 3", "1+2 == 3");
 
   turo.evaluate("unit m : L");
@@ -20,8 +20,8 @@ test("Regression", function (t) {
   t.end();
 });
 
-test("Orthoganal units", function (t) {
-  turo.reset();
+test("Orthoganal units", async function (t) {
+  await turo.reset();
   turo.evaluate("unit s : T");
   turo.evaluate("unit m : L");
   t.equal(turo.evaluate("2m/1s").toString(), "2 m / 1 s = 2 m/s", "2m/1s == \"2 m per s\"");
@@ -33,8 +33,8 @@ test("Orthoganal units", function (t) {
   t.end();
 });
 
-test("More complex units", function (t) {
-  turo.reset();
+test("More complex units", async function (t) {
+  await turo.reset();
   turo.evaluate("unit m : L");
   turo.evaluate("unit s : T");
   turo.evaluate("unit mps : 1 m per s");
@@ -43,8 +43,8 @@ test("More complex units", function (t) {
   t.end();
 });
 
-test('Unary operators', function (t) {
-  turo.reset();
+test('Unary operators', async function (t) {
+  await turo.reset();
 
   t.equal(turo.evaluate("sqrt 25").expressionToString(), "sqrt 25", "sqrt 25 = 5");
 

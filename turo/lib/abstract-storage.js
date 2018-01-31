@@ -11,19 +11,19 @@ function AbstractStorage () {
 }
 
 _.extend(AbstractStorage.prototype, {
-  hasDocument: function (id) {
-    return this.getDocument(id);
+  hasDocument: function (slug) {
+    return this.getDocument(slug);
   },
 
-  isLoadingDocument(id) {
-    return this._state.isLoading[id];
+  isLoadingDocument(slug) {
+    return this._state.isLoading[slug];
   },
 
-  // func (id: String, evaluator: (id, string, cb) -> Void, cb)
+  // func (slug: String, evaluator: (slug, string, cb) -> Void, cb)
   // Should write to cache, for availability elsewhere
-  loadDocument(id, evaluator, callback) {
+  loadDocument(slug, evaluator, callback) {
     var self = this,
-        listeners = self._state.isLoading[id];
+        listeners = self._state.isLoading[slug];
 
     if (listeners) {
       listeners.push(callback);
@@ -31,51 +31,42 @@ _.extend(AbstractStorage.prototype, {
     }
 
     listeners = [callback];
-    self._state.isLoading[id] = listeners;
+    self._state.isLoading[slug] = listeners;
 
-    this.resolveLocation(id, function (location, layer) {
-      // loads doc
-      layer.loadString(location, function (err, string) {
-        if (err) {
-          callback(err, null)
-          return
-        }
+    this.loadString(slug)
+      .then((string) => {
         // evaluates doc
         evaluator(
-          id,
+          slug,
           string,
           function (err, doc) {
+            // JS is single threaded, so nothing can add to listeners
+            delete self._state.isLoading[slug];
             if (err) {
-              delete self._state.isLoading[id];
-              console.error(`Error loading ${id}: ${err}`)
-              callback(err);
+              console.error(`Error loading ${slug}: ${err}`)
+              listeners.forEach((cb) => cb(err));
               return;
             }
-            doc.location = location;
-            self._state.documents[id] = doc;
-            _.each(listeners, function (cb) {
-              cb(null, doc);
-            });
-            delete self._state.isLoading[id];
+            doc.location = slug; //{ slug: slug, storage: this };
+            self._state.documents[slug] = doc;
+            listeners.forEach((cb) => cb(null, doc));
           }
         );
+      })
+      .catch((err) => {
+        listeners.forEach((cb) => cb(err));
       });
-    });  
     // load string,
     // create editable document with evaluate string
     // calls back with model.
   },
 
   loadString: function (location, callback) {
-    throw new Error('Unimplemented method loadString');
+    return Promise.reject('Unimplemented method loadString');
   },
 
-  resolveLocation: function (id, callback) {
-    throw new Error('Unimplemented method resolveLocation');
-  },
-
-  getDocument: function (id) {
-    return this._state.documents[id];
+  getDocument: function (slug) {
+    return this._state.documents[slug];
   },
 });
 

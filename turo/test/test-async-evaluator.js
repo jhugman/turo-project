@@ -68,18 +68,16 @@ _.extend(MockStorage.prototype, {
     return this._state.mock_fs[id];
   },
 
-  resolveLocation: function (id, callback) {
-    callback(id, this);
-  },
-
-  loadString: function (location, callback) {
-    setTimeout(
-      function () {
-        var string = this._state.mock_fs[location];
-        callback(null, string);
-      }.bind(this),
-      Math.random() * 100
-    );
+  loadString: function (slug) {
+    return new Promise((resolve, reject) => {
+      setTimeout(
+        () => {
+          var string = this._state.mock_fs[slug];
+          resolve(string);
+        },
+        Math.random() * 100
+      );  
+    });
   }
 });
 

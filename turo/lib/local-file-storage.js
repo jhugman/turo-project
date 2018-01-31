@@ -14,17 +14,14 @@ extend(LocalFileStorage.prototype, {
     //
   },
 
-  resolveLocation(id, callback) {
-    var location = files[id] ? id : null
-    callback(location, this);
-    return location;
-  },
-
-  loadString(location, callback) {
-    if (!location) {
-      callback('NO_DOCUMENT');
+  loadString(slug) {
+    const id = slug;
+    const string = files[id];
+    if (string) {
+      return Promise.resolve(string);  
+    } else {
+      return Promise.reject('NO_DOCUMENT', slug);
     }
-    callback(null, files[location]);
   },
 });
 

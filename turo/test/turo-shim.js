@@ -3,14 +3,12 @@ import EditableDocument from '../lib/editable-document';
 
 let doc, id;
 
-function reset() {
+async function reset() {
   EditableDocument.storage = new Storage();
   doc = EditableDocument.create();
-  doc.import('app');
   id = 0;
+  return doc.import('app');
 }
-
-reset();
 
 function evaluate(string) {
   // We can do this here because we know that this is a synchronous call. 

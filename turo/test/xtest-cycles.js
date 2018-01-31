@@ -8,7 +8,8 @@ function exec(str) {
   return turo.evaluate(str).resultValueNode;
 }
 
-test("Cycle with prime. Should execute", function (t) {
+test("Cycle with prime. Should execute", async function (t) {
+  await turo.reset();
   exec("r = 1");
   exec("r = 2");
 
@@ -18,7 +19,8 @@ test("Cycle with prime. Should execute", function (t) {
   t.end();
 });
 
-test("Cycle without prime. Should error", function (t) {
+test("Cycle without prime. Should error", async function (t) {
+  await turo.reset();
   exec("r = 1");
   exec("r = 2");
 

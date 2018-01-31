@@ -20,23 +20,14 @@ class TestFixtureFileStorage extends AbstractStorage {
     //
   }
 
-  resolveLocation (id, callback) {
-    id = path.basename(id)
-    const location = (files[id] || fixtures[id]) ? id : null
-    callback(location, this);
-  }
-
-  loadString (location, callback) {
-    if (!location) {
-      callback('NO_DOCUMENT', null);
-      return;
+  loadString (slug) {
+    const id = path.basename(slug);
+    const string = files[id] || fixtures[id];
+    if (string) {
+      return Promise.resolve(string);  
+    } else {
+      return Promise.reject('NO_DOCUMENT', slug);
     }
-    const string = files[location] || fixtures[location];
-    if (!string) {
-      callback('NULL_DOCUMENT', null);
-      return
-    }
-    callback(null, string);
   }
 }
 

@@ -1,10 +1,10 @@
-import Storage from '../lib/local-file-storage';
+import { storage } from '../lib/storage/app-bundle-storage';
 import EditableDocument from '../lib/editable-document';
 
 let doc, id;
 
 async function reset() {
-  EditableDocument.storage = new Storage();
+  EditableDocument.storage = storage;
   doc = EditableDocument.create();
   id = 0;
   return doc.import('app');

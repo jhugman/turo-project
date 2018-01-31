@@ -1,10 +1,10 @@
 import tap from 'tap';
 import _ from 'underscore';
-import Storage from '../lib/local-file-storage';
+import { storage } from '../lib/storage/app-bundle-storage';
 import EditableDocument from '../lib/editable-document';
 import '../lib/actions/autocomplete';
 
-EditableDocument.storage = new Storage();
+EditableDocument.storage = storage;
 
 const { test, plan } = tap;
 

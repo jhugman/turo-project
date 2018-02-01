@@ -12,6 +12,9 @@ import {
 import { findLineNumber, textForStatement } from './blocks-utils';
 
 import { EditableDocument } from 'turo';
+import { storage } from './api-document-loader';
+
+EditableDocument.storage = storage;
 
 const headers = new Headers({ 'Content-Type': "application/json" });
 

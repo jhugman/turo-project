@@ -72,8 +72,7 @@ const updateTokenMap = (blocks, statements, tokenMap = {}) => {
           return;
         }
         tokenMap[block.getKey()] = [];
-    
-        offsetFirst += currentLine.length;
+        offsetFirst += currentLine ? currentLine.length : 0;
         currentLine = lines.shift();
       }
 

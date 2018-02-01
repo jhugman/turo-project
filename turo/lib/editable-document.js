@@ -405,12 +405,13 @@ statics = {
     var theDocument = new EditableDocument(documentId);
 
     function createDocument(docData, cb) {
-      const { id, document: string } = docData;
+      const { id, document: string, title } = docData;
       var doc;
       if (documentId === id) {
         doc = theDocument;
       } else {
         doc = new EditableDocument(id);
+        doc.title = title;
         doc.importScope = theDocument.importScope.clone();
       }
       doc.evaluateDocument_withCallback(string, cb, createDocument);

@@ -25,19 +25,12 @@ const saveDocument = (id, body) => fetch(
 
 
 const initialize = (fetchPromise) => {
-  return fetchPromise
-    .then(res => res.json())
-    .then(({ id, title, document: text }) => {
-      const turoDoc = EditableDocument.create('' + id);
-      return turoDoc.import('app')
-        .then(
-          turoDoc => {
-            return turoDoc.evaluateDocument(text)
-          }
-        ).then(
-          turoDoc => ({ id, title, text, turoDoc })
-        );
-    });
+  return fetchPromise.then(
+      turoDoc => {
+        const { id, title, text } = turoDoc;
+        return { id, title, text, turoDoc };
+      }
+    );
 };
 
 export const batchUpdateEditorState = createAction(
@@ -85,10 +78,7 @@ export const iterativeUpdateEditorState = createAction(
 
 export const createDocument = createAction(
   CREATE_DOCUMENT,
-  body => initialize(fetch(
-    '/api',
-    { method: 'POST', body: JSON.stringify(body), headers }
-  ))
+  body => initialize(EditableDocument.load())
 );
 
 export const updateDocument = createAction(UPDATE_DOCUMENT);
@@ -103,6 +93,6 @@ export const autosaveDocument = createAction(
 
 export const fetchDocument = createAction(
   FETCH_DOCUMENT,
-  (id) => initialize(fetch(`/api/${id}`, { method: 'GET', headers}))
+  id => initialize(EditableDocument.load(id))
 );
 

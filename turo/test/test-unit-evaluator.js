@@ -1,16 +1,11 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
-import parser from '../lib/parser';
-import ast from '../lib/ast';
+import turoParser from '../lib/parser';
 import evaluator from '../lib/evaluator';
-import unitsTable from '../lib/units-table';
-import variablesSymbolTable from '../lib/variables-symbol-table';
 
 const { test, plan } = tap;
 
-const { Context: Variables } = variablesSymbolTable;
-const { UnitsTable: Units } = unitsTable;
+const parser = new turoParser.Parser();
 
 test("Expressions with units", function (t) {
   var result;

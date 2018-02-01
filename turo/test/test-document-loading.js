@@ -1,7 +1,5 @@
 import tap from 'tap';
 import _ from 'underscore';
-import $turo from '../lib/turo';
-import graphBuilder from '../lib/document/document-graph-builder';
 import path from 'path';
 import storage from './turo-fixture-storage';
 import EditableDocument from '../lib/editable-document';

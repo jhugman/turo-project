@@ -1,11 +1,11 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
+import turo from './turo-shim';
 
 const { test, plan } = tap;
 
 test("Output has units", function (t) {
-  turo.reset();
+  turo.resetImportNothing();
   turo.evaluate("unit m : L");
   turo.evaluate("unit km : 1000m");
   t.equal(turo.evaluate("2000m in km").toString(), "2000 m in km = 2 km", "2000m in km == \"2 km\"");
@@ -17,7 +17,7 @@ test("Output has units", function (t) {
 });
 
 test("Output has compound units", function (t) {
-  turo.reset();
+  turo.resetImportNothing();
   turo.evaluate("unit m : L");
   turo.evaluate("unit km : 1000m");
   turo.evaluate("unit s : T");

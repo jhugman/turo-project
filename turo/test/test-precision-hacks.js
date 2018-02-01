@@ -1,11 +1,8 @@
-import tap from 'tap';
-import _ from 'underscore';
-import turo from '../lib/turo';
+import { test, plan } from 'tap';
+import turo from './turo-shim';
 
-const { test, plan } = tap;
-
-test("Initial", function (t) {
-  turo.reset();
+test("Initial", async function (t) {
+  await turo.reset();
   // turo.evaluate("include \"metric\"");
   t.equal(turo.evaluate("0.1 + 0.2").valueToString(), "0.3", "0.1 + 0.2"); // 15
   t.equal(turo.evaluate("1.2 * 6").valueToString(), "7.2", "1.2 * 6");

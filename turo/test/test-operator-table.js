@@ -1,9 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
 import ast from '../lib/ast';
-import parser from '../lib/parser';
-import output from '../lib/to-source';
 import operatorSymbolTable from '../lib/operators-symbol-table';
 import turoNumber from '../lib/turo-number';
 

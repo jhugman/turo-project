@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import parser from '../lib/parser';
+import turoParser from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/evaluator';
 import unitsTable from '../lib/units-table';
@@ -11,7 +11,9 @@ const { test, plan } = tap;
 const { UnitsTable: Units } = unitsTable;
 const { Context: Variables } = variablesSymbolTable;
 
-parser.units = new Units();
+
+const parser = new turoParser.Parser();
+parser.scope._unitsTable = new Units();
 parser.variables = new Variables();
 
 var operatorNames = {

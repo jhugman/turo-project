@@ -11,7 +11,7 @@
 
   const self = this;
 
-  const units = this.scope.units || turo.units;
+  const units = this.scope.units;
   
   const inputLength = this.inputLength || input.length;
   const parseContext = this.parseContext;

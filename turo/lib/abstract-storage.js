@@ -35,7 +35,7 @@ class AbstractStorage {
     self._state.isLoading[slug] = listeners;
 
     this.loadJSON(slug)
-      .then(({ id, title, document: string }) => {
+      .then(({ id, title, document: string }, loader) => {
         // evaluates doc
         evaluator(
           slug,
@@ -48,7 +48,7 @@ class AbstractStorage {
               listeners.forEach((cb) => cb(err));
               return;
             }
-            doc.location = slug; //{ slug: slug, storage: this };
+            doc.location = { slug, loader };
             self._state.documents[slug] = doc;
             listeners.forEach((cb) => cb(null, doc));
           }
@@ -100,13 +100,21 @@ class CompositeStorage extends AbstractStorage {
 
       return store.loadJSON(slug)
         .then(payload => {
-          debugger;
-          return payload;
+          return Promise.resolve(payload, store);
         })
         .catch(e => tryNext());
     };
 
     return tryNext();
+  }
+
+  saveDocument (doc) {
+    const { slug, loader } = doc.location;
+    if (loader && loader.saveDocument) {
+      return loader.saveDocument(doc);
+    } else {
+      return Promise.reject('CANNOT SAVE');
+    }
   }
 }
 

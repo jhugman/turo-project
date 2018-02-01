@@ -22,7 +22,7 @@ function unitNotExists (t, unitName) {
 /////////////////////////////////////////////////////////////////////////
 var fileSource, parser, helper;
 
-function mockEvaluator (id, string, cb) {
+function mockEvaluator ({ id, document: string }, cb) {
   // one scope per id.
   var scope = lang.newScope(id);
   
@@ -121,8 +121,6 @@ function setup () {
     return helper;
 }
 
-var newTuro = setup;
-
 /////////////////////////////////////////////////////////////////////////
 
 test('abstract-storage', function (t) {
@@ -211,7 +209,7 @@ test('naiveEvaluateDocument', function (t) {
   var turo = setup();
 
   function mockEvaluate (filename, cb) {
-    mockEvaluator('doc', fileSource.get(filename), cb);
+    mockEvaluator({ id: 'doc', document: fileSource.get(filename) }, cb);
   }
 
   mockEvaluate('current', function (err, doc) {

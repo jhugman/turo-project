@@ -20,9 +20,9 @@ class AbstractStorage {
     return this._state.isLoading[slug];
   }
 
-  // func (slug: String, evaluator: (slug, string, cb) -> Void, cb)
+  // func (slug: String, documentCreator: ({id, document}, cb) -> Void, cb)
   // Should write to cache, for availability elsewhere
-  loadDocument (slug, evaluator, callback) {
+  loadDocument (slug, documentCreator, callback) {
     var self = this,
         listeners = self._state.isLoading[slug];
 
@@ -35,11 +35,10 @@ class AbstractStorage {
     self._state.isLoading[slug] = listeners;
 
     this.loadJSON(slug)
-      .then(({ id, title, document: string }, loader) => {
+      .then((docData, loader) => {
         // evaluates doc
-        evaluator(
-          slug,
-          string,
+        documentCreator(
+          docData,
           function (err, doc) {
             // JS is single threaded, so nothing can add to listeners
             delete self._state.isLoading[slug];
@@ -111,7 +110,7 @@ class CompositeStorage extends AbstractStorage {
   saveDocument (doc) {
     const { slug, loader } = doc.location;
     if (loader && loader.saveDocument) {
-      return loader.saveDocument(doc);
+      return loader.saveDocument(slug, doc);
     } else {
       return Promise.reject('CANNOT SAVE');
     }
@@ -123,7 +122,7 @@ class DocumentLoader {
     return Promise.reject('Unimplemented method loadJSON');
   }
 
-  saveDocument (doc) {
+  saveDocument (slug, doc) {
     return Promise.reject('Unimplemented method saveDocument');
   }
 }

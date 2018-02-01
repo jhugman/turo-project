@@ -102,10 +102,10 @@ extend(EditableDocument.prototype, {
    *
    * @return isReady, if the no asynchronous activity is needed.
    */
-  evaluateDocument_withCallback (string, callback, optionalDocumentEvaluator) {
+  evaluateDocument_withCallback (string, callback, optionalDocumentCreator) {
     var scope = this._freshScope();
     this.scope = scope;
-    return this._firstParseEval(string, optionalDocumentEvaluator, (err) => {
+    return this._firstParseEval(string, optionalDocumentCreator, (err) => {
       if (err) {
         callback(err);
         return false;
@@ -131,12 +131,12 @@ extend(EditableDocument.prototype, {
     return this._evalDocumentSync(this.text, callback);
   },
 
-  _firstParseEval (string, optionalDocumentEvaluator, syncEval) {
+  _firstParseEval (string, optionalDocumentCreator, syncEval) {
     var firstParseNode = this.parser.parse(string + '\n', 'DocumentFirstParse');
 
     var context = {
       string,
-      documentEvaluator: optionalDocumentEvaluator || statics.createEditableDocument_withCallback,
+      documentEvaluator: optionalDocumentCreator || statics.createEditableDocument_withCallback,
       scope: this.scope,
       document: this,
     };
@@ -372,13 +372,28 @@ Object.defineProperties(EditableDocument.prototype, {
 
 ///////////////////////////////////////////////////////////////////////////////
 statics = {
-  createEditableDocument_withCallback (id, string, cb) {
-    var theDocument = new EditableDocument(id),
-        isReady;
+  createEditableDocument_withCallback (docData, cb) {
+    const { id, document: string, implicitImports } = docData;
+    const theDocument = new EditableDocument(id);
 
-    if (string) {
-      isReady = theDocument.evaluateDocument_withCallback(string, cb);
+    function evalString () {
+      if (string) {
+        theDocument.evaluateDocument_withCallback(string, cb);
+      } else {
+        cb(null, theDocument);
+      }  
     }
+    
+    function importDocs () {
+      if (implicitImports) {
+        theDocument.import_withCallback(implicitImports, evalString);
+      } else {
+        evalString();
+      }
+    }
+
+    importDocs();
+    
     return theDocument;
   },
 
@@ -389,7 +404,8 @@ statics = {
   loadEditableDocument_withCallback (documentId, imports, cb) {
     var theDocument = new EditableDocument(documentId);
 
-    function evaluator(id, string, cb) {
+    function createDocument(docData, cb) {
+      const { id, document: string } = docData;
       var doc;
       if (documentId === id) {
         doc = theDocument;
@@ -397,7 +413,7 @@ statics = {
         doc = new EditableDocument(id);
         doc.importScope = theDocument.importScope.clone();
       }
-      doc.evaluateDocument_withCallback(string, cb, evaluator);
+      doc.evaluateDocument_withCallback(string, cb, createDocument);
     }
 
     // We do two things and a but here.
@@ -409,7 +425,7 @@ statics = {
     theDocument.import_withCallback(
       imports, 
       function thenLoadAndEvaluateDocument () {
-        EditableDocument.storage.loadDocument(documentId, evaluator, cb);
+        EditableDocument.storage.loadDocument(documentId, createDocument, cb);
       }
     );
     return theDocument;

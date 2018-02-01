@@ -3,6 +3,13 @@ import { CompositeStorage, DocumentLoader } from '../../turo/lib/abstract-storag
 
 const headers = new Headers({ 'Content-Type': "application/json" });
 
+const addImplicitImports = (promise) => {
+  return promise.then(json => {
+    json.implicitImports = ['app'];
+    return json;  
+  });
+};
+
 class APIDocumentLoader extends DocumentLoader {
   constructor() {
     super();
@@ -13,14 +20,14 @@ class APIDocumentLoader extends DocumentLoader {
       return this.fetchIDJSON();
     }
     return fetch(`/api/${slug}`, { method: 'GET', headers })
-      .then(res => res.json());
+      .then(res => addImplicitImports(res.json()));
   }
 
   fetchIDJSON() {
     const body = { title: '', document: '' };
     return fetch('/api',
         { method: 'POST', body: JSON.stringify(body), headers }
-    ).then(res => res.json());
+    ).then(res => addImplicitImports(res.json()));
   }
 
   saveDocument(slug, doc) {

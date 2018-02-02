@@ -14,14 +14,16 @@ function eval_t (t, input, expectedOutput) {
   }
 }
 
-test("Percent input & output", function (t) {
+test("Percent input & output", async function (t) {
+  await turo.reset();
   eval_t(t, '10%', '10 %');
   eval_t(t, '(10)%', '10 %');
   eval_t(t, '(10%)', '10 %');
   t.end();
 });
 
-test("Percent simple arithmetic", function (t) {
+test("Percent simple arithmetic", async function (t) {
+  await turo.reset();
   eval_t(t, '10% + 20%', '30 %');
   eval_t(t, '10% - 20%', '-10 %');
   eval_t(t, '10% * 20%', '2 %');
@@ -29,7 +31,8 @@ test("Percent simple arithmetic", function (t) {
   t.end();
 });
 
-test("Percent arithmetic with numbers and units", function (t) {
+test("Percent arithmetic with numbers and units", async function (t) {
+  await turo.reset();
 
   eval_t(t, '10% * 150', '15');
   eval_t(t, '150 * 10%', '15');
@@ -46,7 +49,8 @@ test("Percent arithmetic with numbers and units", function (t) {
   t.end();
 });
 
-test("Percent special case arithmetic", function (t) {
+test("Percent special case arithmetic", async function (t) {
+  await turo.reset();
   eval_t(t, '10 + 10%', '11');
   eval_t(t, '10 m + 10%', '11 metres');
 
@@ -59,8 +63,8 @@ test("Percent special case arithmetic", function (t) {
   t.end();
 });
 
-test("Percent special case arithmetic", function (t) {
-
+test("Percent special case arithmetic", async function (t) {
+  await turo.reset();
   eval_t(t, 'tip = 10%', '10 %');
   eval_t(t, '10 m + tip', '11 metres');
 

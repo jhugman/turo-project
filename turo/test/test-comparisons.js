@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
+import turo from './turo-shim';
 
 const { test, plan } = tap;
 const { Turo } = turo; 
@@ -8,9 +8,7 @@ const { Turo } = turo;
 function testParse(t, turo, string, expected) {
   var result = turo.evaluate(string);
 
-  if (result.expressionErrors()) {
-    console.error(result.expressionErrors());
-  }
+  t.notOk(result.hasErrors());
 
   if (expected === 'false') {
     var st = result.valueToString();
@@ -21,16 +19,17 @@ function testParse(t, turo, string, expected) {
 
 }
 
-test('No comparisons', function (t) {
-  var turo = new Turo();
+test('No comparisons', async function (t) {
+  await turo.reset();
 
   testParse(t, turo, '1 + 2', '3');
 
   t.end();
 });
 
-test('Simple comparisons', function (t) {
-  var turo = new Turo();
+test('Simple comparisons', async function (t) {
+  await turo.reset();
+
   testParse(t, turo, '3 < 3', 'false');
   testParse(t, turo, '2 < 4', 'true');
   testParse(t, turo, '2 <= 3', 'true');
@@ -46,8 +45,8 @@ test('Simple comparisons', function (t) {
   t.end();
 });
 
-test('Simple with expression comparisons', function (t) {
-  var turo = new Turo();
+test('Simple with expression comparisons',  async function (t) {
+  await turo.reset();
 
   testParse(t, turo, '1 + 2 < 3', 'false');
   testParse(t, turo, '1 + 2 < 4', 'true');
@@ -65,8 +64,8 @@ test('Simple with expression comparisons', function (t) {
   t.end();
 });
 
-test('Trivial boolean algebra', function (t) {
-  var turo = new Turo();
+test('Trivial boolean algebra',  async function (t) {
+  await turo.reset();
   testParse(t, turo, 'const true = (1 == 1)', 'true');
   testParse(t, turo, 'const false = (1 != 1)', 'false');
 
@@ -84,9 +83,9 @@ test('Trivial boolean algebra', function (t) {
   t.end();
 });
 
-test('With units', function (t) {
-  var turo = new Turo();
-  turo.include('app');
+test('With units',  async function (t) {
+  await turo.reset();
+  
   testParse(t, turo, '1 m < 0.1 km', 'true');
   testParse(t, turo, '1 m/s < 0.1 km/h', 'false');
   testParse(t, turo, '1 m <= 0.1 km', 'true');

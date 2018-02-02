@@ -1,29 +1,30 @@
 import _ from 'underscore';
+import path from 'path';
 
 /////////////////////////////////////////////////////////////////////////
-function AbstractStorage () {
-  this._state = {
-    isLoading: {},
-    documents: {},
-  };
-  // subclasses should call this constructor
-  // with AbstractStorage.call(this) in their own constructors.
-}
+class AbstractStorage {
+  constructor () {
+    this._state = {
+      isLoading: {},
+      documents: {},
+    };
+    // subclasses should call this constructor
+    // with AbstractStorage.call(this) in their own constructors.
+  }
 
-_.extend(AbstractStorage.prototype, {
-  hasDocument: function (id) {
-    return this.getDocument(id);
-  },
+  hasDocument (slug) {
+    return this.getDocument(slug);
+  }
 
-  isLoadingDocument(id) {
-    return this._state.isLoading[id];
-  },
+  isLoadingDocument (slug) {
+    return this._state.isLoading[slug];
+  }
 
-  // func (id: String, evaluator: (id, string, cb) -> Void, cb)
+  // func (slug: String, documentCreator: ({id, document}, cb) -> Void, cb)
   // Should write to cache, for availability elsewhere
-  loadDocument(id, evaluator, callback) {
+  loadDocument (slug, documentCreator, callback) {
     var self = this,
-        listeners = self._state.isLoading[id];
+        listeners = self._state.isLoading[slug];
 
     if (listeners) {
       listeners.push(callback);
@@ -31,52 +32,116 @@ _.extend(AbstractStorage.prototype, {
     }
 
     listeners = [callback];
-    self._state.isLoading[id] = listeners;
+    self._state.isLoading[slug] = listeners;
 
-    this.resolveLocation(id, undefined, function (location, layer) {
-      // loads doc
-      layer.loadString(location, function (err, string) {
-        if (err) {
-          callback(err, null)
-          return
-        }
+    this.loadJSON(slug)
+      .then((docData, loader) => {
         // evaluates doc
-        evaluator(
-          id,
-          string,
+        documentCreator(
+          docData,
           function (err, doc) {
+            // JS is single threaded, so nothing can add to listeners
+            delete self._state.isLoading[slug];
             if (err) {
-              delete self._state.isLoading[id];
-              console.error(`Error loading ${id}: ${err}`)
-              callback(err);
+              console.error(`Error loading ${slug}: ${err}`)
+              listeners.forEach((cb) => cb(err));
               return;
             }
-            doc.location = location;
-            self._state.documents[id] = doc;
-            _.each(listeners, function (cb) {
-              cb(null, doc);
-            });
-            delete self._state.isLoading[id];
+            doc.location = { slug, loader };
+            self._state.documents[slug] = doc;
+            listeners.forEach((cb) => cb(null, doc));
           }
         );
+      })
+      .catch((err) => {
+        delete self._state.isLoading[slug];
+        listeners.forEach((cb) => cb(err));
       });
-    });  
     // load string,
     // create editable document with evaluate string
     // calls back with model.
-  },
+  }
 
-  loadString: function (location, callback) {
-    throw new Error('Unimplemented method loadString');
-  },
+  getDocument (slug) {
+    return this._state.documents[slug];
+  }
 
-  resolveLocation: function (id, callback) {
-    throw new Error('Unimplemented method resolveLocation');
-  },
+  loadJSON (location) {
+    return Promise.reject('Unimplemented method loadJSON');
+  }
 
-  getDocument: function (id) {
-    return this._state.documents[id];
-  },
-});
+  saveDocument (doc) {
+    return Promise.reject('Unimplemented method saveDocument');
+  }
+}
 
-export default AbstractStorage;
+class CompositeStorage extends AbstractStorage {
+  constructor (jsonStores) {
+    super();
+    this.jsonStores = jsonStores;
+  }
+
+  loadJSON (slug) {
+    const generator = function* (stores) {
+      for (let store of stores) {
+        yield store;
+      }
+    }
+
+    const g = generator(this.jsonStores);
+    const tryNext = () => {
+      const next = g.next();
+
+      if (next.done) {
+        return Promise.reject('NO DOCUMENT IN ANY LOADER');
+      }
+      const store = next.value;
+
+      return store.loadJSON(slug)
+        .then(payload => {
+          return Promise.resolve(payload, store);
+        })
+        .catch(e => tryNext());
+    };
+
+    return tryNext();
+  }
+
+  saveDocument (doc) {
+    const { slug, loader } = doc.location;
+    if (loader && loader.saveDocument) {
+      return loader.saveDocument(slug, doc);
+    } else {
+      return Promise.reject('CANNOT SAVE');
+    }
+  }
+}
+
+class DocumentLoader {
+  loadJSON (slug) {
+    return Promise.reject('Unimplemented method loadJSON');
+  }
+
+  saveDocument (slug, doc) {
+    return Promise.reject('Unimplemented method saveDocument');
+  }
+}
+
+class BundleDocumentLoader extends DocumentLoader {
+  constructor (files) {
+    super();
+    this.files = files;
+  }
+
+  loadJSON (slug) {
+    const id = path.basename(slug);
+    const string = this.files[id];
+    if (string) {
+      return Promise.resolve({ id: slug, title: slug, document: string });  
+    } else {
+      return Promise.reject('BundleDocumentLoader: NO_DOCUMENT ' + slug);
+    }
+  }
+}
+
+export { AbstractStorage, CompositeStorage, DocumentLoader, BundleDocumentLoader };

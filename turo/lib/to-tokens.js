@@ -240,7 +240,7 @@ _.extend(ToSourceVisitor.prototype, {
   visitVariableDefinition: function (node, tokens, context) {
     this.errorStart(node, tokens, context);
     if (node.isConstant) {
-      t.push(t('statement', 'const', node.line, node.offsetFirst, 'kwd'));
+      tokens.push(t('statement', 'const', node.line, node.offsetFirst, 'kwd'));
     }
 
     tokens.push(t('identifier', node.identifier, node.lineFirst, node.statementOffsetFirst, 'x'));

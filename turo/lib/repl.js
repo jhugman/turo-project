@@ -3,7 +3,7 @@ import optimist from 'optimist';
 import fs from 'fs';
 import _ from 'underscore';
 import EditableDocument from './editable-document';
-import Storage from './local-file-storage';
+import { storage } from './storage/app-bundle-storage';
 import readline from 'readline';
 
 var theDocument;
@@ -41,7 +41,7 @@ var argv = optimist
     .argv;
 
 
-EditableDocument.storage = new Storage();
+EditableDocument.storage = storage;
 
 theDocument = EditableDocument.create('repl');
 theDocument.lineByLineMode = true;

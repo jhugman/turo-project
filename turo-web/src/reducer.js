@@ -6,6 +6,8 @@ import {
   UPDATE_DOCUMENT,
   FETCH_DOCUMENT,
   UPDATE_EDITOR_STATE,
+  BATCH_UPDATE_EDITOR_STATE,
+  ITERATIVE_UPDATE_EDITOR_STATE
 } from './constants';
 import decorator from './decorator';
 
@@ -18,25 +20,15 @@ const initialState = {
   tokenMap: null,
 };
 
-const createTuroDoc = editorState => {
-  const turoDoc = EditableDocument.create(genKey());
-  const content = editorState.getCurrentContent();
-  turoDoc.import('app');
-  const text = content.getPlainText();
-  turoDoc.evaluateDocument(text);
+const initDoc = (state, { 
+  payload: { id, title, text, turoDoc }
+}) => {
   docStore.turoDoc = turoDoc;
   window.doc = turoDoc;
-  return turoDoc;
-}
 
-const initDoc = (state, {
-  payload: { id, title, document: text }
-}) => {
   let editorState = EditorState.createWithContent(
     ContentState.createFromText(text)
   );
-
-  const turoDoc = createTuroDoc(editorState);
 
   editorState = EditorState.set(
     editorState,
@@ -51,23 +43,6 @@ const initDoc = (state, {
     turoDoc,
     id,
     editorState,
-    tokenMap,
-  };
-};
-
-const batchUpdateDocument = (state, editorState) => {
-  const { turoDoc } = state;
-  const blocks = editorState.getCurrentContent().getBlocksAsArray();
-  const text = blocks.map((block) => block.getText()).join('\n');
-
-  turoDoc.evaluateDocument(text, (err, turoDoc) => {});
-
-  const tokenMap = updateTokenMap(blocks, turoDoc.statements, {});
-
-  return {
-    ...state,
-    editorState,
-    turoDoc,
     tokenMap,
   };
 };
@@ -97,8 +72,7 @@ const updateTokenMap = (blocks, statements, tokenMap = {}) => {
           return;
         }
         tokenMap[block.getKey()] = [];
-    
-        offsetFirst += currentLine.length;
+        offsetFirst += currentLine ? currentLine.length : 0;
         currentLine = lines.shift();
       }
 
@@ -116,61 +90,12 @@ const updateTokenMap = (blocks, statements, tokenMap = {}) => {
   return tokenMap;
 };
 
-const iterativeUpdateDocument = (state, editorState) => {
-  // editorState works on blocks (i.e. long lines)
-  // turoDoc works on statements (i.e. multi line expressions)
-  // so for each key press, we need to find 
-  // a) which block it was in (easy)
-  // b) which statatement that corresponds to
-  // c) which other blocks does that statement correspond to.
-  // 
-  // Further compounding: blocks are not numbered sequentially.
-  const selection = editorState.getSelection();
-  const startOffset = selection.getStartOffset();
-  const startKey = selection.getStartKey();
 
+const updateEditorState = (state, {
+  payload: { editorState, statements, blocks }
+}) => {
   const { turoDoc, tokenMap } = state;
-
-  const blocks = editorState.getCurrentContent().getBlocksAsArray();
-  let startLine;
-  for (let i=0; i < blocks.length; i++) {
-    if (blocks[i].key === startKey) {
-      startLine = i;
-      break;
-    }
-  }
-
-  if (startLine === undefined) {
-    return;
-  }
-
-  const editToken = { line: startLine + 1, column: startOffset };
-  const statement = turoDoc.findStatementForEditToken(editToken);
-
-  if (!statement) {
-    return;
-  }
-
-  const id = statement.id;
-  const newLines = [];
-  for (let i = statement.info.lineFirst - 1; i < statement.info.lineLast; i++) {
-    const block = blocks[i];
-    if (!block) {
-      break;
-    }
-    newLines.push(block.getText());
-  } 
-
-  const newText = newLines.join('\n');
-
-  turoDoc.evaluateStatement(id, newText, (err, updatedStatements) => {
-
-  });
-
-  const newStatement = turoDoc.getStatement(id);
-  
-  updateTokenMap(blocks, [newStatement], {...tokenMap});
-
+  updateTokenMap(blocks, statements, tokenMap);
   return {
     ...state,
     editorState,
@@ -179,15 +104,6 @@ const iterativeUpdateDocument = (state, editorState) => {
   };
 };
 
-const updateEditorState = (state, {
-  payload: editorState
-}) => {
-  if (editorState.getLastChangeType() !== 'insert-characters') {
-    return batchUpdateDocument(state, editorState);
-  }
-  return iterativeUpdateDocument(state, editorState);
-}
-
 export default handleActions({
   [`${FETCH_DOCUMENT}_FULFILLED`]: initDoc,
   [`${CREATE_DOCUMENT}_FULFILLED`]: initDoc,
@@ -195,5 +111,6 @@ export default handleActions({
     ...state,
     ...payload
   }),
-  [UPDATE_EDITOR_STATE]: updateEditorState,
+  [BATCH_UPDATE_EDITOR_STATE + '_FULFILLED']: updateEditorState,
+  [ITERATIVE_UPDATE_EDITOR_STATE + '_FULFILLED']: updateEditorState,
 }, initialState);

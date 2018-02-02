@@ -21,17 +21,17 @@ _.extend(DocumentHelper.prototype, {
     rootNode.accept(visitor, context);
 
     var toImport = _.keys(context.toImport),
-        evaluator = context.documentEvaluator,
+        documentCreator = context.documentEvaluator,
         doc = context.document;
 
-    return this._doLoading(toImport, doc, doc.scope, evaluator, callback);
+    return this._doLoading(toImport, doc, doc.scope, documentCreator, callback);
   },
 
-  import(toImport, scope, evaluator, callback) {
-    return this._doLoading(toImport, scope, scope, evaluator, callback);
+  import(toImport, scope, documentCreator, callback) {
+    return this._doLoading(toImport, scope, scope, documentCreator, callback);
   },
 
-  _doLoading(toImport, doc, scope, evaluator, callback) {
+  _doLoading(toImport, doc, scope, documentCreator, callback) {
     var storage = this._storage;
 
     var toLoad = _.filter(
@@ -48,7 +48,7 @@ _.extend(DocumentHelper.prototype, {
 
     async.map(
       toLoad,
-      (documentId, cb) => storage.loadDocument(documentId, evaluator, cb),
+      (documentId, cb) => storage.loadDocument(documentId, documentCreator, cb),
       (err, results) => {
         if (err) {
           callback(err, doc);

@@ -100,7 +100,7 @@ _.extend(TuroStatement.prototype, {
   },
 
   toTokens() {
-    return toTokenArray(this.node);
+    return toTokenArray(this.node, {prefs: {}});
   },
 
   valueToString (display, prefs) {

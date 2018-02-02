@@ -4,8 +4,8 @@ import turo from './turo-shim';
 
 const { test, plan } = tap;
 
-test("Implicit conversion", function (t) {
-  turo.reset();
+test("Implicit conversion", async function (t) {
+  await turo.reset();
   turo.evaluate("unit m : Length");
   turo.evaluate("unit km : 1000 m");
   turo.evaluate("x = 1 km");
@@ -14,8 +14,8 @@ test("Implicit conversion", function (t) {
   t.end();
 });
 
-test("Variable reassignment bug", function (t) {
-  turo.reset();
+test("Variable reassignment bug", async function (t) {
+  await turo.reset();
   turo.evaluate("unit m : Length");
   turo.evaluate("unit s : Time");
   turo.evaluate("x = 1 m");
@@ -27,8 +27,8 @@ test("Variable reassignment bug", function (t) {
   t.end();
 });
 
-test("Variable reassignment bug 2", function (t) {
-  turo.reset();
+test("Variable reassignment bug 2", async function (t) {
+  await turo.reset();
   turo.evaluate("unit m : L");
   turo.evaluate("unit mi : 1609m");
   turo.evaluate("unit s : T");
@@ -44,8 +44,8 @@ test("Variable reassignment bug 2", function (t) {
   t.end();
 });
 
-test("Variable with unitLiteral bug 3", function (t) {
-  turo.reset();
+test("Variable with unitLiteral bug 3", async function (t) {
+  await turo.reset();
   turo.evaluate("w = 80 kg");
   turo.evaluate("h = 6 ft");
   turo.evaluate("h");

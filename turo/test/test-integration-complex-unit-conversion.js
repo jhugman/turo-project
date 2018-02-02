@@ -9,15 +9,16 @@ var prefs = {
   padding: ' ',
 };
 
-test("Initial", function (t) {
-  
+test("Initial", async function (t) {
+  await turo.reset();
   // assume synchronous, but it isn't really.
 
   t.equal(turo.evaluate("1 km^2 in m^2").valueToString(), "1000000 m^2", "1 km^2 in m^2 == \"1000000 m^2\"");
   t.end();
 });
 
-test("Square root", function (t) {
+test("Square root", async function (t) {
+  await turo.reset();
   t.equal(turo.evaluate("sqrt(1 ha)").valueToString(), "100 m", "sqrt(1 ha)");
   t.equal(turo.evaluate("sqrt(1 km * 1.024 m)").valueToString(), "0.032 km", "sqrt(1 km * 1.024 m)");
   t.equal(turo.evaluate("sqrt(1 m * 1.024 km)").valueToString(), "32 m", "sqrt(1 m * 1.024 km)");
@@ -33,7 +34,8 @@ test("Square root", function (t) {
   t.end();
 });
 
-test("Nth root", function (t) {
+test("Nth root", async function (t) {
+  await turo.reset();
   t.equal(turo.evaluate("3 nth_root 27").valueToString(), "3", "3 nth_root 27");
   t.equal(turo.evaluate("3 nth_root(27 litres)").valueToString(), "30 cm", "3 nth_root(27 litre)");
   t.equal(turo.evaluate("3 nth_root 27 litres").valueToString(), "3 litres", "3 nth_root 27 litres");
@@ -42,7 +44,8 @@ test("Nth root", function (t) {
 });
 
 
-test("Nth power", function (t) {
+test("Nth power", async function (t) {
+  await turo.reset();
   t.equal(turo.evaluate("2^3").valueToString(), "8", "2^3");
   t.equal(turo.evaluate("(2m)^3").valueToString(), "8 m^3", "(2m)^3");
   t.equal(turo.evaluate("(27m^3)^(1/3)").valueToString(), "3 m", "(27m^3)^(1/3)");
@@ -58,7 +61,8 @@ test("Nth power", function (t) {
 
 
 
-test('Unit Divide', function (t) {
+test('Unit Divide', async function (t) {
+  await turo.reset();
   t.equal(turo.evaluate("4/2").valueToString(), "2", "4/2");
   t.equal(turo.evaluate("4/2s").valueToString(), "2 seconds", "4/2s");
   t.equal(turo.evaluate("4m/2").valueToString(), "2 metres", "4m/2");
@@ -70,7 +74,8 @@ test('Unit Divide', function (t) {
   t.end();
 });
 
-test('Unit prefix ops', function (t) {
+test('Unit prefix ops', async function (t) {
+  await turo.reset();
   // TODO: this should be 100 metres
   t.equal(turo.evaluate("sqrt(1 ha)").valueToString(), "100 m", "sqrt(1 ha)");
   // TODO: sqrt(1 m) should fail.
@@ -99,7 +104,8 @@ test('Unit prefix ops', function (t) {
   t.end();
 });
 
-test('Simple unit conversion based on unitScheme', function (t) {
+test('Simple unit conversion based on unitScheme', async function (t) {
+  await turo.reset();
   const prefs = {
     useUnitRefactor: true,
     simpleUnits: true,

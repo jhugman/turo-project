@@ -14,7 +14,8 @@ function eval_t (t, input, expectedOutput) {
   t.equal(result.valueToString(), expectedOutput, input + ' = ' + expectedOutput);
 }
 
-test("Derive correct units", function (t) {
+test("Derive correct units", async function (t) {
+  await turo.reset();
   eval_t(t, 'sin(0 radians)', '0');
   eval_t(t, 'sin((pi/2) radians)', '1');
 

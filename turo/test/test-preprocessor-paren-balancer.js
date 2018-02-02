@@ -1,6 +1,5 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
 import balancer from '../lib/preprocessor-paren-balancer';
 
 const { test, plan } = tap;

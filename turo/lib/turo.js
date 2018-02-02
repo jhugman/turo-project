@@ -11,7 +11,7 @@ import AST from './ast';
 import turoNumber from './turo-number';
 import lang from './language-model';
 import EditableDocument from './editable-document';
-import Storage from './local-file-storage';
+import { storage } from './storage/app-bundle-storage';
 import wordCleaners from "./preprocessor-word-cleaner";
 import preprocessorParenBalancer from './preprocessor-paren-balancer';
 import autocomplete from './autocomplete';
@@ -23,7 +23,7 @@ import './precision-hacks';
 const { UnitsTable: Units } = unitsTable
 const { Context: Variables } = variablesSymbolTable;
 
-EditableDocument.storage = new Storage();
+EditableDocument.storage = storage;
 
 var MAX_SF = 14;
 
@@ -368,7 +368,7 @@ extend(Turo.prototype, {
 export {
   EditorActions,
   EditableDocument,
-  Storage,
+  storage,
   Turo,
   Error,
 }
@@ -377,9 +377,7 @@ export default extend(new Turo(), {
   Turo: Turo,
   EditableDocument: EditableDocument,
   EditorActions: EditorActions,
-  storage: {
-    LocalFiles: Storage,
-  },
+  storage,
   turoNumber: turoNumber,
   Error: AST.Error,
   toSource: output,

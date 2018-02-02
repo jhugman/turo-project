@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import Storage from '../lib/local-file-storage';
+import { storage } from '../lib/storage/app-bundle-storage';
 import EditableDocument from '../lib/editable-document';
 
 const { test, plan } = tap;
@@ -9,7 +9,7 @@ var prefs = {
   padding: ' ',
 };
 
-EditableDocument.storage = new Storage();
+EditableDocument.storage = storage;
 
 var nextId = 1;
 function simpleEval (doc, string) {

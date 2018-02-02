@@ -1,6 +1,5 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
 import wordCleaner from '../lib/preprocessor-word-cleaner';
 
 const { test, plan } = tap;

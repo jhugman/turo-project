@@ -2,10 +2,27 @@ import _ from 'underscore';
 import theParser from './grammar';
 import lang from './language-model';
 
-function TuroParser (scope) {
+import operatorsTable from './operators-symbol-table';
+
+const DEFAULT_PREFS = {
+  unitScheme: undefined,
+  useUnitRefactor: true,
+  simpleUnits: true,
+  precisionType: undefined, // sf or dp
+  precisionDigits: 4,
+  formatComma: undefined,
+  formatDot: "."
+};
+
+// prefs should be accessible from outside of the parser, e.g. someplace like turo.js
+
+function TuroParser (scope, prefs = _.defaults({}, DEFAULT_PREFS)) {
   this.parseContext = {
     scope: scope || lang.newScope(),
   };
+
+  debugger;
+  this.operators = operatorsTable.createDefaultOperators(prefs);
 }
 
 theParser._parse = theParser.parse;

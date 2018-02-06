@@ -4,10 +4,8 @@
 {
   const helper = require('./parser-helper.js').default;
   const ast = require('./ast').default;
-  const turo = require('./turo').default;
 
-  const operators = turo.operators;
-  const testWriter = turo.writer;
+  const operators = this.operators;
 
   const self = this;
 

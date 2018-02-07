@@ -1,17 +1,17 @@
 import tap from 'tap';
 import _ from 'underscore';
-import $turo from '../lib/turo';
+import turo from './turo-shim';
 import DocumentModel from '../lib/document/document-model';
 
 const { test, plan } = tap;
 
-var model, turo;
+var model;
 function createModel() {
-  turo = new $turo.Turo(); model = new DocumentModel('testDoc');
+  model = new DocumentModel('testDoc');
 }
 
 function parse (lines) {
-  turo.resetScope();
+  turo.resetImportNothing();
   // parse twice because we haven't written document-helper yet.
   turo.parse(lines.join('\n') + '\n', 'EditorText');
   var doc = turo.parse(lines.join('\n') + '\n', 'EditorText');

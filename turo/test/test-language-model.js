@@ -1,6 +1,5 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turo from '../lib/turo';
 import lang from '../lib/language-model';
 
 const { test, plan } = tap;
@@ -120,33 +119,6 @@ test('Available variable tokens', function (t) {
 
   child.addVariable('z', aUnit);
   t.deepEqual(child.getAvailableVariables(), ['z', 'x', 'y']);
-
-  t.end();
-});
-
-test('Integration with turo object', function (t) {
-  var Turo = require('../lib/turo').Turo;
-  var turo = new Turo();
-
-  function testParseable (string) {
-    var prevScopeId = turo.parser.parseContext.scope.id;
-    t.ok(!turo.evaluate(string).parseError, 'is parseable? ' + string);
-    t.equal(prevScopeId, turo.parser.parseContext.scope.id, 'scope ids should be equal');
-  }
-
-  function testUnitAvailability (string) {
-    t.ok(turo.parser.parseContext.scope.findUnit(string), 'unit present? ' + string);
-  }
-
-  var prevScopeId = turo.parser.parseContext.scope.id;
-  //turo.include('app');
-  t.equal(prevScopeId, turo.parser.parseContext.scope.id, 'scope ids should be equal');
-
-  // testUnitAvailability('m');
-
-  testParseable('1 + 1'); // smoke test
-  // testParseable('1 m');
-  // testParseable('2 * c');
 
   t.end();
 });

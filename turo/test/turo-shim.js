@@ -22,4 +22,8 @@ function evaluate(string) {
   return doc.evaluateStatement_withCallback(`_${id++}`, string)[0];
 }
 
-export default { evaluate, reset, resetImportNothing }
+function parse (string, parseRule) {
+  return doc.parser.parse(string, parseRule);
+}
+
+export default { evaluate, reset, resetImportNothing, parse }

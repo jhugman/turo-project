@@ -1,14 +1,14 @@
 import tap from 'tap';
 import _ from 'underscore';
-import $turo from '../lib/turo';
+import turo from './turo-shim';
 import graphBuilder from '../lib/document/document-graph-builder';
 
 const { test, plan } = tap;
 
-var turo, doc;
+var doc;
 
 function setup () {
-  turo = new $turo.Turo(); 
+  turo.resetImportNothing();
 }
 
 function createId (lineNum) {
@@ -28,7 +28,6 @@ function parseLines (lines) {
 
 
 function testGraph(t, g, lines, expected) {
-
   var observed = g.overallOrder();
 
   observed = _.filter(observed, function (id) {
@@ -44,7 +43,7 @@ function testGraph(t, g, lines, expected) {
 
 function testInitialGraph(t, lines, expected) {
   // reset scope only on initial graph.
-  turo.resetScope();
+  turo.resetImportNothing();
   // also, we only need parse the first time for statements out of order.
   turo.parse(lines.join('\n') + '\n', 'EditorText');
 
@@ -92,6 +91,7 @@ test('buildInitialGraph with variables', function (t) {
 });
 
 test('buildInitialGraph without variables', function (t) {
+  setup();
   testInitialGraph(t, ['1', '2', '3'], [1, 2, 3]);
   testInitialGraph(t, ['1', '2', 'x = 3'], [1, 2, 3]);
   testInitialGraph(t, ['1', 'a = 2', 'x = 3'], [1, 2, 3]);
@@ -164,7 +164,7 @@ test('adding duplicate variables', function (t) {
 });
 
 test('document model', function (t) {
-
+  setup();
   testInitialGraph(t, ['x = 1', 'y + 2', 'y = x + z', 'z = x + 3'], [1, 4, 3, 2]);
   testInteractive(t, '1', 'x = 2', [1, 4, 3, 2]); // x = 2|, y + 2, y = x + z, z = x + 3
   testInteractive(t, '2', '1 + 2', [2]);          // x = 2, 1 + 2|, y = x + z, z = x + 3
@@ -174,7 +174,7 @@ test('document model', function (t) {
 });
 
 test('document model2', function (t) {
-  
+  setup();
   var lines = ['a = 1', 'a = 2', 'y = a'];
   testInitialGraph(t, lines, [1, 2, 3]);
 

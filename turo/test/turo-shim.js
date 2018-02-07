@@ -1,5 +1,5 @@
 import { storage } from '../lib/storage/app-bundle-storage';
-import EditableDocument from '../lib/editable-document';
+import { EditableDocument } from '..';
 
 let doc, id;
 
@@ -26,4 +26,4 @@ function parse (string, parseRule) {
   return doc.parser.parse(string, parseRule);
 }
 
-export default { evaluate, reset, resetImportNothing, parse }
+export default { evaluate, reset, resetImportNothing, parse };

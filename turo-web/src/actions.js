@@ -85,10 +85,7 @@ export const updateDocument = createAction(UPDATE_DOCUMENT);
 
 export const autosaveDocument = createAction(
   AUTOSAVE_DOCUMENT,
-  ({ id, title, editorState })  => saveDocument(id, {
-    title,
-    document: editorState.getCurrentContent().getPlainText()
-  })
+  turoDoc  => EditableDocument.save(turoDoc)
 );
 
 export const fetchDocument = createAction(

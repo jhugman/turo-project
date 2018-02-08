@@ -444,6 +444,10 @@ statics = {
     });
   },
 
+  saveEditableDocument (doc) {
+    return EditableDocument.storage.saveDocument(doc);
+  },
+
   // units requires everything 
   // to be in the same scope. For complexity reasons.
   units: new Units(),
@@ -476,5 +480,6 @@ statics = {
 EditableDocument.storage = null;
 EditableDocument.create = statics.createEditableDocument;
 EditableDocument.load = statics.loadEditableDocument;
+EditableDocument.save = statics.saveEditableDocument;
 
 export default EditableDocument;

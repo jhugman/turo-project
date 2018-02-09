@@ -21,7 +21,6 @@ function TuroParser (scope, prefs = _.defaults({}, DEFAULT_PREFS)) {
     scope: scope || lang.newScope(),
   };
 
-  debugger;
   this.operators = operatorsTable.createDefaultOperators(prefs);
 }
 

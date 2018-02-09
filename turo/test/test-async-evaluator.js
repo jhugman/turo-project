@@ -70,8 +70,10 @@ class MockStorage extends AbstractStorage {
     return new Promise((resolve, reject) => {
       setTimeout(
         () => {
-          var string = this._state.mock_fs[slug];
-          resolve({ id: slug, title: slug, document: string });
+          const string = this._state.mock_fs[slug];
+          const docData = { id: slug, title: slug, document: string };
+          const loader = null;
+          resolve({ docData, loader });
         },
         Math.random() * 100
       );  

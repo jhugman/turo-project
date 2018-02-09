@@ -1,5 +1,4 @@
 import _ from 'underscore';
-import path from 'path';
 
 /////////////////////////////////////////////////////////////////////////
 class AbstractStorage {
@@ -35,7 +34,7 @@ class AbstractStorage {
     self._state.isLoading[slug] = listeners;
 
     this.loadJSON(slug)
-      .then((docData, loader) => {
+      .then(({ docData, loader }) => {
         // evaluates doc
         documentCreator(
           docData,
@@ -98,8 +97,8 @@ class CompositeStorage extends AbstractStorage {
       const loader = next.value;
 
       return loader.loadJSON(slug)
-        .then(payload => {
-          return Promise.resolve(payload, loader);
+        .then(docData => {
+          return Promise.resolve({ docData, loader });
         })
         .catch(e => tryNext());
     };
@@ -139,10 +138,10 @@ class BundleDocumentLoader extends DocumentLoader {
   }
 
   loadJSON (slug) {
-    const id = path.basename(slug);
+    const id = slug;
     const string = this.files[id];
     if (string) {
-      return Promise.resolve({ id: slug, title: slug, document: string });  
+      return Promise.resolve({ id, title: slug, document: string });  
     } else {
       return Promise.reject('BundleDocumentLoader: NO_DOCUMENT ' + slug);
     }

@@ -132,16 +132,17 @@ class DocumentLoader {
 }
 
 class BundleDocumentLoader extends DocumentLoader {
-  constructor (files) {
+  constructor (files, implicitImports = null) {
     super();
     this.files = files;
+    this.implicitImports = implicitImports;
   }
 
   loadJSON (slug) {
     const id = slug;
     const string = this.files[id];
     if (string) {
-      return Promise.resolve({ id, title: slug, document: string });  
+      return Promise.resolve({ id, title: slug, document: string, implicitImports: this.implicitImports });  
     } else {
       return Promise.reject('BundleDocumentLoader: NO_DOCUMENT ' + slug);
     }

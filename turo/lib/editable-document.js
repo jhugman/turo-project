@@ -64,14 +64,19 @@ extend(EditableDocument.prototype, {
    * @return boolean - true iff the import completed synchronously
    */
   import_withCallback (id, callback) {
+    if (!callback) {
+      callback = statics.noCallback;
+    }
+    
+    if (!id) {
+      return callback(null, this);
+    }
+
     var toImport = id;
     if (!isArray(id)) {
       toImport = [id];
     }
 
-    if (!callback) {
-      callback = statics.noCallback;
-    }
 
     var scope = this._state.importScope;
     return this.documentHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
@@ -372,9 +377,10 @@ Object.defineProperties(EditableDocument.prototype, {
 
 ///////////////////////////////////////////////////////////////////////////////
 statics = {
-  createEditableDocument_withCallback (docData, cb) {
-    const { id, document: string, implicitImports } = docData;
-    const theDocument = new EditableDocument(id);
+
+  initializeDocument (theDocument, docData, cb) {
+    const { id, document: string, title, implicitImports } = docData;
+    theDocument.title = title;
 
     function evalString () {
       if (string) {
@@ -397,6 +403,13 @@ statics = {
     return theDocument;
   },
 
+  createEditableDocument_withCallback (docData, cb) {
+    const id = docData.id;
+    const theDocument = new EditableDocument(id);
+
+    return statics.initializeDocument(theDocument, docData, cb);
+  },
+
   createEditableDocument(id) {
     return new EditableDocument(id);
   },
@@ -405,16 +418,10 @@ statics = {
     var theDocument = new EditableDocument(documentId);
 
     function createDocument(docData, cb) {
-      const { id, document: string, title } = docData;
-      var doc;
-      if (documentId === id) {
-        doc = theDocument;
-      } else {
-        doc = new EditableDocument(id);
-        doc.title = title;
-        doc.importScope = theDocument.importScope.clone();
-      }
-      doc.evaluateDocument_withCallback(string, cb, createDocument);
+      const id = docData.id;
+      let doc = (documentId === id) ? theDocument : new EditableDocument(id);
+      
+      return statics.initializeDocument(theDocument, docData, cb);
     }
 
     // We do two things and a but here.

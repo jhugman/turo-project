@@ -1,16 +1,15 @@
 import tap from 'tap';
 import _ from 'underscore';
 import path from 'path';
-import storage from './turo-fixture-storage';
+import createStorage from './turo-fixture-storage';
 import EditableDocument from '../lib/editable-document';
 
 const { test, plan } = tap;
 
 const prefs = { shortUnitNames: true };
 
-console.log(storage);
 test('simple load', async function (t) {
-  EditableDocument.storage = storage;
+  EditableDocument.storage = createStorage();
   const doc = await EditableDocument.load('simple-file-on-disk', []);
   t.ok(doc, 'document exists');
   t.equal(path.basename(doc.id), 'simple-file-on-disk', 'filename correct');
@@ -19,7 +18,7 @@ test('simple load', async function (t) {
 });
 
 test('importing load', async function (t) {
-  EditableDocument.storage = storage;
+  EditableDocument.storage = createStorage('metric');
   const doc = await EditableDocument.load('importing', ['metric']);
   t.ok(doc, 'document exists');
   t.equal(path.basename(doc.id), 'importing', 'filename correct');
@@ -28,7 +27,7 @@ test('importing load', async function (t) {
 });
 
 test('simple load with implicit imports of all units', async function (t) {
-  EditableDocument.storage = storage;
+  EditableDocument.storage = createStorage('metric');
   const doc = await EditableDocument.load('loaded-from-disk', ['app']);
   t.ok(doc, 'document exists');
   t.equal(path.basename(doc.id), 'loaded-from-disk', 'filename correct');

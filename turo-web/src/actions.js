@@ -78,7 +78,9 @@ export const iterativeUpdateEditorState = createAction(
 
 export const createDocument = createAction(
   CREATE_DOCUMENT,
-  body => initialize(EditableDocument.load())
+  body => {
+    return initialize(EditableDocument.load(undefined, "app"));
+  }
 );
 
 export const updateDocument = createAction(UPDATE_DOCUMENT);

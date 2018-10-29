@@ -25,16 +25,23 @@ class AbstractStorage {
     var self = this,
         listeners = self._state.isLoading[slug];
 
+    const isNew = !slug;
+
     if (listeners) {
       listeners.push(callback);
       return;
     }
 
     listeners = [callback];
-    self._state.isLoading[slug] = listeners;
+    if (!isNew) {
+      self._state.isLoading[slug] = listeners; 
+    }
 
     this.loadJSON(slug)
       .then(({ docData, loader }) => {
+        if (isNew) {
+          slug = "" + docData.id;
+        }
         // evaluates doc
         documentCreator(
           docData,

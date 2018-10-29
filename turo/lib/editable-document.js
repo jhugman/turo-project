@@ -419,9 +419,10 @@ statics = {
 
     function createDocument(docData, cb) {
       const id = docData.id;
-      let doc = (documentId === id) ? theDocument : new EditableDocument(id);
+
+      let doc = (documentId === id && documentId) ? theDocument : new EditableDocument(id);
       
-      return statics.initializeDocument(theDocument, docData, cb);
+      return statics.initializeDocument(doc, docData, cb);
     }
 
     // We do two things and a but here.

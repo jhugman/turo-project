@@ -1,7 +1,7 @@
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-  entry: './lib/turo.js',
+  entry: './lib/index.js',
   output: {
     filename: './build/index.js'
   },

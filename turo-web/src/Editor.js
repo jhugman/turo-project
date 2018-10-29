@@ -42,7 +42,8 @@ class App extends Component {
     ) {
       this.cachedTitle = doc.title;
       this.cachedContent = contentState;
-      return this.props.autosaveDocument(doc);
+
+      return this.props.autosaveDocument(this.props.turoDoc);
     }
   }, 500);
 

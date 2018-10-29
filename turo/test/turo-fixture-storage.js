@@ -11,7 +11,10 @@ const fixtures = {
   'simple-file-on-disk': simpleSample,
 };
 
-export default new CompositeStorage([
-  new BundleDocumentLoader(builtIn),
-  new BundleDocumentLoader(fixtures),
-]);
+export default function createStorage (...implicitImports) {
+  return new CompositeStorage([
+    new BundleDocumentLoader(builtIn),
+    new BundleDocumentLoader(fixtures, implicitImports),
+  ]);
+};
+

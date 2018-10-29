@@ -33,8 +33,3 @@ import './test-integration-variable-units';
 import './test-percent-arithmetic';
 import './test-trig-functions';
 import './test-unit-schemes';
-
-// Failing
-// import './xtest-cycles';
-// import './test-lenient-parsing';
-// import './test-testfile-writer';

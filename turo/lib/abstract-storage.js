@@ -1,5 +1,4 @@
 import _ from 'underscore';
-import path from 'path';
 
 /////////////////////////////////////////////////////////////////////////
 class AbstractStorage {
@@ -26,16 +25,23 @@ class AbstractStorage {
     var self = this,
         listeners = self._state.isLoading[slug];
 
+    const isNew = !slug;
+
     if (listeners) {
       listeners.push(callback);
       return;
     }
 
     listeners = [callback];
-    self._state.isLoading[slug] = listeners;
+    if (!isNew) {
+      self._state.isLoading[slug] = listeners; 
+    }
 
     this.loadJSON(slug)
-      .then((docData, loader) => {
+      .then(({ docData, loader }) => {
+        if (isNew) {
+          slug = "" + docData.id;
+        }
         // evaluates doc
         documentCreator(
           docData,
@@ -76,30 +82,30 @@ class AbstractStorage {
 }
 
 class CompositeStorage extends AbstractStorage {
-  constructor (jsonStores) {
+  constructor (loaders) {
     super();
-    this.jsonStores = jsonStores;
+    this.loaders = loaders;
   }
 
   loadJSON (slug) {
-    const generator = function* (stores) {
-      for (let store of stores) {
-        yield store;
+    const generator = function* (loaders) {
+      for (let loader of loaders) {
+        yield loader;
       }
     }
 
-    const g = generator(this.jsonStores);
+    const g = generator(this.loaders);
     const tryNext = () => {
       const next = g.next();
 
       if (next.done) {
         return Promise.reject('NO DOCUMENT IN ANY LOADER');
       }
-      const store = next.value;
+      const loader = next.value;
 
-      return store.loadJSON(slug)
-        .then(payload => {
-          return Promise.resolve(payload, store);
+      return loader.loadJSON(slug)
+        .then(docData => {
+          return Promise.resolve({ docData, loader });
         })
         .catch(e => tryNext());
     };
@@ -109,8 +115,13 @@ class CompositeStorage extends AbstractStorage {
 
   saveDocument (doc) {
     const { slug, loader } = doc.location;
-    if (loader && loader.saveDocument) {
-      return loader.saveDocument(slug, doc);
+    if (loader && loader.saveJSON) {
+      const json = {
+        document: doc.text,
+        id: slug, 
+        title: doc.title || doc.id,
+      };
+      return loader.saveJSON(slug, json);
     } else {
       return Promise.reject('CANNOT SAVE');
     }
@@ -122,22 +133,23 @@ class DocumentLoader {
     return Promise.reject('Unimplemented method loadJSON');
   }
 
-  saveDocument (slug, doc) {
+  saveJSON (slug, doc) {
     return Promise.reject('Unimplemented method saveDocument');
   }
 }
 
 class BundleDocumentLoader extends DocumentLoader {
-  constructor (files) {
+  constructor (files, implicitImports = null) {
     super();
     this.files = files;
+    this.implicitImports = implicitImports;
   }
 
   loadJSON (slug) {
-    const id = path.basename(slug);
+    const id = slug;
     const string = this.files[id];
     if (string) {
-      return Promise.resolve({ id: slug, title: slug, document: string });  
+      return Promise.resolve({ id, title: slug, document: string, implicitImports: this.implicitImports });  
     } else {
       return Promise.reject('BundleDocumentLoader: NO_DOCUMENT ' + slug);
     }

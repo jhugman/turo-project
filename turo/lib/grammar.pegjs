@@ -4,14 +4,12 @@
 {
   const helper = require('./parser-helper.js').default;
   const ast = require('./ast').default;
-  const turo = require('./turo').default;
 
-  const operators = turo.operators;
-  const testWriter = turo.writer;
+  const operators = this.operators;
 
   const self = this;
 
-  const units = this.scope.units || turo.units;
+  const units = this.scope.units;
   
   const inputLength = this.inputLength || input.length;
   const parseContext = this.parseContext;

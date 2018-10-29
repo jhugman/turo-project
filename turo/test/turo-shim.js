@@ -1,5 +1,5 @@
 import { storage } from '../lib/storage/app-bundle-storage';
-import EditableDocument from '../lib/editable-document';
+import { EditableDocument } from '..';
 
 let doc, id;
 
@@ -22,4 +22,8 @@ function evaluate(string) {
   return doc.evaluateStatement_withCallback(`_${id++}`, string)[0];
 }
 
-export default { evaluate, reset, resetImportNothing }
+function parse (string, parseRule) {
+  return doc.parser.parse(string, parseRule);
+}
+
+export default { evaluate, reset, resetImportNothing, parse };

@@ -88,7 +88,7 @@ Object.defineProperties(TuroStatement.prototype, {
 
 _.extend(TuroStatement.prototype, {
   isParseable () {
-    return !!(this.node.accept) || this.node.isUnparsed;
+    return !!(this.node.accept) && !this.node.isUnparsed;
   },
 
   hasErrors() {

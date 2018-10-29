@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import parser from '../lib/parser';
+import turoParser from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/evaluator';
 import unitsTable from '../lib/units-table';
@@ -11,8 +11,11 @@ const { test, plan } = tap;
 const { UnitsTable: Units } = unitsTable;
 const { Context: Variables } = variablesSymbolTable;
 
-parser.units = new Units();
+
+const parser = new turoParser.Parser();
+parser.scope._unitsTable = new Units();
 parser.variables = new Variables();
+const defaultOperators = parser.operators;
 
 var operatorNames = {
   sin: true,
@@ -20,7 +23,7 @@ var operatorNames = {
   sqrt: true
 };
 
-parser.operators = {
+const dummyOperators = {
   hasPrefixOperator: function (string) {
     return !!operatorNames[string];
   },
@@ -32,11 +35,9 @@ parser.operators = {
   hasPostfixOperator: function (string) {
     return !!operatorNames[string];
   },
-
 };
 
 function parse (lines) {
-
   var doc = parser.parse(lines.join('\n') + '\n', 'EditorText');
 
   return doc;
@@ -57,7 +58,7 @@ function numStatements (doc) {
 }
 
 test('Multi line, multi single line expressions', function (t) {
-
+  parser.operators = dummyOperators;
   var doc = parse([
       'Some free text',
       '1 + 2 * 3'
@@ -84,11 +85,12 @@ test('Multi line, multi single line expressions', function (t) {
   t.equal(numStatements(doc), 4);
   t.equal(numValidStatements(doc), 2);
 
-
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Multi line statement', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     '1 +',
     '2 + ',
@@ -116,10 +118,12 @@ test('Multi line statement', function (t) {
   t.equal(numStatements(doc), 1);
   t.equal(numValidStatements(doc), 1);
 
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Lines with variables', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     'x = 1',
     '2',
@@ -130,10 +134,12 @@ test('Lines with variables', function (t) {
   t.equal(numStatements(doc), 4);
   t.equal(numValidStatements(doc), 4);
 
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Lines with statements', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     'unit m : Length',
     'const x = 2',
@@ -144,10 +150,12 @@ test('Lines with statements', function (t) {
   t.equal(numStatements(doc), 4);
   t.equal(numValidStatements(doc), 4);
 
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Lines with semi-colons', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     'unit m : Length;',
     'const x = 2;',
@@ -157,11 +165,13 @@ test('Lines with semi-colons', function (t) {
 
   t.equal(numStatements(doc), 4);
   t.equal(numValidStatements(doc), 4);
-
+  
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Docs with empty lines', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     'some text',
     '',
@@ -174,10 +184,12 @@ test('Docs with empty lines', function (t) {
   t.equal(numStatements(doc), 6);
   t.equal(numValidStatements(doc), 3);
 
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Lines with imports and free text', function (t) {
+  parser.operators = dummyOperators;
   var doc = parse([
     'import "foo";',
     'unit m : Length;',
@@ -190,36 +202,35 @@ test('Lines with imports and free text', function (t) {
   t.equal(numStatements(doc), 6);
   t.equal(numValidStatements(doc), 5);
 
+  parser.operators = defaultOperators;
   t.end();
 });
 
 test('Statements with exotic operators', function (t) {
-  var _dummyOperators = parser.operators;
-  debugger;
-  parser.operators = require('../lib/operators-symbol-table').defaultOperators;
+  parser.operators = defaultOperators;
 
   var doc = parse([
     'sqrt(9)',
   ]);
 
-  t.equal(numStatements(doc), 1);
-  t.equal(numValidStatements(doc), 1);
+  t.equal(numStatements(doc), 1, 'sqrt(9) statements');
+  t.equal(numValidStatements(doc), 1, 'sqrt(9) valid statements');
   
+  debugger;
   doc = parse([
     'sin(45)',
   ]);
 
-  t.equal(numStatements(doc), 1);
-  t.equal(numValidStatements(doc), 1);
+  t.equal(numStatements(doc), 1, 'sin(45) statements');
+  t.equal(numValidStatements(doc), 1, 'sin(45) valid statements');
 
   doc = parse([
     '3 nth_root 8',
   ]);
 
-  t.equal(numStatements(doc), 1);
-  t.equal(numValidStatements(doc), 1);
+  t.equal(numStatements(doc), 1, '3 nth_root 8 statements');
+  t.equal(numValidStatements(doc), 1, '3 nth_root 8 valid statements');
 
-  parser.operators = _dummyOperators;
   t.end();
 });
 

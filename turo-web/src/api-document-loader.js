@@ -30,11 +30,9 @@ class APIDocumentLoader extends DocumentLoader {
     ).then(res => addImplicitImports(res.json()));
   }
 
-  saveDocument(slug, doc) {
-    const obj = {
-      document: doc.text,
-      title: doc.id,
-    };
+  saveJSON(slug, body) {
+    const payload = { method: 'PUT', body: JSON.stringify(body), headers };
+    return fetch(`/api/${slug}`, payload).then(res => res.json())
   }
 }
 

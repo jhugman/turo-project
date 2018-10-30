@@ -155,8 +155,7 @@ module.exports = {
             'EditorText',
             'Statement',
             'NumberLiteral',
-            'PaddedStatement',
-            'EditorText'
+            'PaddedStatement'
           ],
         }
       },

@@ -8,7 +8,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
-const eslintFormatter = require('react-dev-utils/eslintFormatter');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -47,6 +47,7 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
 module.exports = {
+  mode: 'production',
   // Don't attempt to continue if there are any errors.
   bail: true,
   // We generate sourcemaps in production. This is slow but gives good results.
@@ -67,7 +68,7 @@ module.exports = {
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
       path
-        .relative(paths.appSrc, info.absoluteResourcePath)
+        .relative(paths.appSrc[0], info.absoluteResourcePath)
         .replace(/\\/g, '/'),
   },
   resolve: {
@@ -85,11 +86,11 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/290
     // `web` extension prefixes have been added for better support
     // for React Native Web.
-    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx'],
+    extensions: ['.web.js', '.js', '.json', '.web.jsx', '.jsx', '.turo', '.pegjs'],
     alias: {
-      'turo-model': '../../turo-model',
-      'turo': '../../turo',
-      'turo-documents': '../../turo-documents',
+      'turo': path.join(__dirname, '../../turo'),
+      'turo-model': path.join(__dirname, '../../turo-model'),
+      'turo-documents': path.join(__dirname, '../../turo-documents'),
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -105,20 +106,6 @@ module.exports = {
 
       // First, run the linter.
       // It's important to do this before Babel processes the JS.
-      {
-        test: /\.(js|jsx)$/,
-        enforce: 'pre',
-        use: [
-          {
-            options: {
-              formatter: eslintFormatter,
-              
-            },
-            loader: require.resolve('eslint-loader'),
-          },
-        ],
-        include: paths.appSrc,
-      },
       // ** ADDING/UPDATING LOADERS **
       // The "file" loader handles all assets unless explicitly excluded.
       // The `exclude` list *must* be updated with every change to loader extensions.
@@ -131,9 +118,12 @@ module.exports = {
         exclude: [
           /\.html$/,
           /\.(js|jsx)$/,
+          /\.pegjs$/,
           /\.css$/,
           /\.json$/,
           /\.bmp$/,
+          /\.turo/,
+          /\.txt/,
           /\.gif$/,
           /\.jpe?g$/,
           /\.png$/,
@@ -153,13 +143,29 @@ module.exports = {
           name: 'static/media/[name].[hash:8].[ext]',
         },
       },
+      {
+        test: /\.pegjs$/,
+        loader: require.resolve('pegjs-loader'),
+        options: {
+          allowedStartRules: [
+            'DocumentFirstParse',
+            'Statement',
+            'NumberLiteral',
+            'PaddedStatement',
+            'EditorText'
+          ],
+        }
+      },
       // Process JS with Babel.
+      {
+        test: [/\.turo$/, /\.txt$/],
+        use: 'raw-loader',
+      },
       {
         test: /\.(js|jsx)$/,
         include: paths.appSrc,
         loader: require.resolve('babel-loader'),
         options: {
-          
           compact: true,
         },
       },
@@ -251,7 +257,7 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
     // Minify the code.
-    new webpack.optimize.UglifyJsPlugin({
+    new UglifyJsPlugin({
       compress: {
         warnings: false,
         // Disabled because of an issue with Uglify breaking seemingly valid code:

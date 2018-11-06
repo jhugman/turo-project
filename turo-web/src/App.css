@@ -1,24 +1,92 @@
-.App {
+body {
+  font-size: 1.4em;
+}
+
+header {
   text-align: center;
+  padding: 2em;
+  padding-bottom: 1em;
+  flex-direction: column;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.public-DraftEditor-content {
+  height: 100%;
+  padding-bottom: 3em;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.public-DraftEditor-content {
+  height: 100%;
 }
 
-.App-intro {
-  font-size: large;
+main {
+}
+
+.public-DraftEditor-content {
+
+}
+
+#root {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  overflow-y: auto;
+  flex-direction: column;
+}
+
+::selection {
+  background: #e7eaf7;
+}
+
+.token--number {
+  color: #4400b3;
+}
+
+.token--identifier {
+  color: #0079ff;
+}
+
+.public-DraftEditorPlaceholder-root {
+  padding: 0;
+  padding-top: .4em;
+  padding-bottom: .4em;
+}
+
+.statement__content, .statement__result {
+  padding: 0;
+  padding-top: .4em;
+  padding-bottom: .4em;
+}
+
+.statement__content {
+  padding-right: 2em;
+}
+
+.statement__result {
+  padding: 0;
+  padding-top: .4em;
+  padding-bottom: .4em;
+  color: #999;
+  pointer-events: none;
+}
+
+.statement__result > span {
+  /* user-select: text; */
+}
+
+.statement, .public-DraftEditorPlaceholder-inner {
+  line-height: 1.3em;
+  padding: 0;
+  margin: 0;
+  margin: auto;
+  max-width: 1200px;
+  width: 80vw;
 }
 
 @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

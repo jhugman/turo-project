@@ -1,34 +1,41 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
+import Editor from 'turo-react';
+import { EditorState, ContentState } from 'draft-js'
+import 'turo-react/dist/index.css';
+import 'draft-js/dist/Draft.css';
 import './App.css';
-import Editor from './Editor';
-// import Auth from './Auth/Auth';
-// import Callback from './Callback/Callback';
-
-import {
-  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom'
-
-// const auth = new Auth();
-// 
-// const handleAuthentication = (nextState, replace) => {
-//   if (/access_token|id_token|error/.test(nextState.location.hash)) {
-//     auth.handleAuthentication();
-//   }
-// };
-//       <Route path="/callback" render={(props) => {
-//         handleAuthentication(props);
-//         return <Callback {...props} /> 
-//       }}/>
+import debounce from 'lodash/debounce';
 
 
-const Routes = () => (
-  <Router>
-    <div>
-      <Route path="/:id?" component={Editor} />
-    </div>
-  </Router>
-);
+class App extends Component {
+  constructor(props) {
+    super(props)
 
-export default Routes;
+    const { location: { pathname }} = props
+    const fromUrl = decodeURIComponent(pathname.substr(1))
+
+    this.state = {
+      editorState: EditorState.createWithContent(ContentState.createFromText(fromUrl))
+    }
+  }
+
+  updateUrl = debounce(() => {
+    const { history } = this.props
+    const { editorState } = this.state
+    const text = editorState.getCurrentContent().getPlainText()
+    history.push(`/${encodeURIComponent(text)}`)
+  }, 500)
+
+  onChange = editorState => {
+    this.updateUrl()
+    this.setState({ editorState })
+  }
+
+  render() {
+    return (
+      <Editor placeholder="Cheer up, type something" onChange={this.onChange} editorState={this.state.editorState} />
+    );
+  }
+}
+
+export default App;

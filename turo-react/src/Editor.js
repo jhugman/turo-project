@@ -57,14 +57,22 @@ class Statement extends Component {
 }
 
 export default class _Editor extends Component {
+  state = {
+    docLoaded: false
+  }
+
   constructor(props) {
     super(props)
     this.turoDoc = EditableDocument.create('new-doc')
-    this.turoDoc.import('app')
-  }
 
-  state = {
-    editorState: EditorState.createEmpty()
+    const { editorState } = props
+    const blocks = editorState.getCurrentContent().getBlocksAsArray();
+    const text = blocks.map((block) => block.getText()).join('\n');
+
+    this.turoDoc.import('app').then(() => this.turoDoc.evaluateDocument(text))
+    .then((turoDoc) => {
+      this.setState({ docLoaded: true })
+    })
   }
 
   onChange = editorState => {
@@ -72,17 +80,18 @@ export default class _Editor extends Component {
     const text = blocks.map((block) => block.getText()).join('\n');
 
     this.turoDoc.evaluateDocument(text)
-    this.setState({ editorState })
+    this.props.onChange(editorState)
   }
 
   blockRendererFn = block => {
-    const { editorState } = this.state
+    const { editorState } = this.props
 
     const lineNumber = editorState
       .getCurrentContent()
       .getBlockMap()
       .keySeq()
       .findIndex(key => key === block.getKey());
+
 
     return {
       component: Statement,
@@ -94,15 +103,19 @@ export default class _Editor extends Component {
   }
 
   render() {
-    return <EditorContainer
-      onChange={this.onChange}
-      editorState={this.state.editorState}
-    >
-      <Plugin
-        decorators={Object.keys(tokenComps).map((type) => createTokenStrategy(type, this.turoDoc))}
-        blockRendererFn={this.blockRendererFn}
-      />
-      <Editor />
-    </EditorContainer>
+    if (this.state.docLoaded) {
+      return <EditorContainer
+        {...this.props}
+        onChange={this.onChange}
+      >
+        <Plugin
+          decorators={Object.keys(tokenComps).map((type) => createTokenStrategy(type, this.turoDoc))}
+          blockRendererFn={this.blockRendererFn}
+        />
+        <Editor />
+      </EditorContainer>
+    } else {
+      return null
+    }
   }
 }

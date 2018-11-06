@@ -1,24 +1,119 @@
-.App {
-  text-align: center;
+* {
+  box-sizing: border-box;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Rubik', sans-serif;
+  color: #666;
+  line-height: 1.5em;
+  font-size: 1.5em;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
+.public-DraftEditor-content{
+  box-sizing: border-box;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  text-align: right;
 }
 
-.App-intro {
-  font-size: large;
+.editor {
+  display: flex;
+  min-height: 100vh;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.statements {
+  width: 60%;
+}
+
+.results {
+  width: 40%;
+  // border-left: 1px solid #eee;
+}
+
+.statement {
+  display: flex;
+  transition: 200ms;
+}
+
+.statement:hover {
+  border-color: #f0f0f0;
+}
+
+.statement__content, .statement__result, .public-DraftEditorPlaceholder-root {
+  width: 100%;
+  padding: .3em .5em;
+}
+
+.statement__content {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.statement__result {
+  user-select: none;
+  white-space: nowrap;
+  width: min-content;
+  color: #b5b5b5;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.statement__result > span:after {
+  display: inline-block;
+  height: 1em;
+  content: ' '
+}
+
+.token--number {
+  color: #389E8C;
+  font-family: 'Roboto Mono', monospace;
+}
+
+.token--operator {
+  color: #4E3F4D;
+}
+
+.token--unit {
+  color: #F38D2E;
+  font-weight: bold;
+}
+
+.token--identifier {
+  color: #0AC6D6;
+}
+
+.top-bar {
+  padding-bottom: 1em;
+  display: flex;
+  width: 100%;
+}
+
+.top-bar input {
+  padding: .5em;
+  border: none;
+  color: #666;
+  background: transparent;
+  outline: none;
+  font-weight: bold;
+  font-size: 1em;
+  width: 100%;
+}
+
+
+.top-bar input:focus {
+  outline: none;
+}
+
+.logo {
+  padding: 0;
+  margin: 0;
+}
+
+.logo img{
+  margin: .5em;
+  display: block;
+  max-width: 40px;
 }

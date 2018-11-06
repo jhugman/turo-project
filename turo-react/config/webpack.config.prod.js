@@ -18,7 +18,7 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
   throw new Error('Production builds must have NODE_ENV=production.');
 }
 
-const cssFilename = 'static/css/[name].[hash:8].css';
+const cssFilename = 'index.css';
 
 const extractTextPluginOptions = shouldUseRelativeAssetPaths
   ? // Making sure that the publicPath goes back to to build folder.
@@ -28,13 +28,14 @@ const extractTextPluginOptions = shouldUseRelativeAssetPaths
 module.exports = {
   mode: 'production',
   bail: true,
+  watch: true,
   devtool: 'source-map',
-  entry: [require.resolve('./polyfills'), paths.appIndexJs],
+  entry: paths.moduleIndex,
   output: {
-    path: paths.appBuild,
-    filename: 'static/js/[name].[chunkhash:8].js',
-    chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
-    publicPath: publicPath,
+    path: paths.moduleBuild,
+    filename: 'index.js',
+    libraryTarget: 'umd',
+    libraryExport: 'default',
     devtoolModuleFilenameTemplate: info =>
       path
         .relative(paths.appSrc[0], info.absoluteResourcePath)
@@ -152,45 +153,9 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      inject: true,
-      template: paths.appHtml,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }),
     new webpack.DefinePlugin(env.stringified),
     new ExtractTextPlugin({
       filename: cssFilename,
-    }),
-    new ManifestPlugin({
-      fileName: 'asset-manifest.json',
-    }),
-    new SWPrecacheWebpackPlugin({
-      dontCacheBustUrlsMatching: /\.\w{8}\./,
-      filename: 'service-worker.js',
-      logger(message) {
-        if (message.indexOf('Total precache size is') === 0) {
-          return;
-        }
-        if (message.indexOf('Skipping static resource') === 0) {
-          return;
-        }
-        console.log(message);
-      },
-      minify: true,
-      navigateFallback: publicUrl + '/index.html',
-      navigateFallbackWhitelist: [/^(?!\/__).*/],
-      staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
@@ -199,8 +164,5 @@ module.exports = {
     fs: 'empty',
     net: 'empty',
     tls: 'empty',
-  },
-  optimization: {
-    minimize: true,
   }
 };

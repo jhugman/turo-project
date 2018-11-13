@@ -141,19 +141,11 @@ extend(Evaluator.prototype, {
     }
   },
 
-  reportError: function (errorCode, highlightedNode) {
-    var currentOperation = this._currentOperationNode, 
-        error = new ast.Error(errorCode, currentOperation);
-
-    if (currentOperation) {
-      currentOperation.error = error;
-    }
-
-    for (var i = 1, max = arguments.length; i < max; i++) {
-      arguments[i].error = error;
-    }
-
-    this.errors.push(error);
+  reportError: function (errorCode, ...highlightedNodes) {
+    highlightedNodes.forEach(node => {
+      const error = new ast.Error(errorCode, node);
+      this.errors.push(error);
+    });
   },
 });
 

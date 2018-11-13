@@ -179,9 +179,14 @@ _.extend(DocumentModel.prototype, {
       state: State.OK,
       scope: finalScope,
     };
-    var idsInEvalOrder = this._cascade(g.execution, statementMap);
-    this._evaluateNodes(idsInEvalOrder, statementMap);
-    return this._finalReturn(ids);
+    try {
+      var idsInEvalOrder = this._cascade(g.execution, statementMap);
+      this._evaluateNodes(idsInEvalOrder, statementMap);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      return this._finalReturn(ids);
+    }
   },
 
   /**

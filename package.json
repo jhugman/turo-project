@@ -9,6 +9,6 @@
     "babel-preset-react-app": "^3.1.0"
   },
   "scripts": {
-    "install-all": "cd turo && yarn && cd ../turo-web && yarn && cd .."
+    "install-all": "cd turo && yarn && cd ../turo-react && yarn && cd .."
   }
 }

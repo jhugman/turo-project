@@ -104,7 +104,9 @@ function defineClone (Ctor) {
 }
 
 function TuroError (errorMessage, node) {
+  // deprecated, use errorCode.
   this.message = errorMessage;
+  this.errorCode = errorMessage;
   this.node = node;
 }
 

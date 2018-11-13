@@ -59,12 +59,12 @@ test("Dimension mismatch", (t) => {
   result = turo.evaluate("1 m + 1 s");
   errors = result.errors;
   t.ok(errors);
-  t.equal(errors.length, 1);
+  t.equal(errors.length, 2);
 
   result = turo.evaluate("(1 m + 1 s) * (1m + 1s)");
   errors = result.errors;
   t.ok(errors);
-  t.equal(errors.length, 2);
+  t.equal(errors.length, 4);
 
   t.end();
 });

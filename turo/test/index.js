@@ -30,6 +30,7 @@ import './test-integration-grammar';
 import './test-integration-operation-labeller';
 import './test-integration-revaluation-with-different-units';
 import './test-integration-variable-units';
+import './test-integration-errors';
 import './test-percent-arithmetic';
 import './test-trig-functions';
 import './test-unit-schemes';

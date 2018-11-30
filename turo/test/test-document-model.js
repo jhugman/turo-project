@@ -69,6 +69,17 @@ test('Batch mode', function (t) {
   t.end();
 });
 
+test('Batch mode, part II', function (t) {
+  createModel();
+  testLines(t, ['x = ', '1'], ['1']);
+  testLines(t, ['x = ', 'x'], ['', '']);
+  // x is defined twice, tho the second definition is ignored.
+  testLines(t, ['x = 1', 'y = 2', 'x = x + 1'], ['1', '2', '2']);
+  testLines(t, ['y = x + 1', 'x = y + 2'], ['', '']);
+
+  t.end();
+});
+
 test('Find statement by line', function (t) {
   var lines = ['x = 1', 'y - x + z', 'y = 3', 'z = y - 3 * x'];
   var expectedList = ['1', '2', '3', '0'];

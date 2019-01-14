@@ -14,23 +14,29 @@ function Operator(options) {
 }
 
 extend(Operator.prototype, {
-  evaluate(x, y, result, ctx) {
-    return this.evaluatorFunction(x, y, result, ctx);
-  },
-  calculateUnit(l, r, ctx, node) {
-    if (this.unitCalculatorDeprecated) {
-      return this.unitCalculatorDeprecated(l, r, ctx, node);
-    } else {
-      return null;
-    }
-  },
+  // publically called by the evaluator.
+  evaluate (leftNode, rightNode, ctx) {},
+
+  // calculates calculates the operands, and then uses them to calculate 
+  // the result.
+  // Returns an AST node.
+  nodeCalculator (leftNode, rightNode, ctx) {},
+
+  // checks for any operands that would cause errors (e.g. unit dimensionality, divide by zero),
+  // returns true if no errors. Reports errors with ctx if so.
+  // Returns Boolean
+  preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {},
+
+  // Calculates the unit of the result (using unitCalculator), normalizes 
+  // the right hand operand to be compatible with the left (using prepareRight)
+  // the calculates the simple values (using simpleValueCalculator).
+  // Returns a TuroNumber
+  turoValueCalculator (leftValue, rightValue) {},
 });
 
 //////////////////////////////////////////////////
 function BinaryOperation (options) {
-  if (options) {
-    extend(this, options);
-  }
+  Object.assign(this, options);
 }
 
 BinaryOperation.prototype = new Operator({
@@ -78,10 +84,8 @@ BinaryOperation.prototype = new Operator({
   },
 
   simpleValueCalculator (left, right) {
-    return left;
+    throw new Error(`No simpleValueCalculator specified for ${literal} operator over ${lValueType} and ${rValueType}`);
   },
-
-
 });
 //////////////////////////////////////////////////
 
@@ -138,7 +142,7 @@ UnaryOperation.prototype = new Operator({
   },
 
   simpleValueCalculator (left) {
-
+    throw new Error(`No simpleValueCalculator specified for ${literal} operator over ${lValueType} or ${rValueType}`);
   },
 });
 
@@ -199,13 +203,9 @@ extend(Operators.prototype, {
     return this._postfixOperatorNames[literal];
   },
 
-  addInfixOperator(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
-    if (isArray(unitCalculator)) {
-      unitCalculator = Object.assign(new BinaryOperation(), ...unitCalculator);
-      evaluatorFunction = undefined;
-    }
-
-    this._addOperator(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction);
+  addInfixOperator(literal, lValueType, rValueType, retValueType, mixins) {
+    const op = Object.assign(new BinaryOperation(), ...mixins);
+    this._addOperator(literal, lValueType, rValueType, retValueType, op);
 
     // XXX we can do this here, because 'in' is specifically mentioned in the parser.
     if (literal !== 'in') {
@@ -214,41 +214,23 @@ extend(Operators.prototype, {
     // TODO get autocomplete to work with the type system.
   },
 
-  addPrefixOperator(literal, rValueType, retValueType, unitCalculator, evaluatorFunction) {
-    this._addUnaryOperator(literal, UNARY_OPERATION, rValueType, retValueType, unitCalculator, evaluatorFunction);
+  addPrefixOperator(literal, rValueType, retValueType, mixins) {
+    this._addUnaryOperator(literal, UNARY_OPERATION, rValueType, retValueType, mixins);
     this._putNameCache("prefix", literal);
   },
 
-  addPostfixOperator(literal, lValueType, retValueType, unitCalculator, evaluatorFunction) {
-    this._addUnaryOperator(literal, lValueType, UNARY_OPERATION, retValueType, unitCalculator, evaluatorFunction);
+  addPostfixOperator(literal, lValueType, retValueType, mixins) {
+    this._addUnaryOperator(literal, lValueType, UNARY_OPERATION, retValueType, mixins);
     this._putNameCache("postfix", literal);
   },
 
-  _addUnaryOperator (literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
-    var op;
-    if (isArray(unitCalculator)) {
-      var allProperties = Object.assign({}, ...unitCalculator);
-      evaluatorFunction = undefined;
-      op = new UnaryOperation(allProperties);
-    } else {
-      op = new UnaryOperation({
-        unitCalculator: unitCalculator,
-        evaluatorFunction: evaluatorFunction,
-      });
-    }
+  _addUnaryOperator (literal, lValueType, rValueType, retValueType, mixins) {
+    const op = Object.assign(new UnaryOperation(), ...mixins);
     this._addOperator(literal, lValueType, rValueType, retValueType, op);
   },
 
-  _addOperator(literal, lValueType, rValueType, retValueType, unitCalculator, evaluatorFunction) {
-    var op;
-    if (isFunction(evaluatorFunction)) {
-      op = new Operator({
-        unitCalculatorDeprecated: unitCalculator,
-        evaluatorFunction: evaluatorFunction
-      });
-    } else {
-      op = unitCalculator;
-    }
+  _addOperator(literal, lValueType, rValueType, retValueType, operationObject) {
+    const op = operationObject;
 
     extend(op, {
       literal: literal,
@@ -256,7 +238,6 @@ extend(Operators.prototype, {
       rValueType: rValueType,
       returnValueType: retValueType,
     });
-
 
     this.table[makeKey(lValueType, literal, rValueType)] = op;
   },

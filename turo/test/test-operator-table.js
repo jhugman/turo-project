@@ -3,20 +3,36 @@ import _ from 'underscore';
 import ast from '../lib/ast';
 import operatorSymbolTable from '../lib/operators-symbol-table';
 import turoNumber from '../lib/turo-number';
+import mixins from '../lib/operators/mixins';
 
+const { makeMixin, simpleTestingOperator } = mixins;
 const { Operators, defaultOperators } = operatorSymbolTable;
 const { test, plan } = tap;
 
 test("simple", function (t) {
   var operators = new Operators({});
 
-  operators.addInfixOperator("+", "number", "number", "number", null, function (x, y) {
-    return x + y;
-  });
+  operators.addInfixOperator(
+    "+", 
+    "number", "number", "number", 
+    makeMixin(
+      function (x, y) {
+        return x + y;
+      },
+      simpleTestingOperator
+    )
+  );
 
-  operators.addInfixOperator("*", "number", "number", "number", null, function (x, y) {
-    return x * y;
-  });
+  operators.addInfixOperator(
+    "*", 
+    "number", "number", "number", 
+    makeMixin(
+      function (x, y) {
+        return x * y;
+      },
+      simpleTestingOperator
+    )
+  );
 
   var operator = operators.findOperator("+", "number", "number");
 

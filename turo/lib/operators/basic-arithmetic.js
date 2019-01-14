@@ -12,47 +12,33 @@ export default {
 
     ops.addInfixOperator(
       '+', number, number, number,
-      [
-        mixins.binaryMatchingUnits,
-        {
-          simpleValueCalculator: function (a, b) {
-            return a + b;
-          }
-        }
-      ]
+      makeMixin(
+        function (a, b) {
+          return a + b;
+        },
+        mixins.binaryMatchingUnits
+      )
     );
 
     ops.addInfixOperator(
       '-', number, number, number,
-      [
-        mixins.binaryMatchingUnits,
-        {
-          simpleValueCalculator: function (a, b) {
-            return a - b;
-          }
-        }
-      ]
+      makeMixin(
+        function (a, b) {
+          return a - b;
+        },
+        mixins.binaryMatchingUnits
+      )
     );
 
     ops.addInfixOperator(
       '*', number, number, number,
-      [
+      makeMixin(
+        function (a, b) {
+          return a * b;
+        },
         mixins.binaryAnyUnits,
-        {
-          unitCalculator: function (leftValue, rightValue) {
-            if (isDimensionless(leftValue)) {
-              return rightValue.unit;
-            }
-            if (isDimensionless(rightValue)) {
-              return leftValue.unit;
-            }
-            return leftValue.unit.by(rightValue.unit);
-          },
-          simpleValueCalculator: function (a, b) {
-            return a * b;
-          }
-        }
-      ]
+        mixins.binaryMultiplyUtils,
+      )
     );
 
     ops.addInfixOperator(

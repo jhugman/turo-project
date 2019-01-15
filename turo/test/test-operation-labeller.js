@@ -1,5 +1,5 @@
 import { test, plan } from 'tap';
-import { Operators } from '../lib/operators-symbol-table';
+import { Operators } from '../lib/operators/table';
 import mixins from '../lib/operators/mixins';
 
 const { makeMixin, simpleTestingOperator } = mixins;

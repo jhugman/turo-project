@@ -2,7 +2,7 @@ import DocumentModel from './document/document-model';
 import unitsTable from './units-table';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
-import { defaultOperators } from './operators-symbol-table';
+import { defaultOperators } from './operators/table';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
 import { each, extend, isArray } from 'underscore';

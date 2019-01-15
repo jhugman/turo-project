@@ -11,7 +11,7 @@ The `operation-labeller.js` assigns lexigraphical types, operations and units to
 
 `to-source.js` outputs the expression in a variety of different ways.
 
-If you want to add more operations e.g. nCr, then look in `operators-default-table.js`. This plugs in to the `operators-symbol-table.js`.
+If you want to add more operations e.g. nCr, then look in `operators-default-table.js`. This plugs in to the `operators/table.js`.
 
 If you want to add more token types, e.g. boolean or string, you should add to the `grammar.pegs`, `ast.js` and `operators-default-table.js`.
 

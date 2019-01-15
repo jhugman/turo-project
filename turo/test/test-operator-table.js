@@ -1,7 +1,7 @@
 import { test } from 'tap';
 import _ from 'underscore';
 import ast from '../lib/ast';
-import { Operators, defaultOperators } from '../lib/operators-symbol-table';
+import { Operators, defaultOperators } from '../lib/operators/table';
 import turoNumber from '../lib/turo-number';
 import mixins from '../lib/operators/mixins';
 

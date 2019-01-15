@@ -1,6 +1,6 @@
 
-import init from './operators/all';
-import { UnaryOperation, BinaryOperation } from './operators';
+import init from './all';
+import { UnaryOperation, BinaryOperation } from '.';
 //////////////////////////////////////////////////
 
 function makeKey(lValueType, literal, rValueType) {

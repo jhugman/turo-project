@@ -1,4 +1,4 @@
-import { defaultOperators } from './operators-symbol-table';
+import { defaultOperators } from './operators/table';
 import operatorLabeller from './operation-labeller';
 import ast from './ast';
 import turoNumber from './turo-number';

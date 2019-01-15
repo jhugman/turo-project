@@ -1,11 +1,8 @@
-import tap from 'tap';
-import _ from 'underscore';
-import operatorSymbolTable from '../lib/operators-symbol-table';
+import { test, plan } from 'tap';
+import { Operators } from '../lib/operators-symbol-table';
 import mixins from '../lib/operators/mixins';
 
 const { makeMixin, simpleTestingOperator } = mixins;
-const { Operators } = operatorSymbolTable;
-const { test, plan } = tap;
 
 test("simple", function (t) {
   var operators = new Operators({});

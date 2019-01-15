@@ -1,10 +1,8 @@
-import operatorSymbolTable from './operators-symbol-table';
+import { defaultOperators } from './operators-symbol-table';
 import operatorLabeller from './operation-labeller';
 import ast from './ast';
 import turoNumber from './turo-number';
 import {extend} from 'underscore';
-
-const { defaultOperators: operators } = operatorSymbolTable;
 
 function unitConversion(node, resultValue) {
   if (resultValue === undefined) {
@@ -168,7 +166,7 @@ export default {
         });
     operatorLabeller
           .label(node,
-                 operators,
+                 defaultOperators,
                  errors,
                  evaluator);
 

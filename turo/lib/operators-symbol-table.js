@@ -105,9 +105,10 @@ class Operators {
 }
 
 const createDefaultOperators = prefs => init(new Operators(undefined, prefs || {}));
+const defaultOperators = createDefaultOperators();
 
-export default {
-  Operators: Operators,
-  defaultOperators: createDefaultOperators(),
-  createDefaultOperators: createDefaultOperators
+export {
+  Operators,
+  defaultOperators,
+  createDefaultOperators
 };

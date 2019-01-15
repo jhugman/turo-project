@@ -2,7 +2,7 @@ import DocumentModel from './document/document-model';
 import unitsTable from './units-table';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
-import operatorsSymbolTable from './operators-symbol-table';
+import { defaultOperators } from './operators-symbol-table';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
 import { each, extend, isArray } from 'underscore';
@@ -10,7 +10,6 @@ import EditorActions from './editor-actions';
 
 const { Parser } = parser;
 const { UnitsTable: Units } = unitsTable;
-const { defaultOperators } = operatorsSymbolTable;
 const { Variables: LegacyVariables } = variablesSymbolTable;
 
 var statics;

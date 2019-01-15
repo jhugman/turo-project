@@ -1,13 +1,11 @@
-import tap from 'tap';
+import { test } from 'tap';
 import _ from 'underscore';
 import ast from '../lib/ast';
-import operatorSymbolTable from '../lib/operators-symbol-table';
+import { Operators, defaultOperators } from '../lib/operators-symbol-table';
 import turoNumber from '../lib/turo-number';
 import mixins from '../lib/operators/mixins';
 
 const { makeMixin, simpleTestingOperator } = mixins;
-const { Operators, defaultOperators } = operatorSymbolTable;
-const { test, plan } = tap;
 
 test("simple", function (t) {
   var operators = new Operators({});

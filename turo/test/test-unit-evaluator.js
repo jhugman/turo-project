@@ -2,8 +2,8 @@ import tap from 'tap';
 import _ from 'underscore';
 import turoParser from '../lib/parser';
 import evaluator from '../lib/evaluator';
-import unitsTable from '../lib/units-table';
-const { UnitsTable: Units } = unitsTable
+import { Units } from '../lib/units';
+
 const { test, plan } = tap;
 
 const parser = new turoParser.Parser();

@@ -1,10 +1,9 @@
 import tap from 'tap';
 import _ from 'underscore';
-import units_table from '../lib/units-table.js';
+import { Units, Dimension } from '../lib/units';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { UnitsTable: Units, Dimension } = units_table;
 
 function equal(t, a, b) {
   t.equal(Math.floor(a * 1e12), Math.floor(b * 1e12), a + " === " + b + "?");

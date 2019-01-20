@@ -1,5 +1,5 @@
 import DocumentModel from './document/document-model';
-import unitsTable from './units-table';
+import { Units } from './units';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
 import { defaultOperators } from './operators/table';
@@ -9,7 +9,6 @@ import { each, extend, isArray } from 'underscore';
 import EditorActions from './editor-actions';
 
 const { Parser } = parser;
-const { UnitsTable: Units } = unitsTable;
 const { Variables: LegacyVariables } = variablesSymbolTable;
 
 var statics;

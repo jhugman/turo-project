@@ -1,8 +1,9 @@
 import _ from 'underscore';
+
 import CompoundUnit from './CompoundUnit';
 import Multiple from './Multiple';
 import Dimension from './Dimension';
-import UnitSchemeHelper from './unit-schemes';
+import UnitSchemes from './UnitSchemes';
 
 /*********************************************
   Units table.
@@ -12,10 +13,10 @@ function isStringOrUnit(obj) {
          (typeof obj === 'object' &&  obj.unitsTable);
 }
 
-export default class UnitsTable {
+export default class Units {
   constructor(initial) {
     this.units = initial || {};
-    this.unitSchemes = new UnitSchemeHelper();
+    this.unitSchemes = new UnitSchemes();
     // Big units table, including aliases.
     this._bigTable = {};
   }

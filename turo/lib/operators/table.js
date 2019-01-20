@@ -1,6 +1,8 @@
 
 import init from './all';
-import { UnaryOperation, BinaryOperation } from '.';
+import UnaryOperation from './UnaryOperation';
+import BinaryOperation from './BinaryOperation';
+
 //////////////////////////////////////////////////
 
 function makeKey(lValueType, literal, rValueType) {

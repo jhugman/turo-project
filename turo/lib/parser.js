@@ -2,7 +2,7 @@ import _ from 'underscore';
 import theParser from './grammar';
 import lang from './language-model';
 
-import { createDefaultOperators } from './operators/table';
+import { createDefaultOperators } from './operators';
 
 const DEFAULT_PREFS = {
   unitScheme: undefined,

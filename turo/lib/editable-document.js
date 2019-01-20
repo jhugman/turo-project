@@ -2,10 +2,10 @@ import DocumentModel from './document/document-model';
 import { Units } from './units';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
-import { defaultOperators } from './operators/table';
+import { defaultOperators } from './operators';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
-import { each, extend, isArray } from 'underscore';
+import { extend, isArray } from 'underscore';
 import EditorActions from './editor-actions';
 
 const { Parser } = parser;
@@ -168,7 +168,7 @@ extend(EditableDocument.prototype, {
     model.batchUpdate(nodes, scope);
 
     var statements = model.statementsInWrittenOrder;
-    each(statements, s => {
+    statements.forEach(s => {
       var node = s.node,
           first = node.statementOffsetFirst,
           last = node.statementOffsetLast;

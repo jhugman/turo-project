@@ -1,8 +1,5 @@
 import { test, plan } from 'tap';
-import { Operators } from '../lib/operators/table';
-import mixins from '../lib/operators/mixins';
-
-const { makeMixin, simpleTestingOperator } = mixins;
+import { Operators, mixins } from '../lib/operators';
 
 test("simple", function (t) {
   var operators = new Operators({});
@@ -10,22 +7,22 @@ test("simple", function (t) {
   operators.addInfixOperator(
     "+", 
     "number", "number", "number", 
-    makeMixin(
+    mixins.makeMixin(
       function (x, y) {
         return x + y;
       },
-      simpleTestingOperator
+      mixins.simpleTestingOperator
     )
   );
 
   operators.addInfixOperator(
     "*", 
     "number", "number", "number", 
-    makeMixin(
+    mixins.makeMixin(
       function (x, y) {
         return x * y;
       },
-      simpleTestingOperator
+      mixins.simpleTestingOperator
     )
   );
 

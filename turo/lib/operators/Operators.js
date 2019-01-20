@@ -1,5 +1,3 @@
-
-import init from './all';
 import UnaryOperation from './UnaryOperation';
 import BinaryOperation from './BinaryOperation';
 
@@ -11,7 +9,7 @@ function makeKey(lValueType, literal, rValueType) {
 
 var UNARY_OPERATION = "++N/A++";
 
-class Operators {
+export default class Operators {
   constructor(table, prefs) {
     this.table = table || {};
     this._turoPrefs = prefs || {};
@@ -106,11 +104,3 @@ class Operators {
   }
 }
 
-const createDefaultOperators = prefs => init(new Operators(undefined, prefs || {}));
-const defaultOperators = createDefaultOperators();
-
-export {
-  Operators,
-  defaultOperators,
-  createDefaultOperators
-};

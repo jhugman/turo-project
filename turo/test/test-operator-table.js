@@ -1,11 +1,8 @@
 import { test } from 'tap';
 import _ from 'underscore';
 import ast from '../lib/ast';
-import { Operators, defaultOperators } from '../lib/operators/table';
+import { Operators, defaultOperators, mixins } from '../lib/operators';
 import turoNumber from '../lib/turo-number';
-import mixins from '../lib/operators/mixins';
-
-const { makeMixin, simpleTestingOperator } = mixins;
 
 test("simple", function (t) {
   var operators = new Operators({});
@@ -13,22 +10,22 @@ test("simple", function (t) {
   operators.addInfixOperator(
     "+", 
     "number", "number", "number", 
-    makeMixin(
+    mixins.makeMixin(
       function (x, y) {
         return x + y;
       },
-      simpleTestingOperator
+      mixins.simpleTestingOperator
     )
   );
 
   operators.addInfixOperator(
     "*", 
     "number", "number", "number", 
-    makeMixin(
+    mixins.makeMixin(
       function (x, y) {
         return x * y;
       },
-      simpleTestingOperator
+      mixins.simpleTestingOperator
     )
   );
 

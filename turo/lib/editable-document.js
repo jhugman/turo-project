@@ -13,34 +13,6 @@ const { Variables: LegacyVariables } = variablesSymbolTable;
 
 var statics;
 
-///////////////////////////////////////////////////////////////////////////////
-function EditableDocument (id) {
-  if (!this) {
-    return new EditableDocument(id);
-  }
-  var importScope = lang.newScope(undefined, statics.units),
-      scope = importScope.newScope(id);
-  this._state = {
-    id: id,
-    model: new DocumentModel(id),
-    importScope: importScope,
-    scope: scope,
-  };
-
-  var parser = new Parser(scope);
-  // Scope rules control the access to units, 
-  // so novel units can drop in and out of scope. 
-  // However, redefining existing units has undefined 
-  // results.
-  // This is probably the worst of both worlds,
-  // so we may not want to scope units with block scope
-  parser.units = scope.units;
-  parser.operators = defaultOperators;
-
-  this.parser = parser;
-
-  this.documentHelper = new DocumentHelper(EditableDocument.storage);
-}
 
 function promiseCallback(resolve, reject, ...defaultArgs) {
   return (err, ...args) => {
@@ -52,7 +24,35 @@ function promiseCallback(resolve, reject, ...defaultArgs) {
   };
 }
 
-extend(EditableDocument.prototype, {
+///////////////////////////////////////////////////////////////////////////////
+class EditableDocument { 
+  constructor (id) {
+    if (!this) {
+      return new EditableDocument(id);
+    }
+    var importScope = lang.newScope(undefined, statics.units),
+        scope = importScope.newScope(id);
+    this._state = {
+      id: id,
+      model: new DocumentModel(id),
+      importScope: importScope,
+      scope: scope,
+    };
+
+    var parser = new Parser(scope);
+    // Scope rules control the access to units, 
+    // so novel units can drop in and out of scope. 
+    // However, redefining existing units has undefined 
+    // results.
+    // This is probably the worst of both worlds,
+    // so we may not want to scope units with block scope
+    parser.units = scope.units;
+    parser.operators = defaultOperators;
+
+    this.parser = parser;
+
+    this.documentHelper = new DocumentHelper(EditableDocument.storage);
+  }
 
   /**
    * Asynchronously imports one or more documents into this document's parent scope.
@@ -78,17 +78,17 @@ extend(EditableDocument.prototype, {
 
     var scope = this._state.importScope;
     return this.documentHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
-  },
+  }
 
   import (id) {
     return new Promise((resolve, reject) => {
       this.import_withCallback(id, promiseCallback(resolve, reject, this));
     });
-  },
+  }
 
   _freshScope () {
     return this.scope.fresh();
-  },
+  }
 
   /**
    * Evaluates the document.
@@ -115,7 +115,7 @@ extend(EditableDocument.prototype, {
       }
       return this._evalDocumentSync(string, callback);
     });
-  },
+  }
 
   evaluateDocument (string) {
     const promise = new Promise((resolve, reject) => {
@@ -128,11 +128,11 @@ extend(EditableDocument.prototype, {
       });
     });
     return promise;
-  },
+  }
 
   reeevaluateDocument (callback) {
     return this._evalDocumentSync(this.text, callback);
-  },
+  }
 
   _firstParseEval (string, optionalDocumentCreator, syncEval) {
     var firstParseNode = this.parser.parse(string + '\n', 'DocumentFirstParse');
@@ -156,7 +156,7 @@ extend(EditableDocument.prototype, {
       context
     );
     return isReady;
-  },
+  }
 
   _evalDocumentSync (string, callback) {
     var scope = this.scope,
@@ -182,13 +182,13 @@ extend(EditableDocument.prototype, {
     }
 
     return this;
-  },
+  }
 
   evaluateStatement (id, string) {
     return new Promise((resolve, reject) => {
       this.evaluateStatement_withCallback(id, string, promiseCallback(resolve, reject));
     });
-  },
+  }
 
   evaluateStatement_withCallback (id, string, callback) {
     if (!callback) {
@@ -201,11 +201,11 @@ extend(EditableDocument.prototype, {
       }
       return this._evalStatementSync(id, string, callback);
     });
-  },
+  }
 
   getStatement(id) {
     return this._state.model.getStatement(id);
-  },
+  }
 
   _evalStatementSync(id, string, callback) {
     var scope = this.scope,
@@ -232,7 +232,7 @@ extend(EditableDocument.prototype, {
     }
 
     return statements;
-  },
+  }
 
   // events: {
   //   requestLines: ['startLine', 'endLine'],
@@ -247,7 +247,7 @@ extend(EditableDocument.prototype, {
       line: line,
       column: column,
     };
-  },
+  }
 
   // TODO: wtf is an editToken?
   findStatementForEditToken (editToken) {
@@ -272,18 +272,18 @@ extend(EditableDocument.prototype, {
     if (id) {
       return model.getStatement(id);
     }
-  },
+  }
 
   setEditPoint (token) {
     // const {column, offset, line} = token;
     this.editToken = token;
     return this;
-  },
+  }
 
   getActions () {
     return this._editActions;
-  },
-});
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 Object.defineProperties(EditableDocument.prototype, {

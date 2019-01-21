@@ -17,5 +17,5 @@ export const loaders = {
 
 export {
   EditableDocument,
-  CompositeStorage
+  CompositeStorage,
 };

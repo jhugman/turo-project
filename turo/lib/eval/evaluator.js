@@ -1,7 +1,7 @@
-import { defaultOperators } from './operators';
+import { defaultOperators } from '../operators';
 import operatorLabeller from './operation-labeller';
-import ast from './ast';
-import turoNumber from './turo-number';
+import ast from '../ast';
+import turoNumber from '../turo-number';
 import {extend} from 'underscore';
 
 function unitConversion(node, resultValue) {

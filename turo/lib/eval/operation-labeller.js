@@ -1,75 +1,68 @@
-import {extend} from 'underscore';
-import ast from './ast';
+import ast from '../ast';
 
-function addError (errorName, parent, context) {
+function addError (errorName, parent, context, ...nodes) {
   ast.addError(errorName, parent, context);
   if (arguments.length <= 3) {
     return;
   }
   delete parent.error;
-  for (var i = 3, max = arguments.length; i < max; i++) {
-    var node = arguments[i];
+  nodes.forEach(node => {
     node.error = errorName;
-  }
+  });
 }
 
-function OperationLabellerVisitor () {
-}
+class OperationLabellerVisitor {
+  visitBinaryOperator (node, context) {
 
-extend(OperationLabellerVisitor.prototype, {
-  visitBinaryOperator: function (node, context) {
+    const len = context.errors.length;
 
-    var len = context.errors.length;
-
-    var lType = node.left.accept(this, context),
-        rType = node.right.accept(this, context),
-        operator;
+    const lType = node.left.accept(this, context),
+          rType = node.right.accept(this, context);
 
     if (!(lType && rType)) {
       // An error happened further down the tree.
       return;
     }
 
-    operator = context.operators.findOperator(node.literal, lType, rType);
+    const operation = context.operators.findOperator(node.literal, lType, rType);
 
-    if (!operator) {
+    if (!operation) {
       addError("TYPE_MISMATCH", node, context, node.left, node.right);
       return;
     }
 
-    node.operation = operator;
-    return operator.returnValueType;
-  },
+    node.operation = operation;
+    return operation.returnValueType;
+  }
 
-  visitUnaryOperation: function (node, context) {
-    var operandType = node.value.accept(this, context),
-        operator;
+  visitUnaryOperation (node, context) {
+    const operandType = node.value.accept(this, context);
 
     if (!operandType) {
       // An error happened further down the tree.
       return;
     }
 
-    operator = context.operators.findUnaryOperator(node.literal, operandType, node.isPrefix);
+    const operation = context.operators.findUnaryOperator(node.literal, operandType, node.isPrefix);
 
-    if (!operator) {
+    if (!operation) {
       ast.addError("TYPE_MISMATCH", node, context);
       return;
     }
 
-    node.operation = operator;
-    return operator.returnValueType;
-  },
+    node.operation = operation;
+    return operation.returnValueType;
+  }
 
-  visitParens: function (node, context) {
+  visitParens (node, context) {
     return node.ast.accept(this, context);
-  }, 
+  } 
 
-  visitInteger: function (node, context) {
+  visitInteger (node, context) {
     return node.valueType;
-  },
+  }
 
-  visitIdentifier: function (node, context) {
+  visitIdentifier (node, context) {
     if (!context.variables && !node.scope) {
       // not throw, because our earlier tests
       // won't pass. TODO
@@ -103,9 +96,9 @@ extend(OperationLabellerVisitor.prototype, {
     delete definitionNode._isBusy;
 
     return retValueType;
-  },
+  }
 
-  visitVariableDefinition: function (node, context) {
+  visitVariableDefinition (node, context) {
     // This is OK to do here, because a) it's only done infrequently
     // we could lazily calculate, but valueType is an intermediate value,
     // but changes in the variables used in this definition may change a
@@ -113,59 +106,58 @@ extend(OperationLabellerVisitor.prototype, {
     node.valueType = node.ast.accept(this, context);
 
     return node.valueType;
-  },
+  }
 
-  visitUnit: function (unit, context) {
+  visitUnit (unit, context) {
     return "unit";
-  },
+  }
 
-  visitUnitPower: function (unit, context) {
+  visitUnitPower (unit, context) {
     return "unit";
-  },
+  }
 
-  visitUnitLiteral: function (unit, context) {
+  visitUnitLiteral (unit, context) {
     return "unit";
-  },
+  }
 
-  visitUnitMultOp: function (unit, context) {
+  visitUnitMultOp (unit, context) {
     return "unit";
-  },
+  }
 
-  visitTuroValue: function (node, context) {
+  visitTuroValue (node, context) {
     return node.turoNumber.valueType;
-  },
+  }
 
-});
-
-function Labeller (visitor, operators, errors, evaluator) {
-  this.operators = operators;
-  this.visitor = visitor;
-  this.errors = errors || [];
-  this.evaluator = evaluator;
-  this.prefs = evaluator.prefs;
 }
 
-extend(Labeller.prototype, {
-  label: function (node) {
+class Labeller {
+  constructor (visitor, operators, errors, evaluator) {
+    this.operators = operators;
+    this.visitor = visitor;
+    this.errors = errors || [];
+    this.evaluator = evaluator;
+    this.prefs = evaluator.prefs;
+  }
+
+  label (node) {
     if (node.accept) {
       var valueType = node.accept(this.visitor, this);
       node.valueType = valueType;
       return valueType;
     }
-  },
+  }
 
-  evaluate: function (node) {
+  evaluate (node) {
     if (this.evaluator) {
       return this.evaluator.evaluate(node);
     }
   }
-});
+}
 
 export default {
   visitor: new OperationLabellerVisitor(), // new ast can be plugged in as and when by extending this
-  label: function (node, operators, errors, evaluator) {
+  label (node, operators, errors, evaluator) {
     return new Labeller(this.visitor, operators, errors, evaluator).label(node);
   },
-
-  OperationLabellerVisitor: OperationLabellerVisitor
+  OperationLabellerVisitor
 };

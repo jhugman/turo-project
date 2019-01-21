@@ -5,7 +5,7 @@ import DocumentHelper from './document/document-helper';
 import { defaultOperators } from './operators';
 import lang from './language-model';
 import variablesSymbolTable from './variables-symbol-table';
-import { extend, isArray } from 'underscore';
+import { isArray } from 'underscore';
 import EditorActions from './editor-actions';
 
 const { Parser } = parser;

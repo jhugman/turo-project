@@ -1,7 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import ast from "../lib/ast";
-import evaluator from "../lib/evaluator";
+import evaluator from "../lib/eval/evaluator";
 
 const { test, plan } = tap;
 

@@ -1,22 +1,33 @@
-import tap from 'tap';
+import { test } from 'tap';
 import _ from 'underscore';
 import ast from '../lib/ast';
-import operatorSymbolTable from '../lib/operators-symbol-table';
+import { Operators, defaultOperators, mixins } from '../lib/operators';
 import turoNumber from '../lib/turo-number';
-
-const { Operators, defaultOperators } = operatorSymbolTable;
-const { test, plan } = tap;
 
 test("simple", function (t) {
   var operators = new Operators({});
 
-  operators.addInfixOperator("+", "number", "number", "number", null, function (x, y) {
-    return x + y;
-  });
+  operators.addInfixOperator(
+    "+", 
+    "number", "number", "number", 
+    mixins.makeMixin(
+      function (x, y) {
+        return x + y;
+      },
+      mixins.simpleTestingOperator
+    )
+  );
 
-  operators.addInfixOperator("*", "number", "number", "number", null, function (x, y) {
-    return x * y;
-  });
+  operators.addInfixOperator(
+    "*", 
+    "number", "number", "number", 
+    mixins.makeMixin(
+      function (x, y) {
+        return x * y;
+      },
+      mixins.simpleTestingOperator
+    )
+  );
 
   var operator = operators.findOperator("+", "number", "number");
 

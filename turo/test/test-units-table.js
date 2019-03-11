@@ -1,10 +1,9 @@
 import tap from 'tap';
 import _ from 'underscore';
-import units_table from '../lib/units-table.js';
+import { Units, Dimension, CompoundUnit } from '../lib/units';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { UnitsTable: Units, Dimension } = units_table;
 
 function equal(t, a, b) {
   t.equal(Math.floor(a * 1e12), Math.floor(b * 1e12), a + " === " + b + "?");
@@ -94,7 +93,6 @@ test("unit objects from units", function (t) {
 });
 
 test("compound unit dimensions", function (t) {
-  var CompoundUnit = units_table.CompoundUnit;
   var units = new Units();
 
   units.addUnit("metre", "Length");
@@ -175,8 +173,29 @@ test("composability", function (t) {
   // 1 metre per second per second
   var acceleration = metre.per(second.by(second));
   t.ok(acceleration.getDimension().isEqual(new Dimension({Length: 1, Time: -2})));
+  t.end();
+});
 
+test("composability II", function (t) {
+  var units = new Units();
 
+  var metre = units.addUnit("metre", "Length"),
+      km = units.addUnit("km", 1000, "metre"),
+      mile = units.addUnit("mile", 1609, "metre"),
+
+      second = units.addUnit("second", "Time"),
+      // we can make a new simple unit out of an old one.
+      hour = units.addUnit("hour", 3600, second),
+
+      kg = units.addUnit("kg", "Mass");
+
+  t.ok(metre);
+  t.ok(km);
+  t.ok(second);
+  t.ok(hour);
+
+  var metrePerSecond = metre.per(second);
+  var kph = km.per(hour);
 
   // now compose from already compound ones.
 
@@ -185,14 +204,14 @@ test("composability", function (t) {
   // TODO 1 kg m s**-2
   // TODO (1 m) ** 2;
   // TODO sqrt(1 m**2);
+  
   var newton = metrePerSecond.per(second).by(kg);
   t.ok(newton.getDimension().isEqual(new Dimension({Length: 1, Time: -2, Mass:1})));
 
   var newton2 = kg.by(metre.per(second.by(second)));
 
-  // needed because getDimension() is lazy.
-  newton2.getDimension();
-  t.deepEqual(newton, newton2);
+  t.deepEqual(newton.getSimpleUnits(), newton2.getSimpleUnits());
+  t.deepEqual(newton.getDimension(), newton2.getDimension());
 
   // testing naming a compound unit...
   // unit newton : kg m/s/s

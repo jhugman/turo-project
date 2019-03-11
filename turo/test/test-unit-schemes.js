@@ -1,10 +1,9 @@
 import tap from 'tap';
 import _ from 'underscore';
-import units_table from '../lib/units-table.js';
+import { Units, Dimension } from '../lib/units';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { UnitsTable: Units, Dimension } = units_table;
 
 test("Unit schemes", function (t) {
   var units = new Units(),

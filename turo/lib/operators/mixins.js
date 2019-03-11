@@ -42,6 +42,12 @@ function checkPercentNoUnits (operandNode, operandValue, ctx) {
 ///////////////////////////////////////////////////////////////////////////////
 
 var mixins = {
+  simpleTestingOperator: {
+    nodeCalculator(x, y) {
+      return this.simpleValueCalculator(x, y);
+    }
+  },
+
   binaryMatchingUnits: {
     preflightCheck (leftNode, leftValue, rightNode, rightValue, ctx) {
       if (isDimensionless(leftValue)) {
@@ -151,6 +157,18 @@ var mixins = {
       }
       return leftValue.unit.per(rightValue.unit);
     } 
+  },
+
+  binaryMultiplyUtils: {
+    unitCalculator: function (leftValue, rightValue) {
+      if (isDimensionless(leftValue)) {
+        return rightValue.unit;
+      }
+      if (isDimensionless(rightValue)) {
+        return leftValue.unit;
+      }
+      return leftValue.unit.by(rightValue.unit);
+    },
   },
 
   unitsUtils: {

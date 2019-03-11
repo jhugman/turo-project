@@ -2,7 +2,7 @@ import _ from 'underscore';
 import theParser from './grammar';
 import lang from './language-model';
 
-import operatorsTable from './operators-symbol-table';
+import { createDefaultOperators } from './operators';
 
 const DEFAULT_PREFS = {
   unitScheme: undefined,
@@ -21,7 +21,7 @@ function TuroParser (scope, prefs = _.defaults({}, DEFAULT_PREFS)) {
     scope: scope || lang.newScope(),
   };
 
-  this.operators = operatorsTable.createDefaultOperators(prefs);
+  this.operators = createDefaultOperators(prefs);
 }
 
 theParser._parse = theParser.parse;

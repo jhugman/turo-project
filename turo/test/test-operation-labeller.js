@@ -1,20 +1,30 @@
-import tap from 'tap';
-import _ from 'underscore';
-import operatorSymbolTable from '../lib/operators-symbol-table';
-
-const { Operators } = operatorSymbolTable;
-const { test, plan } = tap;
+import { test, plan } from 'tap';
+import { Operators, mixins } from '../lib/operators';
 
 test("simple", function (t) {
   var operators = new Operators({});
 
-  operators.addInfixOperator("+", "number", "number", "number", null, function (x, y) {
-    return x + y;
-  });
+  operators.addInfixOperator(
+    "+", 
+    "number", "number", "number", 
+    mixins.makeMixin(
+      function (x, y) {
+        return x + y;
+      },
+      mixins.simpleTestingOperator
+    )
+  );
 
-  operators.addInfixOperator("*", "number", "number", "number", null, function (x, y) {
-    return x * y;
-  });
+  operators.addInfixOperator(
+    "*", 
+    "number", "number", "number", 
+    mixins.makeMixin(
+      function (x, y) {
+        return x * y;
+      },
+      mixins.simpleTestingOperator
+    )
+  );
 
   var operator = operators.findOperator("+", "number", "number");
 

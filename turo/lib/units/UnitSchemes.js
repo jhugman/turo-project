@@ -1,13 +1,12 @@
 import _ from 'underscore';
 
-function UnitSchemeHelper () {
-  this._table = {};
-  this._noScheme = {};
+export default class UnitSchemes {
+  constructor() {
+    this._table = {};
+    this._noScheme = {};
 
-  this._dimensionTable = {};
-}
-
-_.extend(UnitSchemeHelper.prototype, {
+    this._dimensionTable = {};
+  }
 
   addUnit (unit, additionalSchemes) {
     var self = this,
@@ -43,7 +42,7 @@ _.extend(UnitSchemeHelper.prototype, {
       self._addUnitToScheme(self._noScheme, unit);
     }
 
-  },
+  }
 
   _addUnitToScheme (table, unit) {
     var dimension = unit.getDimension(),
@@ -59,7 +58,7 @@ _.extend(UnitSchemeHelper.prototype, {
     }
 
     delete this._keyboardCache;
-  },
+  }
 
   getUnitSchemes () {
 
@@ -70,7 +69,7 @@ _.extend(UnitSchemeHelper.prototype, {
       this._keyboardCache.unitSchemes = _.keys(this._table);
     }
     return this._keyboardCache.unitSchemes;
-  },
+  }
 
   getDimensions (unitScheme) {
     var self = this;
@@ -89,7 +88,7 @@ _.extend(UnitSchemeHelper.prototype, {
       table[unitScheme] = dimensionNames;
     }
     return table[unitScheme];
-  },
+  }
 
   getUnitNames (unitScheme, dimension) {
     if (!unitScheme) {
@@ -119,7 +118,7 @@ _.extend(UnitSchemeHelper.prototype, {
     }
 
     return table[dimension];
-  },
+  }
 
   findClosestUnit (srcUnit, unitScheme, dimensionName) {
 
@@ -150,8 +149,4 @@ _.extend(UnitSchemeHelper.prototype, {
     return closestUnit;
   }
 
-});
-
-export default {
-  UnitSchemeHelper: UnitSchemeHelper
-};
+}

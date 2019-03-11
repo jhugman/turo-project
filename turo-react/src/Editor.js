@@ -3,7 +3,6 @@ import './App.css';
 import { EditorState, EditorBlock } from 'draft-js';
 import { EditorContainer, Editor, Plugin } from '@djsp/core';
 import { EditableDocument, CompositeStorage, loaders } from 'turo';
-import { CompositeStorage } from '../../turo/lib/storage/abstract-storage';
 
 const tokenComps = {
   identifier: ({ children }) => <span className="token--identifier">{children}</span>,

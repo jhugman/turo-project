@@ -234,196 +234,28 @@ export default class CompoundUnit {
     };
   }
 
-  _reductions = (function () {
+  _reductions (unitScheme, simpleUnitsOnly) {
+    var simplified = this.simplify(),
+        list,
+        reduced;
 
-
-    // From a list of units, filter the ones that will be useful to us
-    // to factor the reducingUnit.
-    function findCompoundUnits (allUnits, reducingUnit, unitScheme) {
-      var list = [],
-          unitDimension = reducingUnit.getDimension();
-      _.each(allUnits, function (i, unitName) {
-          var unit = allUnits[unitName],
-              dimension = unit.getDimension();
-          // only compound ones needed
-          if (dimension.cardinality() <= 1) {
-            return;
-          }
-          if (unitDimension.contains(dimension)) {
-            // we're only interested in units that can reduce the reducingUnit
-
-            // TODO: consider unit schemes.
-            if (!unitScheme || _.indexOf(unit.getUnitSchemes(), unitScheme) >= 0) {
-              list.push(unit);
-            }
-
-          }
-      });
-
-      list = _.sortBy(list, function (unit) {
-        return unit.cardinality();
-      });
-
-      return list;
+    if (simpleUnitsOnly) {
+      list = [];
+    } else {
+      list = findCompoundUnits(this.unitsTable.units, simplified.unit, unitScheme);
     }
 
-    // complete is a unit that is refactored.
-    // result is a the result object.
-    // Add complete iff it has a lower cardinality (i.e. expresses the dimension in the fewest possible units)
-    // that the current best.
-    function considerBest (result, complete) {
-      var best = result.bestCardinality,
-          cardinality = complete.cardinality();
-
-      if (best < cardinality) {
-        return;
-      } else if (best === cardinality) {
-        var i = 0, max = result.matches.length;
-        for (; i < max; i++) {
-          // check we haven't got a duplicate
-          if (result.matches[i].isEqual(complete)) {
-            return;
-          }
-        }
-        result.matches.push(complete);
+    if (list.length) {
+      reduced = findReductions(simplified.unit, list, unitScheme);
+      return reduced.matches.length ? reduced.matches : [this];
+    } else {
+      if (unitScheme) {
+        return [translateToUnitScheme(simplified.unit, unitScheme)];
       } else {
-        result.bestCardinality = cardinality;
-        result.matches = [complete];
+        return [this];
       }
     }
-
-    // Translate this compound unit in to the target unitScheme,
-    // unit - which is guaranteed to contain only simple named units.
-    // unitScheme - the unitScheme passed to the refactoredNode method.
-    function translateToUnitScheme (unit, unitScheme) {
-      var unitTable = unit.unitsTable,
-          unitSchemes = unitTable.unitSchemes,
-          simpleUnits = unit.getSimpleUnits(),
-          newSimpleUnits = {};
-      _.each(simpleUnits, function (i, key) {
-        var partUnit = unitTable.getUnit(key),
-            dimensionName = partUnit.getDimension().shortName,
-            newPartUnit;
-
-        if (!dimensionName) {
-          throw new Error("Trying to translate " + partUnit.name + " into " + unitScheme + " but it's not simple");
-        }
-
-        newPartUnit = unitSchemes.findClosestUnit(partUnit, unitScheme, dimensionName);
-
-        newSimpleUnits[newPartUnit.name] = simpleUnits[key];
-
-      });
-
-      return new CompoundUnit(unitTable, newSimpleUnits);
-    }
-
-    /*
-     * reducingUnit - the remaining unit needed to be factored.
-     * currentBigUnits - the list of unconsidered named compound units.
-     * accumulator - a candidate result unit. i.e. reducingUnit * accumulator = paritally factored initial reducingUnit
-     * test - the named compound unit we have just tested to see if it is contained in the reducing unit.
-     * result - the list of complete accumulator units.
-     */
-    function findReductions (reducingUnit, currentBigUnits, unitScheme, accumulator, test, result) {
-      result = result || {
-        bestCardinality: 9999999,
-        matches: []
-      };
-
-      accumulator = accumulator || new CompoundUnit(reducingUnit.unitsTable, {});
-
-      // we should assume that reducing unit is simple;
-
-      if (test) {
-        // if test completely matches reducing unit, then our job is done.
-        if (test.matchesDimensions(reducingUnit)) {
-          // We have constructed an accumulator out of named compound units only.
-          considerBest(result, accumulator.by(test));
-          return result;
-        }
-
-        if (!reducingUnit.getDimension().contains(test.getDimension())) {
-          // We can't reduce the unit with the test unit, so
-          // remove it from the pool.
-          currentBigUnits = _.reject(currentBigUnits, function (un) {
-            return un === test;
-          });
-        } else {
-          // We can reduce the unit with the test unit, so replace the
-          // accumulator with a new one.
-          accumulator = accumulator.by(test);
-
-          // this is how many units we've accumulated already (the 1 is test)
-          var currentCardinality = accumulator.cardinality();
-
-          // If we gave up now, our cardinality would be be
-          // increased by the total dimension cardinality of what's left.
-          // maximumCardinality = currentCardinality + (reducingUnit.getDimension().cardinality() - test.getDimension().cardinality());
-
-          // optimisation, though it's unlikely to do anything in all but
-          // the most complicated units.
-          if (currentCardinality > result.bestCardinality) {
-            return result;
-          }
-
-          // TODO how can this be made less heavy weight?
-          reducingUnit = reducingUnit.per(test)._simplifiedNode().unit;
-
-          // maximumCardinality is not very useful, but we can calculate it here as:
-          // maximumCardinality = currentCardinality + reducingUnit.getDimension().cardinality();
-        }
-      }
-
-
-      // We've run out of named compound units to test.
-      // We only have named simple units left.
-      if (currentBigUnits.length === 0) {
-        // Translate the remaining simple units into unit scheme
-        // appropriate units.
-        if (unitScheme) {
-          reducingUnit = translateToUnitScheme(reducingUnit, unitScheme);
-        }
-        considerBest(result, accumulator.by(reducingUnit));
-        return result;
-      }
-
-
-      _.each(currentBigUnits, function (next) {
-        // recurse if we haven't seen this before, except if we've just looked at it.
-        if (test === next || !accumulator.simpleUnits[next.name]) {
-          findReductions(reducingUnit, currentBigUnits, unitScheme, accumulator, next, result);
-        }
-
-      });
-
-      return result;
-    }
-
-
-    return function _reductions (unitScheme, simpleUnitsOnly) {
-      var simplified = this.simplify(),
-          list,
-          reduced;
-
-      if (simpleUnitsOnly) {
-        list = [];
-      } else {
-        list = findCompoundUnits(this.unitsTable.units, simplified.unit, unitScheme);
-      }
-
-      if (list.length) {
-        reduced = findReductions(simplified.unit, list, unitScheme);
-        return reduced.matches.length ? reduced.matches : [this];
-      } else {
-        if (unitScheme) {
-          return [translateToUnitScheme(simplified.unit, unitScheme)];
-        } else {
-          return [this];
-        }
-      }
-    };
-  })()
+  }
 
   _convertSimpleUnit (quantity, destinationUnit) {
     if (this.multiples && destinationUnit.name) {
@@ -885,5 +717,171 @@ export default class CompoundUnit {
   accept (visitor) {
     ast.acceptVisitor(this, visitor, visitor.visitUnit, arguments);
   }
+}
 
+
+// Utility functions only relevant for reductions.
+
+
+// From a list of units, filter the ones that will be useful to us
+// to factor the reducingUnit.
+function findCompoundUnits (allUnits, reducingUnit, unitScheme) {
+  var list = [],
+      unitDimension = reducingUnit.getDimension();
+  _.each(allUnits, function (i, unitName) {
+      var unit = allUnits[unitName],
+          dimension = unit.getDimension();
+      // only compound ones needed
+      if (dimension.cardinality() <= 1) {
+        return;
+      }
+      if (unitDimension.contains(dimension)) {
+        // we're only interested in units that can reduce the reducingUnit
+
+        // TODO: consider unit schemes.
+        if (!unitScheme || _.indexOf(unit.getUnitSchemes(), unitScheme) >= 0) {
+          list.push(unit);
+        }
+
+      }
+  });
+
+  list = _.sortBy(list, function (unit) {
+    return unit.cardinality();
+  });
+
+  return list;
+}
+
+// complete is a unit that is refactored.
+// result is a the result object.
+// Add complete iff it has a lower cardinality (i.e. expresses the dimension in the fewest possible units)
+// that the current best.
+function considerBest (result, complete) {
+  var best = result.bestCardinality,
+      cardinality = complete.cardinality();
+
+  if (best < cardinality) {
+    return;
+  } else if (best === cardinality) {
+    var i = 0, max = result.matches.length;
+    for (; i < max; i++) {
+      // check we haven't got a duplicate
+      if (result.matches[i].isEqual(complete)) {
+        return;
+      }
+    }
+    result.matches.push(complete);
+  } else {
+    result.bestCardinality = cardinality;
+    result.matches = [complete];
+  }
+}
+
+// Translate this compound unit in to the target unitScheme,
+// unit - which is guaranteed to contain only simple named units.
+// unitScheme - the unitScheme passed to the refactoredNode method.
+function translateToUnitScheme (unit, unitScheme) {
+  var unitTable = unit.unitsTable,
+      unitSchemes = unitTable.unitSchemes,
+      simpleUnits = unit.getSimpleUnits(),
+      newSimpleUnits = {};
+  _.each(simpleUnits, function (i, key) {
+    var partUnit = unitTable.getUnit(key),
+        dimensionName = partUnit.getDimension().shortName,
+        newPartUnit;
+
+    if (!dimensionName) {
+      throw new Error("Trying to translate " + partUnit.name + " into " + unitScheme + " but it's not simple");
+    }
+
+    newPartUnit = unitSchemes.findClosestUnit(partUnit, unitScheme, dimensionName);
+
+    newSimpleUnits[newPartUnit.name] = simpleUnits[key];
+
+  });
+
+  return new CompoundUnit(unitTable, newSimpleUnits);
+}
+
+/*
+ * reducingUnit - the remaining unit needed to be factored.
+ * currentBigUnits - the list of unconsidered named compound units.
+ * accumulator - a candidate result unit. i.e. reducingUnit * accumulator = paritally factored initial reducingUnit
+ * test - the named compound unit we have just tested to see if it is contained in the reducing unit.
+ * result - the list of complete accumulator units.
+ */
+function findReductions (reducingUnit, currentBigUnits, unitScheme, accumulator, test, result) {
+  result = result || {
+    bestCardinality: 9999999,
+    matches: []
+  };
+
+  accumulator = accumulator || new CompoundUnit(reducingUnit.unitsTable, {});
+
+  // we should assume that reducing unit is simple;
+
+  if (test) {
+    // if test completely matches reducing unit, then our job is done.
+    if (test.matchesDimensions(reducingUnit)) {
+      // We have constructed an accumulator out of named compound units only.
+      considerBest(result, accumulator.by(test));
+      return result;
+    }
+
+    if (!reducingUnit.getDimension().contains(test.getDimension())) {
+      // We can't reduce the unit with the test unit, so
+      // remove it from the pool.
+      currentBigUnits = _.reject(currentBigUnits, function (un) {
+        return un === test;
+      });
+    } else {
+      // We can reduce the unit with the test unit, so replace the
+      // accumulator with a new one.
+      accumulator = accumulator.by(test);
+
+      // this is how many units we've accumulated already (the 1 is test)
+      var currentCardinality = accumulator.cardinality();
+
+      // If we gave up now, our cardinality would be be
+      // increased by the total dimension cardinality of what's left.
+      // maximumCardinality = currentCardinality + (reducingUnit.getDimension().cardinality() - test.getDimension().cardinality());
+
+      // optimisation, though it's unlikely to do anything in all but
+      // the most complicated units.
+      if (currentCardinality > result.bestCardinality) {
+        return result;
+      }
+
+      // TODO how can this be made less heavy weight?
+      reducingUnit = reducingUnit.per(test)._simplifiedNode().unit;
+
+      // maximumCardinality is not very useful, but we can calculate it here as:
+      // maximumCardinality = currentCardinality + reducingUnit.getDimension().cardinality();
+    }
+  }
+
+
+  // We've run out of named compound units to test.
+  // We only have named simple units left.
+  if (currentBigUnits.length === 0) {
+    // Translate the remaining simple units into unit scheme
+    // appropriate units.
+    if (unitScheme) {
+      reducingUnit = translateToUnitScheme(reducingUnit, unitScheme);
+    }
+    considerBest(result, accumulator.by(reducingUnit));
+    return result;
+  }
+
+
+  _.each(currentBigUnits, function (next) {
+    // recurse if we haven't seen this before, except if we've just looked at it.
+    if (test === next || !accumulator.simpleUnits[next.name]) {
+      findReductions(reducingUnit, currentBigUnits, unitScheme, accumulator, next, result);
+    }
+
+  });
+
+  return result;
 }

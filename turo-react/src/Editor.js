@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import './App.css';
 import { EditorState, EditorBlock } from 'draft-js';
 import { EditorContainer, Editor, Plugin } from '@djsp/core';
-import { EditableDocument } from 'turo';
-import { bundleLoader } from '../../turo/lib/storage/app-bundle-storage';
-import { CompositeStorage } from '../../turo/lib/abstract-storage';
+import { EditableDocument, CompositeStorage, loaders } from 'turo';
+import { CompositeStorage } from '../../turo/lib/storage/abstract-storage';
 
 const tokenComps = {
   identifier: ({ children }) => <span className="token--identifier">{children}</span>,
@@ -38,7 +37,7 @@ const createTokenStrategy = (displayType, turoDoc) => ({
   component: tokenComps[displayType]
 })
 
-EditableDocument.storage = new CompositeStorage([bundleLoader]);
+EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);
 
 class Statement extends Component {
   render() {

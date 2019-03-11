@@ -1,7 +1,7 @@
 
 import EditableDocument from './editable-document';
 import { bundleLoader, storage } from './storage/app-bundle-storage';
-import { CompositeStorage, DocumentLoader } from './abstract-storage';
+import { CompositeStorage, DocumentLoader } from './storage/abstract-storage';
 import './actions/autocomplete';
 
 // By default, documents are loaded only from the bundle. 

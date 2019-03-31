@@ -9,8 +9,20 @@ export default class Dimension {
         this._isSimple = true;
       } else {
         this.dimensions = initial || {};
-        this._isSimple = false;
       }
+
+      this.initProperties()
+  }
+
+  initProperties() {
+    Object.keys(this.dimensions).forEach(k => {
+      if (!this.dimensions[k]) {
+        delete this.dimensions[k];
+      }
+    });
+    const cardinality = this.cardinality();
+    this._isSimple = cardinality == 1;
+    this._isDimensionless = cardinality == 0;
   }
 
   isEqual (that) {
@@ -19,6 +31,10 @@ export default class Dimension {
     }
 
     return this._minimalContains(that) && that._minimalContains(this);
+  }
+
+  isDimensionless () {
+    return this._isDimensionless;
   }
 
   _minimalContains (that) {
@@ -78,4 +94,32 @@ export default class Dimension {
       return p + (q > 0 ? q : -q);
     }, 0).value();
   }
+
+  by (that) {
+    const sum = {};
+    Object.assign(sum, this.dimensions, that.dimensions);
+    Object.keys(sum).forEach(key => {
+      sum[key] = (this.dimensions[key] || 0) + (that.dimensions[key] || 0);
+    });
+    return new Dimension(sum);
+  }
+
+  per (that) {
+    const sum = {};
+    Object.assign(sum, this.dimensions, that.dimensions);
+    Object.keys(sum).forEach(key => {
+      sum[key] = (this.dimensions[key] || 0) - (that.dimensions[key] || 0);
+    });
+    return new Dimension(sum);
+  }
+
+  pow (pow) {
+    const sum = {};
+    Object.keys(this.dimensions).forEach(key => {
+      sum[key] = (this.dimensions[key] || 0) * pow;
+    });
+    return new Dimension(sum);
+  }  
 }
+
+Dimension.NONE = new Dimension();

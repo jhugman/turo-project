@@ -1,6 +1,6 @@
 import _ from 'underscore'
-import graphBuilder from './document-graph-builder';
-import TuroStatement from './turo-statement';
+import DocumentGraphBuilder from './DocumentGraphBuilder';
+import TuroStatement from './TuroStatement';
 
 //////////////////////////////////////////////////////////////////////
 var State = {
@@ -9,34 +9,35 @@ var State = {
   INVALID: 2,
 };
 
+const graphBuilder = new DocumentGraphBuilder();
+
 //////////////////////////////////////////////////////////////////////
 var nextDocumentId = 0;
 
-function DocumentModel (documentId, overwriteExistingDefinitions) {
-  this.documentId = documentId ? documentId : ('_' + nextDocumentId++);
-  this.overwriteExistingDefinitions = !!overwriteExistingDefinitions;
-  this._state = {
-    updateId: 0,
-    graph: graphBuilder.emptyGraph(),
-    statementMap: {},
-    idsInWrittenOrder: [],
-    state: State.INVALID,
-    scope: null,
-    previousUpdate: [],
-  };
-}
+export default class DocumentModel {
+  constructor (documentId, overwriteExistingDefinitions) {
+    this.documentId = documentId ? documentId : ('_' + nextDocumentId++);
+    this.overwriteExistingDefinitions = !!overwriteExistingDefinitions;
+    this._state = {
+      updateId: 0,
+      graph: graphBuilder.emptyGraph(),
+      statementMap: {},
+      idsInWrittenOrder: [],
+      state: State.INVALID,
+      scope: null,
+      previousUpdate: [],
+    };
+  }
 
-
-_.extend(DocumentModel.prototype, {
   // A nodefinder function. Could be simplified.
-  _nodeFinder: function nodeFinder (id) {
+  _nodeFinder (id) {
     var s = this._state.statementMap[id];
     if (s) {
       return s.node;
     }
-  },
+  }
 
-  _findStatementIdBy: function (labelFirst, labelSecond, number) {
+  _findStatementIdBy (labelFirst, labelSecond, number) {
     if (!_.isNumber(number)) {
       return;
     }
@@ -58,27 +59,27 @@ _.extend(DocumentModel.prototype, {
       return info[labelFirst];
     });
     return ids[index];
-  },
+  }
 
   /*
    * lineNum is one indexed.
    */
-  findStatementIdByLineCol: function (lineNum) {
+  findStatementIdByLineCol (lineNum) {
     return this._findStatementIdBy('lineFirst', 'lineLast', lineNum);
-  },
+  }
 
-  findStatementIdByOffset: function (offset) {
+  findStatementIdByOffset (offset) {
     return this._findStatementIdBy('offsetFirst', 'offsetLast', offset);
-  },
+  }
 
-  _finalReturn: function (nodeIds) {
+  _finalReturn (nodeIds) {
     var statementMap = this._state.statementMap;
     return _.map(nodeIds, function (id) {
         return statementMap[id];
       });
-  },
+  }
 
-  _insertNode: function (id, node, statementMap) {
+  _insertNode (id, node, statementMap) {
     node._id = id;
     var info = {
       id: id,
@@ -92,27 +93,27 @@ _.extend(DocumentModel.prototype, {
     statementMap[id] = s;
 
     return s;
-  },
+  }
 
-  _findNode: function (id, statementMap) {
+  _findNode (id, statementMap) {
     var s = statementMap[id];
     if (s) {
       return s.node;
     }
-  },
+  }
 
-  _workingDefinitionId: function (variableId, g, discountFinal) {
+  _workingDefinitionId (variableId, g, discountFinal) {
     var definitionIds = g.outgoingEdges[variableId],
         numDefinitions = definitionIds.length;
 
     if (numDefinitions) {
       return definitionIds[numDefinitions - 1];
     }
-  },
+  }
 
-  _variableId: function (id, g) {
+  _variableId (id, g) {
     return g.incomingEdges[id][0];
-  },
+  }
 
   /**
    * Re-build the document from scratch.
@@ -136,7 +137,7 @@ _.extend(DocumentModel.prototype, {
    *   info: info,
    * }.
    */
-  batchUpdate: function (nodes, finalScope) {
+  batchUpdate (nodes, finalScope) {
     var prefix = this.documentId + '_',
         nextId = 0;
     
@@ -187,7 +188,7 @@ _.extend(DocumentModel.prototype, {
     } finally {
       return this._finalReturn(ids);
     }
-  },
+  }
 
   /**
    * Update the statement with the given id with the newly parsed AST.
@@ -202,7 +203,7 @@ _.extend(DocumentModel.prototype, {
    * a reparse of the document, and call this.batchUpdate() as
    * soon as possible.
    */
-  interactiveUpdate: function (id, node) {
+  interactiveUpdate (id, node) {
     // calculate the side effects.
 
     var g = this._state.graph,
@@ -257,41 +258,37 @@ _.extend(DocumentModel.prototype, {
 
 
     return evaluatedStatements;
-  },
+  }
 
   //////////////////////////////////////////////////////////////////////
-  getStatement: function (id) {
+  getStatement (id) {
     return this._state.statementMap[id];
-  },
+  }
 
   //////////////////////////////////////////////////////////////////////
 
-  _evaluateNodes: function (statementIds, statementMap) {
+  _evaluateNodes (statementIds, statementMap) {
     _.each(statementIds, function (id) {
       var s = statementMap[id];
       s.reevaluate();
     }.bind(this));
-  },
+  }
 
-  _cascade: function (g, statementMap) {
+  _cascade (g, statementMap) {
     return _.chain(g.overallOrder())
       .filter(function (id) {
         return statementMap[id];
       })
       .value();
-  },
-});
+  }
 
-Object.defineProperties(DocumentModel.prototype, {
   /**
    * Returns the statements as returned by batchUpdate, 
    * with any updates done interactively.
    */
-  statementsInWrittenOrder: {
-    get: function () {
-      return this._finalReturn(this._state.idsInWrittenOrder);
-    }
-  },
+  get statementsInWrittenOrder() {
+    return this._finalReturn(this._state.idsInWrittenOrder);
+  }
 
   /**
    * One of States.OK, States.UNKNOWN, States.INVALID.
@@ -301,13 +298,9 @@ Object.defineProperties(DocumentModel.prototype, {
    * - INVALID: the model's graph is may no longer be accurate, and new variables may 
    *     cause previously unparseable statements to become parsable. Re-parse now.
    */
-  state: {
-    get: function () {
-      return this._state.state;
-    },
+  get state() {
+    return this._state.state;
   }
-});
+}
 
 DocumentModel.State = State;
-
-export default DocumentModel;

@@ -1,11 +1,13 @@
-import DocumentModel from './document/document-model';
-import { Units } from './units';
-import parser from './parser';
-import DocumentHelper from './document/document-helper';
-import { defaultOperators } from './operators';
-import { Scope } from './symbols';
+import { Units } from '../units';
+import parser from '../parser';
+import { defaultOperators } from '../operators';
+import { Scope } from '../symbols';
+import EditorActions from '../editor-actions';
+
+import DocumentHelper from './DocumentHelper';
+import DocumentModel from './DocumentModel';
+
 import { isArray } from 'underscore';
-import EditorActions from './editor-actions';
 
 const { Parser } = parser;
 

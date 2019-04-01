@@ -1,7 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import { storage } from '../lib/storage/app-bundle-storage';
-import EditableDocument from '../lib/editable-document';
+import { EditableDocument } from '../lib/document';
 
 const { test, plan } = tap;
 

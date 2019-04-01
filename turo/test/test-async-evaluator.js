@@ -1,11 +1,11 @@
 import _ from 'underscore';
 import { test, plan } from 'tap';
 
-import DocumentHelper from '../lib/document/document-helper';
+import DocumentHelper from '../lib/document/DocumentHelper';
 import { AbstractStorage } from '../lib/storage/abstract-storage';
 import _parser from '../lib/parser';
 import { Scope } from '../lib/symbols';
-import EditableDocument from '../lib/editable-document';
+import { EditableDocument } from '../lib/document';
 
 const { Parser } = _parser;
 ////////////////////////////////////////////////////////////////////////

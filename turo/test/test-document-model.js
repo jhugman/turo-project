@@ -1,7 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import turo from './turo-shim';
-import DocumentModel from '../lib/document/document-model';
+import DocumentModel from '../lib/document/DocumentModel';
 
 const { test, plan } = tap;
 

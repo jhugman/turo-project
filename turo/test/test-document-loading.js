@@ -2,7 +2,7 @@ import tap from 'tap';
 import _ from 'underscore';
 import path from 'path';
 import createStorage from './turo-fixture-storage';
-import EditableDocument from '../lib/editable-document';
+import { EditableDocument } from '../lib/document';
 
 const { test, plan } = tap;
 

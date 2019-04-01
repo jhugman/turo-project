@@ -1,9 +1,9 @@
-import tap from 'tap';
+import { test, plan } from 'tap';
 import _ from 'underscore';
 import turo from './turo-shim';
-import graphBuilder from '../lib/document/document-graph-builder';
+import DocumentGraphBuilder from '../lib/document/DocumentGraphBuilder';
 
-const { test, plan } = tap;
+const graphBuilder = new DocumentGraphBuilder();
 
 var doc;
 

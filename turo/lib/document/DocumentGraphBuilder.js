@@ -1,6 +1,5 @@
 import _ from 'underscore';
-import depGraph from 'dependency-graph';
-const { DepGraph } = depGraph;
+import { DepGraph } from 'dependency-graph';
 
 var statics;
 
@@ -57,19 +56,15 @@ For each refId, find defId from sope.findScopeWith(test, arg).
 
 
 ////////////////////////////////////////////////////////////////
-function GraphNodeAdder () {
-}
-
-_.extend(GraphNodeAdder.prototype, {
-  visitVariableDefinition: function (node, context) {
+class GraphNodeAdder {
+  visitVariableDefinition (node, context) {
     var g = context.graph,
         defId = statics.createIdentifierId('variable', node.definingScope, node.identifier);
     statics.addNode(g.execution, defId);
     statics.addNode(g.navigation, defId);
-  },
+  }
 
-  visit: function (nodes, context) {
-    
+  visit (nodes, context) {
     var addToGraph = function (node) {
       node.accept(this, context);
       
@@ -85,24 +80,21 @@ _.extend(GraphNodeAdder.prototype, {
     } else {
       addToGraph(nodes);
     }
-  },
-});
+  }
+}
 
 ////////////////////////////////////////////////////////////////
 
-function InitialGraphBuilder () {
-/*
-  InitialGraphBuilder
-  - variable definition
-    - add id -> defId in nav graph
-  - variable ref
-    - add refId -> id in exec graph
-    - add refId -> id in nav graph
-*/
-}
-
-_.extend(InitialGraphBuilder.prototype, {
-  visitVariableDefinition: function (node, context) {
+class InitialGraphBuilder {
+  /*
+    InitialGraphBuilder
+    - variable definition
+      - add id -> defId in nav graph
+    - variable ref
+      - add refId -> id in exec graph
+      - add refId -> id in nav graph
+  */
+  visitVariableDefinition (node, context) {
     var g = context.graph,
         scope = node.definingScope,
         identifier = node.identifier,
@@ -127,9 +119,9 @@ _.extend(InitialGraphBuilder.prototype, {
     // This will be checked against the deleteToken, 
     // produced by IdentifierRemovalVisitor.
     return defId;
-  },
+  }
 
-  visitIdentifier: function (node, context) {
+  visitIdentifier (node, context) {
     var g = context.graph,
         identifier = node.name,
         scope = node.scope;
@@ -149,22 +141,22 @@ _.extend(InitialGraphBuilder.prototype, {
 
     statics.addExecutionFlow(g.execution, refId, thisId);
     statics.addExecutionFlow(g.navigation, refId, thisId);
-  },
+  }
 
-  visit: function (nodes, context) {
+  visit (nodes, context) {
     _.each(nodes, function (node) {
       context.currentId = node._id;
       node.accept(this, context);
     }.bind(this));
-  },
-});
+  }
+}
 
 /////////////////////////////////////////////////////////
 // This visitor prepares a delete-token: enough information 
 // to delete this from the graph and the scope.
 // It may or may not be used, depending on 
 ////////////////////////////////////////////////////////
-function IdentifierRemovalVisitor () {
+class IdentifierRemovalVisitor {
   /*
   IdentifierRemovalVisitor
   - variable definition
@@ -172,10 +164,7 @@ function IdentifierRemovalVisitor () {
       - remove id -> defId (in execution graph)
       - remove id -> defId (in nav graph)
   */
-}
-
-_.extend(IdentifierRemovalVisitor.prototype, {
-  visitVariableDefinition: function (node, context) {
+  visitVariableDefinition (node, context) {
     var scope = node.definingScope,
         identifier = node.identifier;
     
@@ -193,18 +182,16 @@ _.extend(IdentifierRemovalVisitor.prototype, {
       type: 'variable',
       prevId: node._id,
     };
-  },
-});
+  }
+}
 
 /////////////////////////////////////////////////////////
 // This visitor generates a variable definition id (defId)
 // for a given statement.
 // This is id will be compared against that of the deleteToken.
 ////////////////////////////////////////////////////////
-function IdentifierUpdateVisitor () {}
-
-_.extend(IdentifierUpdateVisitor.prototype, {
-  visitVariableDefinition: function (node, context) {
+class IdentifierUpdateVisitor {
+  visitVariableDefinition (node, context) {
     var defId = statics.createIdentifierId(
       'variable', 
       node.definingScope,
@@ -212,8 +199,8 @@ _.extend(IdentifierUpdateVisitor.prototype, {
     );
     
     return defId;
-  },
-});
+  }
+}
 
 /////////////////////////////////////////////////////////
 //
@@ -224,9 +211,9 @@ var graphNodeAdder = new GraphNodeAdder(),
     identifierUpdater = new IdentifierUpdateVisitor(),
     identifierRemover = new IdentifierRemovalVisitor();
 
-export default {
+export default class DocumentGraphBuilder {
 
-  emptyGraph: function () {
+  emptyGraph () {
     return {
       // This is the execution order. It should be up-to-date for all parsed
       // statements at any one time.
@@ -235,9 +222,9 @@ export default {
       // but also keeps track of the duplicate definitions.
       navigation: new DepGraph(),
     };
-  },
+  }
 
-  _orderingContext: function (graph) {
+  _orderingContext (graph) {
     var refMap = {},
         defMap = {};
     var context = {
@@ -247,9 +234,9 @@ export default {
     };
 
     return context;
-  },
+  }
 
-  buildInitialGraph: function (nodes) {
+  buildInitialGraph (nodes) {
     var graph = this.emptyGraph();
     var context = this._orderingContext(graph);
 
@@ -262,9 +249,9 @@ export default {
     );
 
     return graph;
-  },
+  }
 
-  updateGraph: function (graph, id, oldNode, newNode, nodeFinder, overwriteExistingDefinitions) {
+  updateGraph (graph, id, oldNode, newNode, nodeFinder, overwriteExistingDefinitions) {
     var context = this._orderingContext(graph);
 
     // context is available everywhere.
@@ -377,9 +364,9 @@ export default {
 
     return returnGraph;
 
-  },
+  }
 
-  subgraphOfDependants: function (id, graph, returnGraph) {
+  subgraphOfDependants (id, graph, returnGraph) {
     var subgraph = returnGraph || new DepGraph();
     var ids = graph.dependantsOf(id);
 
@@ -396,9 +383,9 @@ export default {
     });
 
     return subgraph;
-  },
+  }
 
-  subgraphOfDependancies: function (id, graph, returnGraph) {
+  subgraphOfDependancies (id, graph, returnGraph) {
     var subgraph = returnGraph || new DepGraph();
     var ids = graph.dependenciesOf(id);
 
@@ -415,9 +402,9 @@ export default {
     });
 
     return subgraph;
-  },
+  }
 
-};
+}
 
 ////////////////////////////////////////////////////////////////
 statics = {
@@ -425,7 +412,7 @@ statics = {
   ////////////////////////////////////////////////////////////////
   // Statement finding utils
   ////////////////////////////////////////////////////////////////
-  createNodeFinder: function (nodes) {
+  createNodeFinder (nodes) {
     var nodeMap = _.chain(nodes)
       .pluck('_id')
       .object(nodes)
@@ -440,7 +427,7 @@ statics = {
   ////////////////////////////////////////////////////////////////
   // Scope utils
   ////////////////////////////////////////////////////////////////
-  _addToScope: function (scope, definitionType, identifier, node) {
+  _addToScope (scope, definitionType, identifier, node) {
     switch (definitionType) {
       case 'variable':
         scope.addVariable(identifier, node);
@@ -448,14 +435,14 @@ statics = {
     }
   },
 
-  _findScopeWith: function (scope, refType, identifier) {
+  _findScopeWith (scope, refType, identifier) {
     switch (refType) {
       case 'variable':
         return scope.findScopeWithVariable(identifier);
     }
   },
 
-  _removeFromScope: function (scope, definitionType, identifier) {
+  _removeFromScope (scope, definitionType, identifier) {
     switch (definitionType) {
       case 'variable':
         scope.addVariable(identifier, undefined);
@@ -467,14 +454,14 @@ statics = {
   // Graph utils
   ////////////////////////////////////////////////////////////////
 
-  createIdentifierId: function (defType, scope, identifier) {
+  createIdentifierId (defType, scope, identifier) {
     if (!identifier) {
       throw new Error('Identifier is undefined');
     }
     return defType + ':' + scope.id + '/' + identifier;
   },
 
-  addNode: function (g, id) {
+  addNode (g, id) {
     // if id is already in the graph, g.addNode will 
     // leave g in an inconsistent state.
     if (!g.hasNode(id)) {
@@ -482,13 +469,13 @@ statics = {
     }
   },
 
-  addExecutionFlow: function (g, from, to) {
+  addExecutionFlow (g, from, to) {
     // Note that the execution flow is 
     // the reverse of the dependency flow.
     addDependency(g, to, from);
   },
 
-  removeDependencies: function (g, name) {
+  removeDependencies (g, name) {
     var outgoing = g.outgoingEdges[name];
     g.outgoingEdges[name] = [];
     _.each(outgoing, function (to) {
@@ -496,7 +483,7 @@ statics = {
     });
   },
 
-  removeDependants: function (g, name) {
+  removeDependants (g, name) {
     var incoming = g.incomingEdges[name];
     g.incomingEdges[name] = [];
     _.each(incoming, function (from) {
@@ -504,7 +491,7 @@ statics = {
     });
   },
 
-  removeNode: function (g, name, forRealz) {
+  removeNode (g, name, forRealz) {
     statics.removeDependencies(g, name);
     statics.removeDependants(g, name);
     if (forRealz) {
@@ -514,7 +501,7 @@ statics = {
     }
   },
 
-  wireUpExecutionGraph: function (context, nodeFinder) {
+  wireUpExecutionGraph (context, nodeFinder) {
     statics._wireUpExecutionGraph(
       context.graph, 
       _.values(context.defMap), 
@@ -529,7 +516,7 @@ statics = {
   // It decides which definition propagates,
   // And how it propagates across scopes. 
   ////////////////////////////////////////////////////////////////
-  _wireUpExecutionGraph: function (g, defs, refs, nodeFinder, overwriteExistingDefinitions) {
+  _wireUpExecutionGraph (g, defs, refs, nodeFinder, overwriteExistingDefinitions) {
     /*
     For each defId, scope in defs
       - from nav graph, find the last incoming edge:

@@ -4,15 +4,12 @@ import turoParser from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/eval/evaluator';
 import { Units } from '../lib/units';
-import variablesSymbolTable from '../lib/variables-symbol-table';
 import output from '../lib/to-source';
 
 const { test, plan } = tap;
-const { Context: Variables } = variablesSymbolTable;
 
 const parser = new turoParser.Parser();
 parser.scope._unitsTable = new Units();
-parser.variables = new Variables();
 const defaultOperators = parser.operators;
 
 var operatorNames = {

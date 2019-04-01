@@ -4,7 +4,7 @@ import { test, plan } from 'tap';
 import DocumentHelper from '../lib/document/document-helper';
 import { AbstractStorage } from '../lib/storage/abstract-storage';
 import _parser from '../lib/parser';
-import lang from '../lib/language-model';
+import { Scope } from '../lib/symbols';
 import EditableDocument from '../lib/editable-document';
 
 const { Parser } = _parser;
@@ -24,7 +24,7 @@ var fileSource, parser, helper;
 
 function mockEvaluator ({ id, document: string }, cb) {
   // one scope per id.
-  var scope = lang.newScope(id);
+  var scope = Scope.newScope(id);
   
   var doc = {
     id: id,

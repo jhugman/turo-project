@@ -3,13 +3,11 @@ import { Units } from './units';
 import parser from './parser';
 import DocumentHelper from './document/document-helper';
 import { defaultOperators } from './operators';
-import lang from './language-model';
-import variablesSymbolTable from './variables-symbol-table';
+import { Scope } from './symbols';
 import { isArray } from 'underscore';
 import EditorActions from './editor-actions';
 
 const { Parser } = parser;
-const { Variables: LegacyVariables } = variablesSymbolTable;
 
 var statics;
 
@@ -30,7 +28,7 @@ class EditableDocument {
     if (!this) {
       return new EditableDocument(id);
     }
-    var importScope = lang.newScope(undefined, statics.units),
+    var importScope = Scope.newScope(undefined, statics.units),
         scope = importScope.newScope(id);
     this._state = {
       id: id,

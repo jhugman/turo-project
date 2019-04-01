@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import theParser from './grammar';
-import lang from './language-model';
+import { Scope } from './symbols';
 
 import { createDefaultOperators } from './operators';
 
@@ -18,7 +18,7 @@ const DEFAULT_PREFS = {
 
 function TuroParser (scope, prefs = _.defaults({}, DEFAULT_PREFS)) {
   this.parseContext = {
-    scope: scope || lang.newScope(),
+    scope: scope || Scope.newScope(),
   };
 
   this.operators = createDefaultOperators(prefs);

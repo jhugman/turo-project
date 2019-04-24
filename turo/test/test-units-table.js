@@ -293,6 +293,20 @@ test("api first", function (t) {
   t.end();
 });
 
+test("api first dimensions", (t) => {
+
+  const _length = new Dimension("Length");
+  const _time = new Dimension("Time");
+  const _speed = _length.per(_time);
+  const _area = _length.by(_length);
+
+  t.ok(_area.isEqual(_length.pow(2), "_length * _length == _length ^ 2"));
+
+  t.ok(_length.by(_time).per(_time).isEqual(_length), "Zero dimensions are pruned");
+
+  t.end();
+});
+
 test("advanced complex conversion", function (t) {
   var units = new Units(),
       output = require("../lib/to-source");
@@ -364,30 +378,30 @@ test("unit simplification", function (t) {
       litre = units.addUnit("litre", 1000, cm.pow(3));
 
   var node = cm.per(metre).simplify();
-  t.equal(node.value, 0.01);
-  t.ok(node.unit.isDimensionless());
+  t.equal(node.value, 0.01, "cm / m is 0.01");
+  t.ok(node.unit.isDimensionless(), "cm /m is dimensionless");
 
 
   var unit = metre.per(cm.pow(2));
-  t.equal(output.toString(unit), "metre/cm^2");
+  t.equal(output.toString(unit), "metre/cm^2", "metre/cm^2");
 
   node = unit.simplify();
-  t.equal(output.toString(node.unit, " "), "/cm");
+  t.equal(output.toString(node.unit, " "), "/cm", "/cm");
   t.equal(node.value, 100);
 
 
   unit = cm.pow(2).per(metre);
-  t.equal(output.toString(unit, " "), "cm^2/metre");
+  t.equal(output.toString(unit, " "), "cm^2/metre", "cm^2/metre");
 
   node = unit.simplify();
-  t.equal(output.toString(node.unit, " "), "cm");
+  t.equal(output.toString(node.unit, " "), "cm", "cm");
   t.equal(node.value, 0.01);
 
 
 
   unit = litre.per(cm.by(cm));
   // this is current behavior. We need to simplify it.
-  t.equal(output.toString(unit, " "), "litre/cm^2");
+  t.equal(output.toString(unit, " "), "litre/cm^2", "litre/cm^2");
 
   // 2 litre == 2 * 10 cm * 10 cm * 10 cm
   // 2 * 10 cm * 10 cm * 10 cm / 1 cm^2
@@ -403,19 +417,19 @@ test("unit simplification", function (t) {
   var orig;
   orig = cm.by(metre);
   node = orig.simplify();
-  t.equal(output.toString(node.unit), "cm^2");
+  t.equal(output.toString(node.unit), "cm^2", "cm^2");
   t.equal(node.value, 100);
   t.equal(orig.convert(1, node.unit), node.value);
 
   orig = cm.by(metre).by(cm);
   node = orig.simplify();
-  t.equal(output.toString(node.unit), "cm^3");
+  t.equal(output.toString(node.unit), "cm^3", "cm^3");
   t.equal(node.value, 100);
   t.equal(orig.convert(1, node.unit), node.value);
 
   orig = metre.by(metre).by(cm);
   node = orig.simplify();
-  t.equal(output.toString(node.unit), "metre^3");
+  t.equal(output.toString(node.unit), "metre^3", "metre^3");
   t.equal(node.value, 0.01);
   t.equal(orig.convert(1, node.unit), node.value);
 
@@ -433,9 +447,9 @@ test("unit simplification", function (t) {
   // e.g. kg / month * year => kg
   orig = kg.per(month).by(year);
   node = orig.simplify();
-  t.equal(output.toString(node.unit), "kg");
-  t.equal(node.value, 12);
-  t.equal(orig.convert(1, node.unit), node.value);
+  t.equal(output.toString(node.unit), "kg", "simplify kg year/month to kg");
+  t.equal(node.value, 12, "simplify kg year/month to kg, but output a multiple for year/month");
+  t.equal(orig.convert(1, kg), node.value, "simplify kg year/month, but convert year/month");
 
   // month per year => dimensionless.
   orig = month.per(year);

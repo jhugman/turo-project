@@ -535,7 +535,7 @@ statics = {
 
     // From the navigation graph, find the correct id -> defId.
     // id -> defId in execution graph.
-    _.each(defs, function (def) {
+    defs.forEach(def => {
       var defName = def.identifier,
           defType = def.type,
           defId = def.defId,
@@ -613,7 +613,7 @@ statics = {
       // If node is falsey, then it was defined in this scope, but now is not,
       // so may safely be removed.
       statics._addToScope(defScope, defType, defName, node);
-    }.bind(this));
+    });
 
     ///////////////////////////////////////////////////////////
     // Make the graph fit the scope for child-to-parent scoping.

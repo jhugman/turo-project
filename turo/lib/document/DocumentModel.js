@@ -144,7 +144,7 @@ export default class DocumentModel {
     var statementMap = {},
         ids = [];
 
-    _.each(nodes, function (child) {
+    nodes.forEach(child => {
       // All of this document is being blown away.
       // Use a prefix so ids are stable across documents.
       // We should probably be tracking scope ids.
@@ -158,7 +158,7 @@ export default class DocumentModel {
       ids.push(nodeId);
       this._insertNode(nodeId, child, statementMap);
       nextId ++;
-    }.bind(this));
+    });
 
     var validNodes = _.filter(nodes, function (child) {
       return !!child.accept;
@@ -251,11 +251,10 @@ export default class DocumentModel {
     this._state.previousUpdate = updatedIds;
 
     // Now we can evaluate the nodes in the correct order.
-    _.each(evaluatedStatements, function (s) {
+    evaluatedStatements.forEach(s => {
       s.reevaluate();
       s.isUpdated = true;
     });
-
 
     return evaluatedStatements;
   }
@@ -268,10 +267,9 @@ export default class DocumentModel {
   //////////////////////////////////////////////////////////////////////
 
   _evaluateNodes (statementIds, statementMap) {
-    _.each(statementIds, function (id) {
-      var s = statementMap[id];
-      s.reevaluate();
-    }.bind(this));
+    statementIds
+      .map(id => statementMap[id])
+      .forEach(s => s.reevaluate());
   }
 
   _cascade (g, statementMap) {

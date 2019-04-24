@@ -60,34 +60,27 @@ export default class CompoundUnit {
     } else {
       this.simpleUnits = constituentUnits;
     }
-    if (dimension) {
-      this._dimension = dimension;
-    }
     this.unitsTable = table;
+    this._dimension = dimension || this._deriveDimension();
   }
 
   getDimension () {
-    if (this._dimension) {
-      return this._dimension;
-    }
-    var self = this,
-        dimension = {};
+    return this._dimension;
+  }
+
+  _deriveDimension () {
+    const self = this;
+    let dimension = Dimension.NONE;
 
     _.each(self.simpleUnits, function (i, key) {
-      var scalar = self.simpleUnits[key],
+      const scalar = self.simpleUnits[key],
           unit = self.unitsTable.getUnit(key),
-          myDimension = unit.getDimension().dimensions;
+          myDimension = unit.getDimension();
 
-      _.each(myDimension, function (j, dimName) {
-        var currentValue = dimension[dimName] || 0;
-        currentValue += scalar * myDimension[dimName];
-        dimension[dimName] = currentValue;
-      });
+      dimension = dimension.by(myDimension.pow(scalar));
     });
-    this._removeZeroDimensions(dimension);
-    this._isDimensionless = !!_.isEmpty(dimension);
-    this._dimension = new Dimension(dimension);
-    return this._dimension;
+
+    return dimension;
   }
 
   // schemes should be mutable.
@@ -167,10 +160,7 @@ export default class CompoundUnit {
   }
 
   isDimensionless () {
-    if (typeof this._isDimensionless === 'undefined') {
-      this.getDimension();
-    }
-    return this._isDimensionless;
+    return this.getDimension().isDimensionless();
   }
 
   getSimpleUnits () {
@@ -374,8 +364,10 @@ export default class CompoundUnit {
       return product;
     }
 
-    var product = simpleConversion(quantity, srcPlan.top, dstPlan.top).
-                  divide(simpleConversion(Multiple.one(), srcPlan.bottom, dstPlan.bottom));
+    var product = simpleConversion(quantity, srcPlan.top, dstPlan.top)
+                    .divide(
+                      simpleConversion(Multiple.one(), srcPlan.bottom, dstPlan.bottom)
+                    );
 
     // TODO this is a javascript number.
     var result = product.
@@ -687,7 +679,7 @@ export default class CompoundUnit {
       newCompound[unitName] = (newCompound[unitName] || 0) + mySimpleUnits[unitName];
     });
     this._removeZeroDimensions(newCompound);
-    return new CompoundUnit(this.unitsTable, newCompound);
+    return new CompoundUnit(this.unitsTable, newCompound, this.getDimension().by(other.getDimension()));
   }
 
   per (other) {
@@ -700,7 +692,7 @@ export default class CompoundUnit {
       newCompound[unitName] = (newCompound[unitName] || 0) + mySimpleUnits[unitName];
     });
     this._removeZeroDimensions(newCompound);
-    return new CompoundUnit(this.unitsTable, newCompound);
+    return new CompoundUnit(this.unitsTable, newCompound, this.getDimension().per(other.getDimension()));
   }
 
   pow (power) {
@@ -711,7 +703,7 @@ export default class CompoundUnit {
     _.each(newCompound, function (i, unitName) {
       newCompound[unitName] *= power;
     });
-    return new CompoundUnit(this.unitsTable, newCompound);
+    return new CompoundUnit(this.unitsTable, newCompound, this.getDimension().pow(power));
   }
 
   accept (visitor) {

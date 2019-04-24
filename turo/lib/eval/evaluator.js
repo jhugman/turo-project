@@ -1,8 +1,7 @@
 import { defaultOperators } from '../operators';
 import operatorLabeller from './operation-labeller';
-import ast from '../ast';
 import turoNumber from '../turo-number';
-import {extend} from 'underscore';
+import VisitorContext from './VisitorContext';
 
 function unitConversion(node, resultValue) {
   if (resultValue === undefined) {
@@ -33,13 +32,8 @@ class EvaluatorVisitor {
   }
 
   visitStatementList (node, context) {
-    var turo = context.turo;
-    if (!turo) {
-      throw "No turo object";
-    }
-
     node.ast.forEach(function(st) {
-      node.accept(this, context, turo);
+      node.accept(this, context);
     });
   }
 
@@ -122,48 +116,26 @@ class EvaluatorVisitor {
   }
 }
 
-class Evaluator {
-  constructor (visitor, opts) {
-    this.visitor = visitor;
-    extend(this, opts);
-  }
-
-  evaluate (node) {
-    if (node.accept) {
-      return node.accept(this.visitor, this);
-    }
-  }
-
-  reportError (errorCode, ...highlightedNodes) {
-    highlightedNodes.forEach(node => {
-      const error = new ast.Error(errorCode, node);
-      this.errors.push(error);
-    });
-  }
-}
-
 export default {
   visitor: new EvaluatorVisitor(), // new ast can be plugged in as and when by extending this
-  variables: null,
-  evaluate: function (node, turo) {
+  evaluate: function (node) {
     // we need to do this because we can't detect if the variables
     // have changed units or types.
-    var errors = node.errors || [],
+    const errors = node.errors || [],
+        prefs = {},
+
         scope = node.scope,
-        len = errors.length,
-        evaluator = new Evaluator(this.visitor, 
-        {
-          prefs: turo && turo.prefs ? turo.prefs() : {}, 
-          errors: errors,
-          units: turo ? turo.units : 
-                 scope ? scope.units : null,
-          cacheVariableValue: true,
-        });
-    operatorLabeller
-          .label(node,
-                 defaultOperators,
-                 errors,
-                 evaluator);
+        units = scope ? scope.units : undefined;
+
+    const len = errors.length;
+
+    const ctx = new VisitorContext(this.visitor, { prefs, errors, units });
+
+    operatorLabeller.label(
+        node,
+        defaultOperators,
+        errors
+    );
 
     if (errors.length !== len) {
       node.errors = errors;
@@ -171,7 +143,7 @@ export default {
     }
 
     // now we have units and operations, we can evaluate.
-    var value = evaluator.evaluate(node);
+    var value = ctx.evaluate(node);
 
     if (errors.length !== len) {
       node.errors = errors;

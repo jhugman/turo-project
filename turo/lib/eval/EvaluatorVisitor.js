@@ -1,5 +1,4 @@
 import { defaultOperators } from '../operators';
-import operatorLabeller from './operation-labeller';
 import turoNumber from '../turo-number';
 import VisitorContext from './VisitorContext';
 
@@ -26,7 +25,7 @@ function unitConversion(node, resultValue) {
 }
 
 ///////////////////////////////////////////////////////////////
-class EvaluatorVisitor {
+export default class EvaluatorVisitor {
   visitIncludeStatement (node, context) {
     // NOP, we do this in the parser.
   }
@@ -115,43 +114,3 @@ class EvaluatorVisitor {
     return node.turoNumber.number;
   }
 }
-
-export default {
-  visitor: new EvaluatorVisitor(), // new ast can be plugged in as and when by extending this
-  evaluate: function (node) {
-    // we need to do this because we can't detect if the variables
-    // have changed units or types.
-    const errors = node.errors || [],
-        prefs = {},
-
-        scope = node.scope,
-        units = scope ? scope.units : undefined;
-
-    const len = errors.length;
-
-    const ctx = new VisitorContext(this.visitor, { prefs, errors, units });
-
-    operatorLabeller.label(
-        node,
-        defaultOperators,
-        errors
-    );
-
-    if (errors.length !== len) {
-      node.errors = errors;
-      return;
-    }
-
-    // now we have units and operations, we can evaluate.
-    var value = ctx.evaluate(node);
-
-    if (errors.length !== len) {
-      node.errors = errors;
-    }
-
-    return value;
-  },
-
-
-  EvaluatorVisitor: EvaluatorVisitor
-};

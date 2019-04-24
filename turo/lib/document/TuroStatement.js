@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import output from '../to-source';
 import { toTokenArray } from '../to-tokens';
-import evaluator from '../eval/evaluator';
+import evaluator from '../eval';
 
 export default class TuroStatement {
   constructor (id, node, info, updateId) {

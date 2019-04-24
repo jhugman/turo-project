@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 import turoParser from "../lib/parser";
 import ast from "../lib/ast";
-import evaluator from "../lib/eval/evaluator";
+import evaluator from "../lib/eval";
 import { Units } from "../lib/units";
 import output from "../lib/to-source";
 

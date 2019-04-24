@@ -1,6 +1,6 @@
 import VisitorContext from './VisitorContext';
 
-class OperationLabellerVisitor {
+export default class OperationLabellerVisitor {
   visitBinaryOperator (node, context) {
     const len = context.errors.length;
 
@@ -116,12 +116,3 @@ class OperationLabellerVisitor {
     return node.turoNumber.valueType;
   }
 }
-
-export default {
-  visitor: new OperationLabellerVisitor(), // new ast can be plugged in as and when by extending this
-  label (node, operators, errors = []) {
-    const context = new VisitorContext(this.visitor, { operators, errors });
-    return context.evaluate(node);
-  },
-  OperationLabellerVisitor
-};

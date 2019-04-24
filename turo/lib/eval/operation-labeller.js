@@ -127,37 +127,17 @@ class OperationLabellerVisitor {
   visitTuroValue (node, context) {
     return node.turoNumber.valueType;
   }
-
-}
-
-class Labeller {
-  constructor (visitor, operators, errors, evaluator) {
-    this.operators = operators;
-    this.visitor = visitor;
-    this.errors = errors || [];
-    this.evaluator = evaluator;
-    this.prefs = evaluator.prefs;
-  }
-
-  label (node) {
-    if (node.accept) {
-      var valueType = node.accept(this.visitor, this);
-      node.valueType = valueType;
-      return valueType;
-    }
-  }
-
-  evaluate (node) {
-    if (this.evaluator) {
-      return this.evaluator.evaluate(node);
-    }
-  }
 }
 
 export default {
   visitor: new OperationLabellerVisitor(), // new ast can be plugged in as and when by extending this
-  label (node, operators, errors, evaluator) {
-    return new Labeller(this.visitor, operators, errors, evaluator).label(node);
+  label (node, operators, errors = []) {
+    const context = { operators, errors };
+    if (node.accept) {
+      var valueType = node.accept(this.visitor, context);
+      node.valueType = valueType;
+      return valueType;
+    }
   },
   OperationLabellerVisitor
 };

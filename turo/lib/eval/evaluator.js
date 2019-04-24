@@ -27,16 +27,12 @@ function unitConversion(node, resultValue) {
 }
 
 ///////////////////////////////////////////////////////////////
-function EvaluatorVisitor () {
-}
-
-extend(EvaluatorVisitor.prototype, {
-
-  visitIncludeStatement: function (node, context) {
+class EvaluatorVisitor {
+  visitIncludeStatement (node, context) {
     // NOP, we do this in the parser.
-  },
+  }
 
-  visitStatementList: function (node, context) {
+  visitStatementList (node, context) {
     var turo = context.turo;
     if (!turo) {
       throw "No turo object";
@@ -45,32 +41,32 @@ extend(EvaluatorVisitor.prototype, {
     node.ast.forEach(function(st) {
       node.accept(this, context, turo);
     });
-  },
+  }
 
-  visitBinaryOperator: function (node, context) {
+  visitBinaryOperator (node, context) {
     var operation = node.operation,
         result = operation.evaluate(node.left, node.right, context);
     return unitConversion(node, result);
-  },
+  }
 
-  visitUnaryOperation: function (node, context) {
+  visitUnaryOperation (node, context) {
     var operation = node.operation,
         result = operation.evaluate(node.value, context);
     return unitConversion(node, result);
-  },
+  }
 
-  visitParens: function (node, context) {
+  visitParens (node, context) {
     var child = node.ast,
         result = child.accept(this, context);
     return unitConversion(node, result);
-  },  
+  }  
 
-  visitInteger: function (node, context) {
+  visitInteger (node, context) {
     node.value = node._value; // XXX WTF
     return turoNumber.newInstance(node.value, node.unitLiteral, node.valueType);
-  },
+  }
 
-  visitIdentifier: function (node, context) {
+  visitIdentifier (node, context) {
     var definition = node.definition,
         value = definition.currentValue;
     
@@ -89,63 +85,62 @@ extend(EvaluatorVisitor.prototype, {
 
     delete node.error;
     return unitConversion(node, value);
-  },
+  }
 
-  visitVariableDefinition: function (node, context) {
+  visitVariableDefinition (node, context) {
     var value = node.ast.accept(this, context);
     node.currentValue = value;
     return value;
-  },
+  }
 
-  visitUnitDefinitionStatement: function (node, context) {
+  visitUnitDefinitionStatement (node, context) {
     return node;
-  },
+  }
 
-  visitUnit: function (node, context) {
+  visitUnit (node, context) {
     return node;
-  },
+  }
 
-  visitUnitPower: function (node, context) {
+  visitUnitPower (node, context) {
     return node;
-  },
+  }
 
-  visitUnitPer: function (node, context) {
+  visitUnitPer (node, context) {
     return node;
-  },
+  }
 
-  visitUnitLiteral: function (node, context) {
+  visitUnitLiteral (node, context) {
     return node;
-  },
+  }
 
-  visitUnitMultOp: function (node, context) {
+  visitUnitMultOp (node, context) {
     return node;
-  },
+  }
 
-  visitTuroValue: function (node, context) {
+  visitTuroValue (node, context) {
     return node.turoNumber.number;
-  },
-});
-
-
-function Evaluator (visitor, opts) {
-  this.visitor = visitor;
-  extend(this, opts);
+  }
 }
 
-extend(Evaluator.prototype, {
-  evaluate: function (node) {
+class Evaluator {
+  constructor (visitor, opts) {
+    this.visitor = visitor;
+    extend(this, opts);
+  }
+
+  evaluate (node) {
     if (node.accept) {
       return node.accept(this.visitor, this);
     }
-  },
+  }
 
-  reportError: function (errorCode, ...highlightedNodes) {
+  reportError (errorCode, ...highlightedNodes) {
     highlightedNodes.forEach(node => {
       const error = new ast.Error(errorCode, node);
       this.errors.push(error);
     });
-  },
-});
+  }
+}
 
 export default {
   visitor: new EvaluatorVisitor(), // new ast can be plugged in as and when by extending this

@@ -34,60 +34,58 @@ var nextId = (function () {
 ////////////////////////////////////////////////////////////////////
 // DAO
 
+export default class Scope {
+  constructor (parent, id, unitsTable) {
+    this.parent = parent;
+    this._unitsTable = unitsTable;
+    this.id = id || nextId();
+    this._init();
+    this._nextChildId = 0;
+  }
 
-function Scope (parent, id, unitsTable) {
-  this.parent = parent;
-  this._unitsTable = unitsTable;
-  this.id = id || nextId();
-  this._init();
-  this._nextChildId = 0;
-}
-
-_.extend(Scope.prototype, {
-  
   _init() {
     this._variables = {};
     this._units = {};
     this._includes = {};
-  },
+  }
+
+  static newScope(id, unitsTable) {
+    return new Scope(undefined, id, unitsTable);
+  }
 
   clone() {
     let clone = new Scope(this.parent, this.id, this._unitsTable);
     return Object.assign(clone, this);
-  },
+  }
 
   getInclude(name) {
     return this._includes[name];
-  },
+  }
 
   addInclude(name, scope) {
     this._includes[name] = scope;
     return scope;
-  },
+  }
 
   findInclude(name) {
     return this._findFirst(this.getInclude, arguments);
-  },
+  }
 
-});
-
-////////////////////////////////////////////////////////////////////
-
-_.extend(Scope.prototype, {
+  ////////////////////////////////////////////////////////////////////
   // Units
   ////////
   getUnit(name) {
     return this._units[name];
-  },
+  }
 
   findUnit(name) {
     var unit = this._findFirst(this.getUnit, arguments);
     return unit;
-  },
+  }
 
   _addUnit(name, value) {
     if (name) this._units[name] = value;
-  },
+  }
 
   addUnit(unit, name, alternatives) {
     if (name) this._addUnit(name, unit);
@@ -95,7 +93,7 @@ _.extend(Scope.prototype, {
     (alternatives || []).forEach((n) => this._addUnit(n, unit));
 
     return unit;
-  },
+  }
 
   getAvailableUnits() {
     return this._getMineAndAncestors(
@@ -104,40 +102,32 @@ _.extend(Scope.prototype, {
       }, 
       arguments
     );
-  },
-});
-
-Object.defineProperties(Scope.prototype, {
-  units: {
-    get() {
-      if (this._unitsTable) {
-        return this._unitsTable;
-      }
-      if (this.parent) {
-        return this.parent.units;
-      }
-    },
   }
-});
 
+  get units() {
+    if (this._unitsTable) {
+      return this._unitsTable;
+    }
+    if (this.parent) {
+      return this.parent.units;
+    }
+  }
 
-////////////////////////////////////////////////////////////////////
-// variables. We could use the existing symbol table here.
-  //////////////  
-_.extend(Scope.prototype, {
+  ////////////////////////////////////////////////////////////////////
+  // variables. We could use the existing symbol table here.
+  ////////////// 
   
-
   getVariableDefinition(name) {
     return this._variables[name];
-  },
+  }
 
   findVariable(name) {
     return this._findFirst(this.getVariableDefinition, arguments);
-  },
+  }
 
   findScopeWithVariable(name) {
     return this._findScopeWith(this.getVariableDefinition, arguments);
-  },
+  }
 
   addVariable(name, value) {
     this._variables[name] = value;
@@ -145,11 +135,11 @@ _.extend(Scope.prototype, {
       value.definingScope = this;
     }
     return value;
-  },
+  }
 
   deleteVariable(name) {
     delete this._variables[name];
-  },
+  }
 
   getAvailableVariables() {
     return this._getMineAndAncestors(
@@ -158,19 +148,16 @@ _.extend(Scope.prototype, {
       }, 
       arguments
     );
-  },
-});
+  }
 
-////////////////////////////////////////////////////////////////////
-
-_.extend(Scope.prototype, {
+  ////////////////////////////////////////////////////////////////////
 
   _findFirst(thisArrayFunction, args) {
     var scope = this._findScopeWith(thisArrayFunction, args, {});
     if (scope) {
       return thisArrayFunction.apply(scope, args);
     }
-  },
+  }
 
   _findScopeWith(thisAccessFunction, args, seen) {
     var scope,
@@ -187,7 +174,7 @@ _.extend(Scope.prototype, {
       return this;
     } 
     return this._findShadowedScopeWith(thisAccessFunction, args, seen);
-  },
+  }
 
   _findShadowedScopeWith(thisArrayFunction, args, seen) {
     var found;
@@ -201,7 +188,7 @@ _.extend(Scope.prototype, {
     }
 
     return found;
-  },
+  }
 
   _getMineAndAncestors(thisMethod, args, seen) {
     seen = seen || {};
@@ -221,46 +208,30 @@ _.extend(Scope.prototype, {
     });
     parentArrays.unshift(thisArray);
     return _.flatten(parentArrays);
-  },
+  }
 
-});
-
-////////////////////////////////////////////////////////////////////
-
-_.extend(Scope.prototype, {
+  ////////////////////////////////////////////////////////////////////
 
   invalidateParentLookups() {
     // TODO, when caching becomes necessary.
     return this;
-  },
+  }
 
-});
+  ////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////
-
-_.extend(Scope.prototype, {
   newScope(id) {
     if (!id) {
       id = this.id + '/' + this._nextChildId;
       this._nextChildId ++;
     }
     return new Scope(this, id);
-  },
+  }
 
   fresh() {
     return new Scope(this.parent, this.id);
-  },
+  }
 
   popScope() {
     return this.parent;
-  },
-});
-
-
-export default {
-  Scope: Scope,
-
-  newScope(id, unitsTable) {
-    return new Scope(undefined, id, unitsTable);
-  },
-};
+  }
+}

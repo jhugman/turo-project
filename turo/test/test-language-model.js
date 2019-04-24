@@ -1,9 +1,6 @@
-import tap from 'tap';
+import { test, plan } from 'tap';
 import _ from 'underscore';
-import lang from '../lib/language-model';
-
-const { test, plan } = tap;
-const { Scope, LanguageModel } = lang;
+import { Scope } from '../lib/symbols';
 
 var aUnit = ['unit-metre'],
     aVariable = ['_id_'],

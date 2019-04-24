@@ -2,7 +2,6 @@ import tap from 'tap';
 import _ from 'underscore';
 import output from '../lib/to-source';
 import turoParser from '../lib/parser';
-import variables from '../lib/variables-symbol-table';
 
 const { test, plan } = tap;
 const parser = new turoParser.Parser();

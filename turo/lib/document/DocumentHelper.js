@@ -10,11 +10,10 @@ var visitor = {
 };
 
 //////////////////////////////////////////////////////////////////////////
-function DocumentHelper (storage) {
-  this._storage = storage;
-}
-
-_.extend(DocumentHelper.prototype, {
+export default class DocumentHelper {
+  constructor (storage) {
+    this._storage = storage;
+  }
 
   evaluate(rootNode, callback, context) {
     context.toImport = {};
@@ -25,11 +24,11 @@ _.extend(DocumentHelper.prototype, {
         doc = context.document;
 
     return this._doLoading(toImport, doc, doc.scope, documentCreator, callback);
-  },
+  }
 
   import(toImport, scope, documentCreator, callback) {
     return this._doLoading(toImport, scope, scope, documentCreator, callback);
-  },
+  }
 
   _doLoading(toImport, doc, scope, documentCreator, callback) {
     var storage = this._storage;
@@ -60,7 +59,7 @@ _.extend(DocumentHelper.prototype, {
     );
 
     return false;
-  },
+  }
 
   _finishLoading(toImport, currentScope) {
     var storage = this._storage;
@@ -71,8 +70,5 @@ _.extend(DocumentHelper.prototype, {
       // where we should call this method.
       currentScope.addInclude(id, doc.scope);
     });
-  },
-
-});
-
-export default DocumentHelper;
+  }
+}

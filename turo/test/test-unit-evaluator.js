@@ -1,7 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import turoParser from '../lib/parser';
-import evaluator from '../lib/eval/evaluator';
+import evaluator from '../lib/eval';
 import { Units } from '../lib/units';
 
 const { test, plan } = tap;

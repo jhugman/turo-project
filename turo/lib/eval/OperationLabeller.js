@@ -1,19 +1,7 @@
-import ast from '../ast';
+import VisitorContext from './VisitorContext';
 
-function addError (errorName, parent, context, ...nodes) {
-  ast.addError(errorName, parent, context);
-  if (arguments.length <= 3) {
-    return;
-  }
-  delete parent.error;
-  nodes.forEach(node => {
-    node.error = errorName;
-  });
-}
-
-class OperationLabellerVisitor {
+export default class OperationLabellerVisitor {
   visitBinaryOperator (node, context) {
-
     const len = context.errors.length;
 
     const lType = node.left.accept(this, context),
@@ -27,7 +15,7 @@ class OperationLabellerVisitor {
     const operation = context.operators.findOperator(node.literal, lType, rType);
 
     if (!operation) {
-      addError("TYPE_MISMATCH", node, context, node.left, node.right);
+      context.reportError("TYPE_MISMATCH", node, node.left, node.right);
       return;
     }
 
@@ -46,7 +34,7 @@ class OperationLabellerVisitor {
     const operation = context.operators.findUnaryOperator(node.literal, operandType, node.isPrefix);
 
     if (!operation) {
-      ast.addError("TYPE_MISMATCH", node, context);
+      context.reportError("TYPE_MISMATCH", node);
       return;
     }
 
@@ -75,14 +63,14 @@ class OperationLabellerVisitor {
     }
 
     if (!definitionNode || !definitionNode.accept) {
-      ast.addError("NO_SUCH_VARIABLE", node, context);
+      context.reportError("NO_SUCH_VARIABLE", node);
       return;
     }
 
     // TODO detect cycles
     if (definitionNode._isBusy) {
-      ast.addError("UNCALCULATED_VARIABLE", node, context);
-      ast.addError("CYCLIC_DEFINITION", definitionNode, context);
+      context.reportError("UNCALCULATED_VARIABLE", node);
+      context.reportError("CYCLIC_DEFINITION", definitionNode);
       return;
     }
     definitionNode._isBusy = true;
@@ -127,37 +115,4 @@ class OperationLabellerVisitor {
   visitTuroValue (node, context) {
     return node.turoNumber.valueType;
   }
-
 }
-
-class Labeller {
-  constructor (visitor, operators, errors, evaluator) {
-    this.operators = operators;
-    this.visitor = visitor;
-    this.errors = errors || [];
-    this.evaluator = evaluator;
-    this.prefs = evaluator.prefs;
-  }
-
-  label (node) {
-    if (node.accept) {
-      var valueType = node.accept(this.visitor, this);
-      node.valueType = valueType;
-      return valueType;
-    }
-  }
-
-  evaluate (node) {
-    if (this.evaluator) {
-      return this.evaluator.evaluate(node);
-    }
-  }
-}
-
-export default {
-  visitor: new OperationLabellerVisitor(), // new ast can be plugged in as and when by extending this
-  label (node, operators, errors, evaluator) {
-    return new Labeller(this.visitor, operators, errors, evaluator).label(node);
-  },
-  OperationLabellerVisitor
-};

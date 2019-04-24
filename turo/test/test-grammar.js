@@ -3,13 +3,11 @@ import _ from 'underscore';
 
 import turoParser from "../lib/parser";
 import ast from "../lib/ast";
-import evaluator from "../lib/eval/evaluator";
+import evaluator from "../lib/eval";
 import { Units } from "../lib/units";
-import variablesSymbolTable from "../lib/variables-symbol-table";
 import output from "../lib/to-source";
 
 const parser = new turoParser.Parser();
-const { Context: Variables } = variablesSymbolTable;
 const { test, plan } = tap;
 
 // horrible hacky way of reseting the units table. 

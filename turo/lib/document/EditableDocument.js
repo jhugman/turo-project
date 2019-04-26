@@ -1,5 +1,5 @@
 import { Units } from '../units';
-import parser from '../parser';
+import { Parser } from '../parser';
 import { defaultOperators } from '../operators';
 import { Scope } from '../symbols';
 import EditorActions from '../editor-actions';
@@ -8,8 +8,6 @@ import DocumentHelper from './DocumentHelper';
 import DocumentModel from './DocumentModel';
 
 import { isArray } from 'underscore';
-
-const { Parser } = parser;
 
 var statics;
 

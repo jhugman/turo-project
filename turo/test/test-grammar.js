@@ -1,13 +1,13 @@
 import tap from 'tap';
 import _ from 'underscore';
 
-import turoParser from "../lib/parser";
+import { Parser } from "../lib/parser";
 import ast from "../lib/ast";
 import evaluator from "../lib/eval";
 import { Units } from "../lib/units";
 import output from "../lib/to-source";
 
-const parser = new turoParser.Parser();
+const parser = new Parser();
 const { test, plan } = tap;
 
 // horrible hacky way of reseting the units table. 

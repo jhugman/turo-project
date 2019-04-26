@@ -3,7 +3,7 @@
  */
 {
   const helper = require('./parser-helper.js').default;
-  const ast = require('./ast').default;
+  const ast = require('../ast').default;
 
   const operators = this.operators;
 

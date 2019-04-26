@@ -1,10 +1,10 @@
 import tap from 'tap';
 import _ from 'underscore';
 import output from '../lib/to-source';
-import turoParser from '../lib/parser';
+import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;
-const parser = new turoParser.Parser();
+const parser = new Parser();
 
 function roundtrip(t, src) {
   var node = parser.parse(src);

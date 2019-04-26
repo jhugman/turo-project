@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import turoParser from '../lib/parser';
+import { Parser } from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/eval';
 import { Units } from '../lib/units';
@@ -8,7 +8,7 @@ import output from '../lib/to-source';
 
 const { test, plan } = tap;
 
-const parser = new turoParser.Parser();
+const parser = new Parser();
 parser.scope._unitsTable = new Units();
 const defaultOperators = parser.operators;
 

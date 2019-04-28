@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import output from '../to-source';
-import { toTokenArray } from '../to-tokens';
+import output from '../output';
+import { toTokenArray } from '../output/to-tokens';
 import evaluator from '../eval';
 
 export default class TuroStatement {

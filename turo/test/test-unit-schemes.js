@@ -1,7 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
 import { Units, Dimension } from '../lib/units';
-import output from '../lib/to-source';
 
 const { test, plan } = tap;
 

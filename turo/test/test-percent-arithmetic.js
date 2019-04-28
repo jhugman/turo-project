@@ -9,7 +9,7 @@ function eval_t (t, input, expectedOutput) {
   if (result.hasErrors()) {
     t.fail('Problem with ' + input + ': ' + _.pluck(result.errors, 'message'));
   } else {
-    result = result.valueToString(undefined, {padding: ' '});
+    result = result.valueToString(undefined, { output_defaultPadding: ' ' });
     t.equal(result, expectedOutput, input + ' = ' + result);
   }
 }

@@ -73,8 +73,8 @@ test('Batch mode, part II', function (t) {
   createModel();
   testLines(t, ['x = ', '1'], ['1']);
   testLines(t, ['x = ', 'x'], ['', '']);
-  // x is defined twice, tho the second definition is ignored.
-  testLines(t, ['x = 1', 'y = 2', 'x = x + 1'], ['1', '2', '2']);
+  // x is defined twice, the first definition wins
+  testLines(t, ['x = 1', 'y = 2', 'x = y + 1', 'x'], ['1', '2', '3', '1']);
   testLines(t, ['y = x + 1', 'x = y + 2'], ['', '']);
 
   t.end();
@@ -123,8 +123,7 @@ test('Interactive, deleting of variables', function (t) {
 
 test('Interactive, duplicating variables', function (t) {
   var lines = ['a = 1', 'a = 2', 'y = a'];
-  var expectedList = ['1', '2', '2'];
-  testLines(t, lines, expectedList, true);
+  testLines(t, lines, ['1', '2', '2'], true);
 
   // Change the first one, it should have no effect on 
   // the others.

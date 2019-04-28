@@ -273,25 +273,6 @@ _.extend(TokenPredictor.prototype, {
   }
 });
 
-// deprecated
-function create (turo) {
-  return new TokenPredictor(turo.parser, {
-    variable: _.bind(turo.variables.getVariableNames, turo.variables),
-    unit: _.bind(turo.units.getUnitNames, turo.units),
-    number: function () {
-      // NOP
-    },
-    operator: _.bind(turo.operators.getInfixOperatorNames, turo.operators),
-    "variable definition": function () {
-      // NOP
-    },
-    startNumber: function () {
-      return true;
-    }
-  });
-}
-
 export default {
-  TokenPredictor: TokenPredictor,
-  create: create
+  TokenPredictor
 };

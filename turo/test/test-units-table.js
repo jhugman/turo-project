@@ -1,9 +1,16 @@
 import tap from 'tap';
 import _ from 'underscore';
 import { Units, Dimension, CompoundUnit } from '../lib/units';
-import output from '../lib/to-source';
+import output from '../lib/output';
 
 const { test, plan } = tap;
+
+const paddedPrefs = {
+  output_defaultPadding: " ",
+};
+const unpaddedPrefs = {
+  output_defaultPadding: "",
+};
 
 function equal(t, a, b) {
   t.equal(Math.floor(a * 1e12), Math.floor(b * 1e12), a + " === " + b + "?");
@@ -308,9 +315,7 @@ test("api first dimensions", (t) => {
 });
 
 test("advanced complex conversion", function (t) {
-  var units = new Units(),
-      output = require("../lib/to-source");
-
+  var units = new Units();
 
   var metre = units.addUnit("metre", "Length"),
       second = units.addUnit("second", "Time"),
@@ -351,13 +356,13 @@ test("source visitor", function (t) {
       litre = units.addUnit("litre", 0.001, metre.pow(3));
 
 
-  let string = output.toString(speed, " ");
+  let string = output.toString(speed, paddedPrefs);
 
-  t.equal(output.toString(speed, " "), "metre/second");
-  t.equal(output.toString(acceleration, " "), "metre/second^2");
+  t.equal(output.toString(speed, paddedPrefs), "metre/second");
+  t.equal(output.toString(acceleration, paddedPrefs), "metre/second^2");
 
-  t.equal(output.toString(area, " "), "metre^2");
-  t.equal(output.toString(volume, " "), "metre^3");
+  t.equal(output.toString(area, paddedPrefs), "metre^2");
+  t.equal(output.toString(volume, paddedPrefs), "metre^3");
   t.equal(output.toString(area.per(litre), " "), "metre^2/litre");
 
   t.end();
@@ -386,22 +391,22 @@ test("unit simplification", function (t) {
   t.equal(output.toString(unit), "metre/cm^2", "metre/cm^2");
 
   node = unit.simplify();
-  t.equal(output.toString(node.unit, " "), "/cm", "/cm");
+  t.equal(output.toString(node.unit, paddedPrefs), "/cm", "/cm");
   t.equal(node.value, 100);
 
 
   unit = cm.pow(2).per(metre);
-  t.equal(output.toString(unit, " "), "cm^2/metre", "cm^2/metre");
+  t.equal(output.toString(unit, paddedPrefs), "cm^2/metre", "cm^2/metre");
 
   node = unit.simplify();
-  t.equal(output.toString(node.unit, " "), "cm", "cm");
+  t.equal(output.toString(node.unit, paddedPrefs), "cm", "cm");
   t.equal(node.value, 0.01);
 
 
 
   unit = litre.per(cm.by(cm));
   // this is current behavior. We need to simplify it.
-  t.equal(output.toString(unit, " "), "litre/cm^2", "litre/cm^2");
+  t.equal(output.toString(unit, paddedPrefs), "litre/cm^2", "litre/cm^2");
 
   // 2 litre == 2 * 10 cm * 10 cm * 10 cm
   // 2 * 10 cm * 10 cm * 10 cm / 1 cm^2
@@ -412,7 +417,7 @@ test("unit simplification", function (t) {
   // TODO Make this behaviour the default.
   node = unit.simplify();
   t.equal(node.value, 1000);
-  t.equal(output.toString(node.unit, " "), "cm");
+  t.equal(output.toString(node.unit, paddedPrefs), "cm");
 
   var orig;
   orig = cm.by(metre);

@@ -4,7 +4,6 @@ import { Parser } from '../lib/parser';
 import ast from '../lib/ast';
 import evaluator from '../lib/eval';
 import { Units } from '../lib/units';
-import output from '../lib/to-source';
 
 const { test, plan } = tap;
 

@@ -73,8 +73,9 @@ test('Batch mode, part II', function (t) {
   createModel();
   testLines(t, ['x = ', '1'], ['1']);
   testLines(t, ['x = ', 'x'], ['', '']);
-  // x is defined twice, the first definition wins
-  testLines(t, ['x = 1', 'y = 2', 'x = y + 1', 'x'], ['1', '2', '3', '1']);
+  // x is defined twice, the last definition wins
+  testLines(t, ['x = 1', 'y = 2', 'x = y + 1', 'x'], ['1', '2', '3', '3'], true);
+  
   testLines(t, ['y = x + 1', 'x = y + 2'], ['', '']);
 
   t.end();

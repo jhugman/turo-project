@@ -130,12 +130,9 @@ const toStringWithDisplay = function (node, display = stringDisplay, prefs = def
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const toString = createToString(stringDisplay);
-function displayImpliedParentheses () {}
-
 export {
-  toString,
   toStringWithDisplay,
   createToString,
-  displayImpliedParentheses,
+  toTokenArray,
+  joinTokenArray
 };

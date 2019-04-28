@@ -1,7 +1,4 @@
-import { 
-  createToString,
-  toStringWithDisplay } from './to-source';
-
+import { toStringWithDisplay, createToString } from './to-source';
 import StringDisplay from './StringDisplay';
 
 const toString = createToString(new StringDisplay());

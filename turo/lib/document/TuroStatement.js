@@ -1,6 +1,5 @@
 import _ from 'underscore';
-import output from '../to-source';
-import { toTokenArray } from '../to-tokens';
+import output from '../output';
 import evaluator from '../eval';
 
 export default class TuroStatement {
@@ -79,8 +78,8 @@ export default class TuroStatement {
     return this.errors && this.errors.length;
   }
 
-  toTokens() {
-    return toTokenArray(this.node, {prefs: {}});
+  toTokens(prefs) {
+    return output.toTokenArray(this.node, {prefs});
   }
 
   valueToString (display, prefs) {
@@ -92,9 +91,6 @@ export default class TuroStatement {
   }
 
   verboseToString (display, prefs) {
-    if (!prefs) {
-      prefs = { padding: ' '};
-    }
     var t = [
       output.toStringWithDisplay(this.node, display, prefs),
       '=',

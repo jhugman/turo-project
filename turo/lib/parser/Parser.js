@@ -1,8 +1,8 @@
 import _ from 'underscore';
 import theParser from './grammar';
-import { Scope } from './symbols';
+import { Scope } from '../symbols';
 
-import { createDefaultOperators } from './operators';
+import { createDefaultOperators } from '../operators';
 
 const DEFAULT_PREFS = {
   unitScheme: undefined,
@@ -48,7 +48,4 @@ Object.defineProperties(TuroParser.prototype, {
   }
 });
 
-var instance = new TuroParser();
-instance.Parser = TuroParser;
-
-export default instance;
+export default TuroParser;

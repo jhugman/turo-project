@@ -19,13 +19,13 @@ test("Result convenience methods", (t) => {
 
   // t.equal(r.identifier(), undefined);
   // t.equal(r.identifierToString(), "");
-  t.equal(r.expressionToString(), "2*2 m");
+  t.equal(r.expressionToString(), "2 * 2 m");
   t.equal(r.valueToString(), "4 m");
 
   r = turo.evaluate("area = 2 m * 2m");
   // t.equal(r.identifier(), "area");
   // t.equal(r.identifierToString(), "area");
-  t.equal(r.expressionToString(), "area = 2 m*2 m");
+  t.equal(r.expressionToString(), "area = 2 m * 2 m");
   t.equal(r.valueToString(), "4 m^2");
 
   t.end();

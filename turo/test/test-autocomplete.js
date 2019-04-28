@@ -1,9 +1,11 @@
 import tap from 'tap';
 import _ from 'underscore';
 import ac from '../lib/autocomplete';
-import parser from '../lib/parser';
+import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;
+
+const parser = new Parser()
 
 var stubParser = {
   expect: function () {

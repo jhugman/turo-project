@@ -1,6 +1,6 @@
 var _ = require("underscore"),
     fs = require("fs"),
-    toSource = require("./to-source");
+    toSource = require("./output");
 _.str = require("underscore.string");
 // function ensureDirExists(dest, dryRun) {
 //     var dir = path.dirname(dest);

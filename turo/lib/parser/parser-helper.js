@@ -1,4 +1,4 @@
-import ast from '../lib/ast';
+import ast from '../ast';
 
 var infixAliases = {
   '**': '^',

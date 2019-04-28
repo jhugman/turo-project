@@ -1,13 +1,13 @@
 import tap from 'tap';
 import _ from 'underscore';
 
-import turoParser from "../lib/parser";
+import { Parser } from "../lib/parser";
 import ast from "../lib/ast";
 import evaluator from "../lib/eval";
 import { Units } from "../lib/units";
-import output from "../lib/to-source";
+import output from "../lib/output";
 
-const parser = new turoParser.Parser();
+const parser = new Parser();
 const { test, plan } = tap;
 
 // horrible hacky way of reseting the units table. 
@@ -54,12 +54,14 @@ function evaluate(t, string, expected) {
   }
 }
 
+var output_displayImpliedParentheses = false;
 function roundtrip(t, string, expected) {
   expected = expected || string;
   var ast = parser.parse(string);
   t.ok(ast);
 
-  t.equal(output.toString(ast), expected, string + " == " + expected);
+
+  t.equal(output.toString(ast, { output_displayImpliedParentheses, output_defaultPadding: '' }), expected, string + " == " + expected);
 }
 
 
@@ -214,21 +216,21 @@ test("Units in expressions", function (t) {
 test("Unary expressions", function (t) {
   parser.parse("x = 1", "Statement");
 
-  output.displayImpliedParentheses(true);
+  output_displayImpliedParentheses = true;
   roundtrip(t, "1!", '(1)!');// "((1)!)");
   roundtrip(t, "1!!", '((1)!)!');//"(((1)!)!)");
   roundtrip(t, "sqrt 1", "sqrt(1)");
   roundtrip(t, "sqrt sqrt 1", "sqrt(sqrt(1))");
   //roundtrip(t, "sqrt x!", "(sqrt((x)!))"); // Google calculator
   roundtrip(t, "sqrt x!", '(sqrt(x))!'); // "((sqrt(x))!)"); // Wolfram Alpha
-  output.displayImpliedParentheses(false);
+  output_displayImpliedParentheses = false;
   t.end();
 });
 
 test("Unary minus expressions", function (t) {
   parser.parse("x = 1", "Statement");
 
-  output.displayImpliedParentheses(true);
+  output_displayImpliedParentheses = true;
   roundtrip(t, "-1", "-(1)");
   roundtrip(t, "+1", "+(1)");
 
@@ -236,7 +238,7 @@ test("Unary minus expressions", function (t) {
   roundtrip(t, "-x", "-(x)");
   roundtrip(t, "1+-x", "(1)+(-(x))");
 
-  output.displayImpliedParentheses(false);
+  output_displayImpliedParentheses = false;
   t.end();
 });
 
@@ -244,7 +246,7 @@ test("Unary minus expressions", function (t) {
 test("Unary & Binary Operation Interactions", function (t) {
   parser.parse("x = 1", "Statement");
 
-  output.displayImpliedParentheses(true);
+  output_displayImpliedParentheses = true;
   roundtrip(t, "x^3!", "(x)^((3)!)");
   roundtrip(t, "5!^2!", "((5)!)^((2)!)");
   roundtrip(t, "sqrt 5 ^ 2", "(sqrt(5))^(2)");
@@ -258,7 +260,7 @@ test("Unary & Binary Operation Interactions", function (t) {
   //
   //
   //
-  output.displayImpliedParentheses(false);
+  output_displayImpliedParentheses = false;
   t.end();
 });
 

@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import output from './to-source';
+import output from './output';
 import precision from './precision-hacks';
 
 var noUnits = null;

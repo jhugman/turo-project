@@ -1,10 +1,10 @@
 import tap from 'tap';
 import _ from 'underscore';
-import output from '../lib/to-source';
-import turoParser from '../lib/parser';
+import output from '../lib/output';
+import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;
-const parser = new turoParser.Parser();
+const parser = new Parser();
 
 function roundtrip(t, src) {
   var node = parser.parse(src);
@@ -12,7 +12,7 @@ function roundtrip(t, src) {
 }
 
 test("simple", function (t) {
-  roundtrip(t, "1+2");
+  roundtrip(t, "1 + 2");
   t.end();
 });
 
@@ -23,14 +23,14 @@ test("identifier", function (t) {
 
   // now test
   roundtrip(t, "x");
-  roundtrip(t, "x+y");
+  roundtrip(t, "x + y");
   t.end();
 });
 
 test("brackets", function (t) {
   roundtrip(t, "(1)");
-  roundtrip(t, "(1+2)");
-  roundtrip(t, "1+(2+3)");
+  roundtrip(t, "(1 + 2)");
+  roundtrip(t, "1 + (2 + 3)");
   t.end();
 });
 

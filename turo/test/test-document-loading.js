@@ -6,7 +6,7 @@ import { EditableDocument } from '../lib/document';
 
 const { test, plan } = tap;
 
-const prefs = { shortUnitNames: true };
+const prefs = { output_shortUnitNames: true };
 
 test('simple load', async function (t) {
   EditableDocument.storage = createStorage();

@@ -1,5 +1,5 @@
 import { defaultOperators } from '../operators';
-import VisitorContext from './VisitorContext';
+import { VisitorContext } from '../visitors';
 import OperationLabeller from './OperationLabeller';
 import EvaluatorVisitor from './EvaluatorVisitor';
 

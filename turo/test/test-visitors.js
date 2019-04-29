@@ -1,6 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import output from '../lib/output';
+import { ASTVisitor } from '../lib/visitors';
 import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;
@@ -38,12 +39,14 @@ test("missing method", function (t) {
   // the simplest visitors should work, recursing if the method is missing.
   var identifierCount= 0;
   var identifiers = {};
-  var visitor = {
-    visitIdentifier: function (node) {
+  class TestVisitor extends ASTVisitor {
+    visitIdentifier (node) {
       identifierCount++;
       identifiers[node.name] = (identifiers[node.name]||0) + 1;
     }
-  };
+  }
+
+  const visitor = new TestVisitor();
 
   function count(src, expectedCount) {
     var node = parser.parse(src);

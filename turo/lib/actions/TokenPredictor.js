@@ -133,17 +133,17 @@ class TabCompleteTokenProcessor {
 }
 
 
-function TokenPredictor (parser, generatorMap) {
-  this.generatorMap = generatorMap || {};
-  this.parser = parser;
-}
+export default class TokenPredictor {
+  constructor (parser, generatorMap) {
+    this.generatorMap = generatorMap || {};
+    this.parser = parser;
+  }
 
-_.extend(TokenPredictor.prototype, {
-  addListCreator: function (tokenType, fn) {
+  addListCreator (tokenType, fn) {
     this.generatorMap[tokenType] = fn;
-  },
+  }
 
-  autocomplete: function (string, offset, ordering) {
+  autocomplete (string, offset, ordering) {
     const self = this,
           tokenProcessorWithoutPrefix = new AutocompleteTokenProcessor(offset, '', ordering);
     const tokens = self._makePrediction(tokenProcessorWithoutPrefix, string, offset);
@@ -154,16 +154,16 @@ _.extend(TokenPredictor.prototype, {
       return {tokens: [...tokens, ...newTokens]};
     }
     return {tokens};
-  },
+  }
 
-  tabComplete: function (string, dirtyString, offset, ordering) {
+  tabComplete (string, dirtyString, offset, ordering) {
     var self = this,
         tokenProcessor = new TabCompleteTokenProcessor(dirtyString, offset, ordering);
 
     return self._makePrediction(tokenProcessor, string, offset);
-  },
+  }
 
-  createKeyboard: function (originalString, offset) {
+  createKeyboard (originalString, offset) {
 
     if (offset === undefined) {
       offset = originalString.length;
@@ -172,7 +172,7 @@ _.extend(TokenPredictor.prototype, {
     var parser = this.parser,
         generatorMap = this.generatorMap;
     var tokenProcessor = {
-      collect: function (expectedTokenType, tokenValue) {
+      collect (expectedTokenType, tokenValue) {
         this.keyboard[expectedTokenType] = tokenValue;
         switch (expectedTokenType) {
           case "unitPer":
@@ -182,7 +182,7 @@ _.extend(TokenPredictor.prototype, {
         }
       },
 
-      delivery: function () {
+      delivery () {
         if (parser.lastDigitOffset === offset) {
           // special case digits, because they're always matched by \d+
           this.keyboard.digits = true;
@@ -193,16 +193,16 @@ _.extend(TokenPredictor.prototype, {
     tokenProcessor.keyboard = {};
     parser.lastDigitOffset = undefined;
     return this._makePrediction(tokenProcessor, originalString, offset);
-  },
+  }
 
-  createParseError: function (string, offset) {
+  createParseError (string, offset) {
     var KNOWN_BAD = "§bad_token";
     
     var error = this._getParseError(string + KNOWN_BAD);
     return error;
-  },
+  }
 
-  _collectCompletions: function (tokenProcessor, expected, error) {
+  _collectCompletions (tokenProcessor, expected, error) {
     const generateMap = this.generatorMap;
     _.chain(expected)
       .map(function (tokenType) {
@@ -219,9 +219,9 @@ _.extend(TokenPredictor.prototype, {
         }
       })
       .value();
-  },
+  }
 
-  _makePrediction: function (tokenProcessor, string, offset) {
+  _makePrediction (tokenProcessor, string, offset) {
     var self = this,
         parsedString = string,
         error;
@@ -253,9 +253,9 @@ _.extend(TokenPredictor.prototype, {
     }
 
     return retValue;
-  },
+  }
 
-  _getParseError: function (string) {
+  _getParseError (string) {
     var scope = this.parser.scope;
     try {
       // TODO make a new scope for the parser
@@ -271,8 +271,4 @@ _.extend(TokenPredictor.prototype, {
       this.parser.scope = scope;
     }
   }
-});
-
-export default {
-  TokenPredictor
-};
+}

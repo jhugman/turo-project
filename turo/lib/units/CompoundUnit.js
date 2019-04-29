@@ -2,9 +2,6 @@ import _ from 'underscore';
 import Dimension from './Dimension';
 import Multiple from './Multiple';
 
-// XXX this should not be here.
-import ast from '../ast';
-
 /**
  * A series of objects that will build up to units
  */
@@ -706,8 +703,8 @@ export default class CompoundUnit {
     return new CompoundUnit(this.unitsTable, newCompound, this.getDimension().pow(power));
   }
 
-  accept (visitor) {
-    ast.acceptVisitor(this, visitor, visitor.visitUnit, arguments);
+  accept (visitor, ...args) {
+    return visitor.visitUnit(this, ...args);
   }
 }
 

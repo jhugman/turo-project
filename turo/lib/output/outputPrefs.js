@@ -37,4 +37,5 @@ export default {
   output_padding,
   output_defaultPadding: ' ',
   output_displayImpliedParentheses: false,
+  output_shortUnitNames: false,
 };

@@ -1,6 +1,6 @@
-import EditorActions from '../editor-actions';
+import EditorActions from '../actions/EditorActions';
 import './suggestions';
-import autocomplete from '../autocomplete';
+import TokenPredictor from './TokenPredictor';
 
 
 const tokenGenerator = {
@@ -26,7 +26,7 @@ EditorActions.extend({
   },
 
   createTokenPredictor (tokenMap) {
-    return new autocomplete.TokenPredictor(this.doc.parser, tokenMap);
+    return new TokenPredictor(this.doc.parser, tokenMap);
   },
 });
 

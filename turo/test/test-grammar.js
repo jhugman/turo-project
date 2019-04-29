@@ -408,8 +408,8 @@ test('Node offsets', function (t) {
   t.equal(node._offsetLiteralLast, 2);
 
   t.equal(node.unitNode.offsetFirst, 4);
-  t.equal(node.unitNode.offsetLast, 5);
-  t.equal(node.offsetLast, 5);
+  t.equal(node.unitNode.offsetLast, 5, "node.unitNode.offsetLast");
+  t.equal(node.offsetLast, 5, `node.offsetLast ${node.constructor.name}`);
 
   node = parser.parse('1.0 cm^2');
   t.equal(node.offsetFirst, 0, '1.0 cm^2');
@@ -418,7 +418,7 @@ test('Node offsets', function (t) {
 
   t.equal(node.unitNode.offsetFirst, 4);
   t.equal(node.unitNode.unitNode.offsetFirst, 4);
-  t.equal(node.unitNode.unitNode.offsetLast, 5);
+  t.equal(node.unitNode.unitNode.offsetLast, 5, "node.unitNode.unitNode.offsetLast");
 
   t.equal(node.unitNode._offsetLiteralFirst, 6);
   t.equal(node.unitNode._offsetLiteralLast, 6);

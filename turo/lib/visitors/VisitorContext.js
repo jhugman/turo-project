@@ -1,4 +1,5 @@
-import ast from "../ast";
+import ast from '../ast';
+import { TuroError } from '../errors';
 
 export default class VisitorContext {
   constructor (visitor, opts) {
@@ -14,7 +15,7 @@ export default class VisitorContext {
 
   reportError (errorCode, ...highlightedNodes) {
     highlightedNodes.forEach(node => {
-      const error = new ast.Error(errorCode, node);
+      const error = new TuroError(errorCode, node);
       this.errors.push(error);
     });
   }

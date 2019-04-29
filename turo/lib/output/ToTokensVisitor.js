@@ -1,3 +1,4 @@
+import { ASTVisitor } from '../visitors';
 import { sortBy } from 'underscore';
 import Token from './Token';
 
@@ -5,7 +6,7 @@ function t(...args) {
   return new Token(...args);
 }
 
-export default class ToSourceVisitor {
+export default class ToSourceVisitor extends ASTVisitor {
   bracketStart (node, tokens, context) {
     var bracketCount = context.bracketCount || 0,
         token = t('bracketStart', '(', node.line, node.offsetFirst);
@@ -134,7 +135,7 @@ export default class ToSourceVisitor {
     this.printUnit(node, tokens, context);
   }
 
-  visitInteger (node, tokens, context) {
+  visitNumberNode (node, tokens, context) {
     var display = this.display;
     this.errorStart(node, tokens, context);
     if (context.editable) {
@@ -262,7 +263,7 @@ export default class ToSourceVisitor {
     var node = unit,
         name = unit.name;
     if (name) {
-      if (!context.prefs.shortUnitNames) {
+      if (!context.prefs.output_shortUnitNames) {
         switch (value) {
           case undefined:
             break;

@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import EditorActions from '../lib/editor-actions';
+import EditorActions from '../lib/actions/EditorActions';
 
 const { test, plan } = tap;
 

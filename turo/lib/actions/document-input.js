@@ -1,4 +1,4 @@
-import EditableActions from '../editor-actions';
+import EditableActions from '../actions/EditorActions';
 
 EditableActions.extend(
   {

@@ -1,6 +1,6 @@
 import tap from 'tap';
 import _ from 'underscore';
-import ac from '../lib/autocomplete';
+import TokenPredictor from '../lib/actions/TokenPredictor';
 import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;
@@ -31,7 +31,7 @@ function setEqual(t, observed, expected) {
 
 test("Tab complete", function (t) {
 
-  var predictor = new ac.TokenPredictor(stubParser);
+  var predictor = new TokenPredictor(stubParser);
 
   predictor.addListCreator("variable", function () {
     return ["aV", "bV", "cV", "dV"];
@@ -70,7 +70,7 @@ test("Tab complete", function (t) {
 });
 
 test("Create keyboard", function (t) {
-      var predictor = new ac.TokenPredictor(parser,
+      var predictor = new TokenPredictor(parser,
         {
           digits: true,
           point: true,

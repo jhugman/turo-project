@@ -58,7 +58,7 @@ test('Add includes', function (t) {
   t.equal(parent.findVariable('x'), aVariable);
 
   var doc = new Scope();
-  doc.addInclude('app', parent);
+  doc.addImport('app', parent);
 
   var pUnit = doc.findUnit('m');
   var pVar = doc.findVariable('x');
@@ -77,7 +77,7 @@ test('Add includes', function (t) {
   var grandparent = new Scope();
   grandparent.addUnit(a3rdUnit, 'yd');
 
-  parent.addInclude('imperial', grandparent);
+  parent.addImport('imperial', grandparent);
 
   t.equal(parent.findUnit('yd'), a3rdUnit);
   t.equal(doc.findUnit('yd'), a3rdUnit);

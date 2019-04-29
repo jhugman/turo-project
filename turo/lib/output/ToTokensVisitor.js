@@ -315,7 +315,7 @@ export default class ToSourceVisitor extends ASTVisitor {
     return tokens;
   }
 
-  visitIncludeStatement (node, tokens, context) {
+  visitImportStatement (node, tokens, context) {
     t.push(t('statement', 'include', node.line, node.offsetFirst, 'kwd'));
     t.push(t('string', '"' + node.ast + '"', 0, '"'));
   }

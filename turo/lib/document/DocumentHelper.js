@@ -72,7 +72,7 @@ export default class DocumentHelper {
       // Note: this is where the document is imported 
       // into the current scope. It is the only place 
       // where we should call this method.
-      currentScope.addInclude(id, doc.scope);
+      currentScope.addImport(id, doc.scope);
     });
   }
 }

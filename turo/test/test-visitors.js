@@ -1,7 +1,7 @@
 import tap from 'tap';
 import _ from 'underscore';
 import output from '../lib/output';
-import { ASTVisitor } from '../lib/syntax';
+import { ASTVisitor } from '../lib/visitors';
 import { Parser } from '../lib/parser';
 
 const { test, plan } = tap;

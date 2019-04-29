@@ -1,7 +1,6 @@
 import { defaultOperators } from '../operators';
 import turoNumber from '../turo-number';
-import { ASTVisitor } from '../syntax';
-import VisitorContext from './VisitorContext';
+import { ASTVisitor } from '../visitors';
 
 function unitConversion(node, resultValue) {
   if (resultValue === undefined) {

@@ -1,4 +1,4 @@
-import { ASTVisitor } from '../syntax';
+import { ASTVisitor } from '../visitors';
 import _ from 'underscore';
 import async from 'async';
 

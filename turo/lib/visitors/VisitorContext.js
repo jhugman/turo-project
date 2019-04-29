@@ -1,5 +1,5 @@
 import ast from '../ast';
-import { TuroError } from '../error';
+import { TuroError } from '../errors';
 
 export default class VisitorContext {
   constructor (visitor, opts) {

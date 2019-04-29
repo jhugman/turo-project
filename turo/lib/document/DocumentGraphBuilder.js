@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import { DepGraph } from 'dependency-graph';
-import { ASTVisitor } from '../syntax';
+import { ASTVisitor } from '../visitors';
 
 var statics;
 

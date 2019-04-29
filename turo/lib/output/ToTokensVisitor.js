@@ -1,4 +1,4 @@
-import { ASTVisitor } from '../syntax';
+import { ASTVisitor } from '../visitors';
 import { sortBy } from 'underscore';
 import Token from './Token';
 

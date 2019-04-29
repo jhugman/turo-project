@@ -1,5 +1,4 @@
-import { ASTVisitor } from '../syntax';
-import VisitorContext from './VisitorContext';
+import { ASTVisitor } from '../visitors';
 
 export default class OperationLabellerVisitor extends ASTVisitor {
   visitBinaryOperator (node, context) {

@@ -1,5 +1,6 @@
 import { defaultOperators } from '../operators';
 import turoNumber from '../turo-number';
+import { ASTVisitor } from '../syntax';
 import VisitorContext from './VisitorContext';
 
 function unitConversion(node, resultValue) {
@@ -25,8 +26,8 @@ function unitConversion(node, resultValue) {
 }
 
 ///////////////////////////////////////////////////////////////
-export default class EvaluatorVisitor {
-  visitIncludeStatement (node, context) {
+export default class EvaluatorVisitor extends ASTVisitor {
+  visitImportStatement (node, context) {
     // NOP, we do this in the parser.
   }
 
@@ -54,7 +55,7 @@ export default class EvaluatorVisitor {
     return unitConversion(node, result);
   }  
 
-  visitInteger (node, context) {
+  visitNumberNode (node, context) {
     node.value = node._value; // XXX WTF
     return turoNumber.newInstance(node.value, node.unitLiteral, node.valueType);
   }

@@ -1,5 +1,6 @@
 import _ from 'underscore';
 import { DepGraph } from 'dependency-graph';
+import { ASTVisitor } from '../syntax';
 
 var statics;
 
@@ -56,7 +57,7 @@ For each refId, find defId from sope.findScopeWith(test, arg).
 
 
 ////////////////////////////////////////////////////////////////
-class GraphNodeAdder {
+class GraphNodeAdder extends ASTVisitor {
   visitVariableDefinition (node, context) {
     var g = context.graph,
         defId = statics.createIdentifierId('variable', node.definingScope, node.identifier);
@@ -85,7 +86,7 @@ class GraphNodeAdder {
 
 ////////////////////////////////////////////////////////////////
 
-class InitialGraphBuilder {
+class InitialGraphBuilder extends ASTVisitor {
   /*
     InitialGraphBuilder
     - variable definition
@@ -156,7 +157,7 @@ class InitialGraphBuilder {
 // to delete this from the graph and the scope.
 // It may or may not be used, depending on 
 ////////////////////////////////////////////////////////
-class IdentifierRemovalVisitor {
+class IdentifierRemovalVisitor extends ASTVisitor {
   /*
   IdentifierRemovalVisitor
   - variable definition
@@ -190,7 +191,7 @@ class IdentifierRemovalVisitor {
 // for a given statement.
 // This is id will be compared against that of the deleteToken.
 ////////////////////////////////////////////////////////
-class IdentifierUpdateVisitor {
+class IdentifierUpdateVisitor extends ASTVisitor {
   visitVariableDefinition (node, context) {
     var defId = statics.createIdentifierId(
       'variable', 

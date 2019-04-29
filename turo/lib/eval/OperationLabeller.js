@@ -1,6 +1,7 @@
+import { ASTVisitor } from '../syntax';
 import VisitorContext from './VisitorContext';
 
-export default class OperationLabellerVisitor {
+export default class OperationLabellerVisitor extends ASTVisitor {
   visitBinaryOperator (node, context) {
     const len = context.errors.length;
 
@@ -46,7 +47,7 @@ export default class OperationLabellerVisitor {
     return node.ast.accept(this, context);
   } 
 
-  visitInteger (node, context) {
+  visitNumberNode (node, context) {
     return node.valueType;
   }
 

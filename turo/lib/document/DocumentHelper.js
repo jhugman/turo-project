@@ -1,13 +1,17 @@
+import { ASTVisitor } from '../syntax';
 import _ from 'underscore';
 import async from 'async';
 
 //////////////////////////////////////////////////////////////////////////
-var visitor = {
-  visitImportStatement(node, context) {
-    var documentId = node.ast;
+
+class ImportFinder extends ASTVisitor {
+  visitImportStatement (node, context) {
+    const documentId = node.ast;
     context.toImport[documentId] = true;
-  },
-};
+  }
+}
+
+const visitor = new ImportFinder();
 
 //////////////////////////////////////////////////////////////////////////
 export default class DocumentHelper {

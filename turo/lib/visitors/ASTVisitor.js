@@ -69,10 +69,6 @@ export default class ASTVisitor {
     return descend(this, node, ...args);
   }
 
-  visitTuroValue (node, ...args) {
-    return descend(this, node, ...args);
-  }
-
   visitEditorLinesNode (node, ...args) {
     return descend(this, node, ...args);
   }

@@ -111,8 +111,4 @@ export default class OperationLabellerVisitor extends ASTVisitor {
   visitUnitMultOp (unit, context) {
     return "unit";
   }
-
-  visitTuroValue (node, context) {
-    return node.turoNumber.valueType;
-  }
 }

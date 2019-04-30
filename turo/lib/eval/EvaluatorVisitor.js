@@ -109,8 +109,4 @@ export default class EvaluatorVisitor extends ASTVisitor {
   visitUnitMultOp (node, context) {
     return node;
   }
-
-  visitTuroValue (node, context) {
-    return node.turoNumber.number;
-  }
 }

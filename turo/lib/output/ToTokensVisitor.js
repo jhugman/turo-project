@@ -152,11 +152,6 @@ export default class ToSourceVisitor extends ASTVisitor {
     return tokens;
   }
 
-  visitTuroValue (node, tokens, context) {
-    var turoValue = node.turoNumber;
-    return this.tokenizeTuroNumber(turoValue, tokens, context, node);
-  }
-
   tokenizeTuroNumber (turoValue, tokens, context, node) {
     turoValue.prepareLiteral(context.prefs);
     var value = turoValue.value,

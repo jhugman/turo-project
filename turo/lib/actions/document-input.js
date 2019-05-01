@@ -1,6 +1,6 @@
-import EditableActions from '../actions/EditorActions';
+import EditorActions from './EditorActions';
 
-EditableActions.extend(
+EditorActions.extend(
   {
     replaceLine: function (string, callback) {
       this.doc.evaluateStatement(this.id, string, callback);

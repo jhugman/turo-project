@@ -183,14 +183,14 @@ UnitSchemeAnnotation =
   }
 
 NewUnitDefinition =
-    id:UnitDefinitionLeft _ UnitAssignmentLiteral _ dimension:OptionalDimensionIdentifier? _ 
+    id:UnitDefinitionLeft _ UnitAssignmentLiteral nbsp dimension:OptionalDimensionIdentifier? _ 
     num:NumberLiteral _ unitNode:UnitExpression {
       return units.addUnit(id.id, num || 1.0, unitNode.unit, id.schemes, dimension, id.alternatives);
     }
-  / id:UnitDefinitionLeft _ UnitAssignmentLiteral _ dimension:DimensionIdentifier {
+  / id:UnitDefinitionLeft _ UnitAssignmentLiteral nbsp dimension:DimensionIdentifier {
       return units.addUnit(id.id, dimension, undefined, id.schemes, undefined, id.alternatives);
     }
-  / num:NumberLiteral _ id:UnitDefinitionLeft _ UnitAssignmentLiteral _ dimension:OptionalDimensionIdentifier? _ unitNode:UnitExpression {
+  / num:NumberLiteral _ id:UnitDefinitionLeft _ UnitAssignmentLiteral nbsp dimension:OptionalDimensionIdentifier? _ unitNode:UnitExpression {
       return units.addUnit(id.id, unitNode.unit, num, id.schemes, dimension, id.alternatives);
     }
 
@@ -351,7 +351,7 @@ ConstDefinition = "const" __ variable:VariableDefinition {
 ////////////////////////////////////////////////////////////////////////////////
 
 VariableDefinition =
-  identifier:IdentifierLiteral _ AssignmentLiteral _ definition:NumericalExpression {
+  identifier:IdentifierLiteral nbsp AssignmentLiteral nbsp definition:NumericalExpression {
   return parseContext.scope.addVariable(identifier, new ast.VariableDefinition(identifier, definition));
 }
 
@@ -753,17 +753,17 @@ KeywordLiteral = "unit" / "per" / "const" / "test"
 
 ////////////////////////////////////////////////////////////////////////////////
 _
-   "some whitespace" = [ \t\r\n\xA0]* (Comment [ \t\r\n]*)*
+   "some whitespace" = [ \t\xA0]* (Comment [ \t]*)*
 
 // TODO parse non significant words, and somehow insert them into the token list
 // or AST itself, so we can output it and format it.
 // not variable, not operator, not keyword, not number, not
 
 
-Comment = "//" [^\n]* [\r\n]+
+Comment = "//" [^\n]* CR
 
 __
-   "whitespace" = [ \t\r\n]+
+   "whitespace" = [ \t]+
 
 nbsp = [ \t]*
 nbsp_1 = [ \t]+

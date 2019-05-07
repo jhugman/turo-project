@@ -82,7 +82,7 @@ test('Multi line, multi single line expressions', function (t) {
   t.end();
 });
 
-test('Multi line statement', function (t) {
+xtest('Multi line statement', function (t) {
   parser.operators = dummyOperators;
   var doc = parse([
     '1 +',

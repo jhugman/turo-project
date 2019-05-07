@@ -1,4 +1,5 @@
-import tap from 'tap';
+import { test, plan } from 'tap';
+import { xtest } from './xtap';
 import _ from 'underscore';
 import { storage } from '../lib/storage/app-bundle-storage';
 import { EditableDocument } from '../lib/document';
@@ -6,12 +7,11 @@ import '../lib/actions/autocomplete';
 
 EditableDocument.storage = storage;
 
-const { test, plan } = tap;
 
 test('Test statementOffset', (t) => {
   const doc = EditableDocument.create('testing');
-  doc.import('fundamental');
-  doc.evaluateDocument('radius1 = 1 m\nradius2 = 2 m\nradius3 = 3 m\nradius4 = \n4m\nradius5 = \n\n5m')
+  await doc.import('fundamental');
+  await doc.evaluateDocument('radius1 = 1 m\nradius2 = 2 m\nradius3 = 3 m\nradius4 = \n4m\nradius5 = \n\n5m')
 
   let editActions = doc.setEditPoint({ line: 1, column: 10 }).getActions();
   t.equal(editActions.statementOffset, 10);
@@ -41,8 +41,8 @@ test('Editor autocomplete, single line', (t) => {
   // }
 
   const doc = EditableDocument.create('testing');
-  doc.import('fundamental');
-  doc.evaluateDocument('radius = 1 m\n1 / r  \n1 / r \n')
+  await doc.import('fundamental');
+  await doc.evaluateDocument('radius = 1 m\n1 / r  \n1 / r \n')
 
   let editActions = doc.setEditPoint({ line: 1, column: 12 }).getActions();
   t.ok(editActions, 'EditorActions are accessible from getEditPoint()');
@@ -84,10 +84,10 @@ test('Editor autocomplete, single line', (t) => {
   t.end();
 });
 
-test('Editor autocomplete, multi line', (t) => {
+xtest('Editor autocomplete, multi line', async (t) => {
   const doc = EditableDocument.create('testing');
-  doc.import('fundamental');
-  doc.evaluateDocument('radius = \n1 m\n1 / \nr  \n');
+  await doc.import('fundamental');
+  await doc.evaluateDocument('radius = \n1 m\n1 / \nr  \n');
 
   let editActions = doc.setEditPoint({ line: 2, column: 3 }).getActions();
   t.ok(editActions, 'EditorActions are accessible from getEditPoint()');
@@ -107,10 +107,10 @@ test('Editor autocomplete, multi line', (t) => {
   t.end();
 });
 
-test('Editor autocomplete, multi line with iterative evaluation', (t) => {
+xtest('Editor autocomplete, multi line with iterative evaluation', async (t) => {
   const doc = EditableDocument.create('testing');
-  doc.import('fundamental');
-  doc.evaluateDocument('radius = 1 m\n1 *\n2 * r  \n');
+  await doc.import('fundamental');
+  await doc.evaluateDocument('radius = 1 m\n1 *\n2 * r  \n');
 
   let editActions = doc.setEditPoint({ line: 3, column: 5 }).getActions();
   let suggestions = editActions.getSuggestions();

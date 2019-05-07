@@ -1,9 +1,8 @@
-import tap from 'tap';
+import { test, plan } from 'tap';
+import { xtest } from './xtap';
 import _ from 'underscore';
 import { storage } from '../lib/storage/app-bundle-storage';
 import { EditableDocument } from '../lib/document';
-
-const { test, plan } = tap;
 
 var prefs = {
   output_defaultPadding: ' ',

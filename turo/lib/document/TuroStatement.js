@@ -78,7 +78,7 @@ export default class TuroStatement {
     return this.errors && this.errors.length;
   }
 
-  toTokens(prefs) {
+  toTokens(prefs = {}) {
     return output.toTokenArray(this.node, {prefs});
   }
 

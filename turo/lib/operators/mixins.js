@@ -205,7 +205,6 @@ var mixins = {
       var prefs = ctx.prefs,
           units = ctx.units,
           unit = units.unitSchemes.getUnitNames(prefs.unitScheme, 'Angle')[0];
-      console.log('get default angle unit', ctx);
       return units.getUnit(unit);
     },
 
@@ -232,15 +231,12 @@ var mixins = {
 
     toRadians (operandValue, ctx) {
       if (isDimensionless(operandValue)) {
-        console.log('dimension less?', ctx);
         operandValue = turoNumber.newInstance(
           operandValue.number,
           this.getDefaultAngleUnit(ctx),
           operandValue.valueType
         );
       }
-
-      console.log('to radians', operandValue);
 
       if (!this.isRadians(operandValue.unit)) {
         operandValue = operandValue.convert(this.getRadians(ctx));

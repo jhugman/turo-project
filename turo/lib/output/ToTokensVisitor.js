@@ -152,11 +152,6 @@ export default class ToSourceVisitor extends ASTVisitor {
     return tokens;
   }
 
-  visitTuroValue (node, tokens, context) {
-    var turoValue = node.turoNumber;
-    return this.tokenizeTuroNumber(turoValue, tokens, context, node);
-  }
-
   tokenizeTuroNumber (turoValue, tokens, context, node) {
     turoValue.prepareLiteral(context.prefs);
     var value = turoValue.value,
@@ -315,7 +310,7 @@ export default class ToSourceVisitor extends ASTVisitor {
     return tokens;
   }
 
-  visitIncludeStatement (node, tokens, context) {
+  visitImportStatement (node, tokens, context) {
     t.push(t('statement', 'include', node.line, node.offsetFirst, 'kwd'));
     t.push(t('string', '"' + node.ast + '"', 0, '"'));
   }

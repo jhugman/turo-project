@@ -6,7 +6,7 @@ import _ from 'underscore';
  * It is intended for the parser, the execution context and the 
  * editor to use this object.
  *
- * Includes are modelled as parent scopes to the current document scope.
+ * Imports are modelled as parent scopes to the current document scope.
  *
  * In this manner, we can have local variables, units and functions, as
  * well as specialized language features.
@@ -58,17 +58,17 @@ export default class Scope {
     return Object.assign(clone, this);
   }
 
-  getInclude(name) {
+  getImport(name) {
     return this._includes[name];
   }
 
-  addInclude(name, scope) {
+  addImport(name, scope) {
     this._includes[name] = scope;
     return scope;
   }
 
-  findInclude(name) {
-    return this._findFirst(this.getInclude, arguments);
+  findImport(name) {
+    return this._findFirst(this.getImport, arguments);
   }
 
   ////////////////////////////////////////////////////////////////////

@@ -140,7 +140,6 @@ Statement
 
 RawStatement 
   = UnitDefinitionStatement
-  / IncludeStatement
   / ImportStatement
   / ConstDefinition
   / VariableDefinition
@@ -329,12 +328,6 @@ UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.
 
   return helper.decorateTerminal(node, line, offset, unitName);
  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-IncludeStatement = "include" _ filename:StringLiteral {
-  return new ast.StatementNode("Include", filename);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 

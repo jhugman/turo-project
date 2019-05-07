@@ -1,9 +1,72 @@
 import _ from 'underscore';
 
-function EditorActions (doc, editToken) {
-  this.doc = doc;
-  this._editToken = editToken || { offset: 0 };
-  this._editState = {};
+class EditorActions {
+  constructor (doc, editToken) {
+    this.doc = doc;
+    this._editToken = editToken || { offset: 0 };
+    this._editState = {};
+  }
+
+  //////////////////////////////////////////////////////////////////
+  // Methods themselves. These won't actually call the methods,
+  // just let you know if you can do them.
+  //////////////////////////////////////////////////////////////////
+
+  can (actionName) {
+    const test = EditorActions._actionInfo.tests[actionName];
+    if (!test) {
+      return false;
+    }
+    return test.call(this);
+  }
+
+  available (actionType) {
+    const actionTypesMap = EditorActions._actionInfo.actionTypes,
+        actionTypes = actionTypesMap[actionType];
+    if (!actionTypes) {
+      return [];
+    }
+    return (
+      _.chain(actionTypes)
+        .keys()
+        .filter(function (actionName) {
+          var test = actionTypes[actionName];
+          return test.call(this);
+        }.bind(this))
+        .value()
+    );
+  }
+
+  doAvailable (actionType, args) {
+    const actions = this.available(actionType);
+    if (args !== undefined) {
+      args = _.toArray(arguments);
+    } else {
+      args = [];
+    }
+
+    return _.map(actions, action => {
+      return this[action].apply(this, args);
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////
+  // This is where all the properties derive everything from.
+  //////////////////////////////////////////////////////////////////
+
+  get editToken () {
+    return this._editToken;
+  }
+
+  set editToken (newToken) {
+    if (_.isNumber(newToken)) {
+      newToken = {
+        offset: newToken,
+      };
+    }
+    this._editToken = newToken;
+    this._editState = {};
+  }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -22,7 +85,7 @@ function __lazyGetters (prefix, properties) {
     .each(function (propertyName) {
       var getter = properties[propertyName];
       wrappedProperties[propertyName] = {
-        get: function () {
+        get () {
           var value = this[prefix][propertyName];
           if (value !== undefined) {
             return value;
@@ -37,27 +100,25 @@ function __lazyGetters (prefix, properties) {
   Object.defineProperties(EditorActions.prototype, wrappedProperties);
 }
 
-
 //////////////////////////////////////////////////////////////////
 // Some static methods to help building editor actions easier.
 //////////////////////////////////////////////////////////////////
-_.extend(EditorActions, {
-
+const statics = {
   _actionInfo: {
     tests: {},
     actionTypes: {},
   },
 
-  addAction: function (type, tests, extension) {
+  addAction (type, tests, extension) {
     if (arguments.length === 1) {
       extension = type;
     }
-    _.extend(EditorActions.prototype, extension);
+    Object.assign(EditorActions.prototype, extension);
 
     if (!tests) {
       return;
     }
-    _.extend(EditorActions._actionInfo.tests, tests);
+    Object.assign(EditorActions._actionInfo.tests, tests);
 
     if (!type) {
       return;
@@ -71,11 +132,11 @@ _.extend(EditorActions, {
       actionTypesMap[type] = actionTypes;
     }
 
-    _.extend(actionTypes, tests);
+    Object.assign(actionTypes, tests);
   },
 
-  extend: function (extension) {
-    _.extend(EditorActions.prototype, extension);
+  extend (extension) {
+    Object.assign(EditorActions.prototype, extension);
   },
 
   /*
@@ -84,7 +145,7 @@ _.extend(EditorActions, {
    * The Edit Token may be passed on to other edits,
    * so should only be things to do with this statement.
    */
-  addEditTokenProperties: function (properties) {
+  addEditTokenProperties (properties) {
     __lazyGetters('editToken', properties);
   },
 
@@ -93,87 +154,28 @@ _.extend(EditorActions, {
    * The edit state will not be recycled between edits, so you can put 
    * anything in here.
    */
-  addEditStateProperties: function (properties) {
+  addEditStateProperties (properties) {
     __lazyGetters('_editState', properties);
   },
-});
+};
 
-//////////////////////////////////////////////////////////////////
-// Methods themselves. These won't actually call the methods,
-// just let you know if you can do them.
-//////////////////////////////////////////////////////////////////
+Object.assign(EditorActions, statics);
 
-_.extend(EditorActions.prototype, {
-  can: function (actionName) {
-    var test = EditorActions._actionInfo.tests[actionName];
-    if (!test) {
-      return false;
-    }
-    return test.call(this);
-  },
-
-  available: function (actionType) {
-    var actionTypesMap = EditorActions._actionInfo.actionTypes,
-        actionTypes = actionTypesMap[actionType];
-    if (!actionTypes) {
-      return [];
-    }
-    return (
-      _.chain(actionTypes)
-        .keys()
-        .filter(function (actionName) {
-          var test = actionTypes[actionName];
-          return test.call(this);
-        }.bind(this))
-        .value()
-    );
-  },
-
-  doAvailable: function (actionType, args) {
-    var actions = this.available(actionType);
-    if (args !== undefined) {
-      args = _.toArray(arguments);
-    } else {
-      args = [];
-    }
-
-    return _.map(actions, function (action) {
-      return this[action].apply(this, args);
-    }.bind(this));
-  },
-});
-
-Object.defineProperties(EditorActions.prototype, {
-  editToken: {
-    get: function () {
-      return this._editToken;
-    },
-    set: function (newToken) {
-      if (_.isNumber(newToken)) {
-        newToken = {
-          offset: newToken,
-        };
-      }
-      this._editToken = newToken;
-      this._editState = {};
-    },
-  },
-});
 
 //////////////////////////////////////////////////////////////
 // Some properites that will help other editor actions.
 //////////////////////////////////////////////////////////////
 EditorActions.addEditStateProperties({
-  statement: function () {
+  statement () {
     return this.doc.findStatementForEditToken(this._editToken);
   },
-  astRootNode: function () {
+  astRootNode () {
     return this.statement.node;
   }
 });
 
 EditorActions.addEditTokenProperties({
-  id: function () {
+  id () {
     return this.statement.id;
   },
 });

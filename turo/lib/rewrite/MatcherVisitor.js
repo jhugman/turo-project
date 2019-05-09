@@ -1,7 +1,37 @@
 import PatternVisitor from './PatternVisitor';
 
 function mergeCaptures(left, right, nodeEquals) {
+  const target = new Map(left.entries());
+  
+  for (let [k, v] of right.entries()) {  
+    const existing = target.get(k);
+    if (!existing) {
+      target.set(k, v);
+      continue;
+    }
 
+    if (!nodeEquals(existing, v)) {
+      return;
+    }
+
+    target.set(k, v);
+  }
+
+  return target;
+}
+
+const emptyMap = new Map();
+
+function newMap(key, value) {
+  return new Map().set(key, value);
+}
+
+function bypassParens (node) {
+  if (node.nodeType === 'ParensNode') {
+    const [inner] = node.children;
+    return inner;
+  }
+  return node;
 }
 
 export default class MatcherVisitor extends PatternVisitor {
@@ -12,52 +42,108 @@ export default class MatcherVisitor extends PatternVisitor {
   }
 
   visitAnyExpression (pattern, astNode, ...args) {
-    return { [pattern.captureName]: astNode };
+    return newMap(pattern.captureSymbol, astNode);
   }
 
   visitVariable (pattern, astNode, ...args) {
-    const { nodeType, value } = astNode;
+    const bareNode = bypassParens(astNode);
+    const { nodeType, value } = bareNode;
 
     if (nodeType === 'IdentifierNode') {
-      return { [pattern.captureName]: astNode };
+      return newMap(pattern.captureSymbol, bareNode);
     }
   }
 
   visitAnyLiteral (pattern, astNode, ...args) {
-    const { nodeType, value } = astNode;
+    const bareNode = bypassParens(astNode);
+    const { nodeType, value } = bareNode;
+
     if (nodeType === 'NumberNode') {
-      return { [pattern.captureName]: astNode };
+      return newMap(pattern.captureSymbol, bareNode);
     }
   }
 
   visitLiteralLiteral (pattern, astNode, ...args) {
-    const { nodeType, value } = astNode;
+    const bareNode = bypassParens(astNode);
+    const { nodeType, value } = bareNode;
 
     if (nodeType === 'NumberNode' && value == pattern.literal) {
-      return {};
+      return emptyMap;
     }
   }
 
-  visitBinaryOperation (node, ...args) {
-    const [left, right] = this.visitChildren(node, ...args);
-    return `${left} ${node.literal} ${right}`;
+  visitBinaryOperation (pattern, astNode, nodeEquals, ...args) {
+    const bareNode = bypassParens(astNode);
+    const { nodeType, literal } = bareNode;
+
+    if (nodeType !== 'BinaryNode' || literal !== pattern.literal) {
+      return;
+    }
+
+    if (astNode.children.length !== pattern.children.length) {
+      return;
+    }
+
+    const [leftPattern, rightPattern] = pattern.children;
+    const [leftAstNode, rightAstNode] = bareNode.children;
+
+    const leftCapture = leftPattern.accept(this, leftAstNode, nodeEquals, ...args);
+    const rightCapture = rightPattern.accept(this, rightAstNode, nodeEquals, ...args);
+
+    if (!leftCapture || !rightCapture) {
+      return;
+    }
+
+    return mergeCaptures(leftCapture, rightCapture, nodeEquals);
   }
 
-  visitParenthesis (node, ...args) {
-    const [operand] = this.visitChildren(node, ...args);
+  visitParenthesis (pattern, astNode, ...args) {
+    const bareNode = bypassParens(astNode);
+    const [patternChild] = pattern.children;
 
-    return `(${operand})`;
+    return patternChild.accept(this, bareNode, ...args);
   }
 
-  visitUnaryOperation (node, ...args) {
-    const [operand] = this.visitChildren(node, ...args);
+  visitUnaryOperation (pattern, astNode, ...args) {
+    const bareNode = bypassParens(astNode);
+    const { nodeType, literal } = bareNode;
 
-    return `${node.literal} ${operand}`;
+    if (nodeType !== 'UnaryOperationNode' || literal !== pattern.literal) {
+      return;
+    }
+
+    const [patternChild] = pattern.children;
+    const [astNodeChild] = bareNode.children;
+
+    return patternChild.accept(this, astNodeChild, ...args);
   }
 
-  visitEquality (node, ...args) {
-    const [left, right] = this.visitChildren(node, ...args);
-    return `${left} = ${right}`;
+  visitEquality (pattern, astNode, nodeEquals, ...args) {
+    const bareNode = bypassParens(astNode);
+    const { nodeType, literal } = bareNode;
+
+    // TODO assignment is not what we're trying to do here.
+    const isEquality = (nodeType === 'BinaryNode' && literal === '==');
+    const isAssignment = (nodeType === 'VariableDefinition');
+    if (!isEquality && !isAssignment) {
+      return;
+    }
+
+    if (astNode.children.length !== pattern.children.length) {
+      return;
+    }
+
+    const [leftPattern, rightPattern] = pattern.children;
+    const [leftAstNode, rightAstNode] = bareNode.children;
+
+    const leftCapture = leftPattern.accept(this, leftAstNode, nodeEquals, ...args);
+    const rightCapture = rightPattern.accept(this, rightAstNode, nodeEquals, ...args);
+
+    if (!leftCapture || !rightCapture) {
+      return;
+    }
+
+    return mergeCaptures(leftCapture, rightCapture, nodeEquals);
   }
 
   visitInequality (node, ...args) {

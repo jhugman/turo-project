@@ -28,8 +28,8 @@ class PatternNode {
     return this.accept(toString);
   }
 
-  match (astNode, nodeEquals, ...ast) {
-    return this.accept(matcher, astNode, nodeEquals, ...ast);
+  match (astNode, nodeEquals, ...args) {
+    return this.accept(matcher, astNode, nodeEquals, ...args);
   }
 
 
@@ -77,6 +77,10 @@ class CapturePattern extends PatternNode {
 
   get captureId() {
     return this._literal;
+  }
+
+  get captureSymbol() {
+    return this.captureId;
   }
 }
 

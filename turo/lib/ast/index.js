@@ -5,6 +5,11 @@ class ASTNode {
   constructor(...children) {
     this._children = children.filter(child => child && child.accept);
   }
+
+  get nodeType () {
+    return this.constructor.name;
+  }
+
   get children() { return this._children; }
 
   clone () {

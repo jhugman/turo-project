@@ -35,17 +35,6 @@ class PatternNode {
 
   ////////////////////////////////////////////////////////////////////////////
 
-  op (literal, that) {
-
-    if (left instanceof PatternNode && right instanceof PatternNode) {
-      return new BinaryOperation(literal, left, right);
-    } else if (left instanceof PatternNode && right === undefined) {
-      return new UnaryOperation(literal, left);
-    } else {
-      throw new Error(`Internal: unable to combine patterns ${left}, ${right}`);
-    }
-  }
-
   binary (literal, that) {
     if (that instanceof PatternNode) {
       return new BinaryOperation(literal, this, that);  
@@ -172,16 +161,6 @@ class Equality extends BinaryOperation {
   }
 }
 
-////////////////////////////////////////////////////////////////////////////
-class Inequality extends PatternNode {
-  constructor (literal, left, right) {
-    super(literal, left, right);
-  }
-
-  accept (visitor, ...args) {
-    return visitor.visitInequality(this, ...args);
-  }
-}
 
 const value = value => new LiteralLiteral(value);
 const anyValue = captureName => new AnyLiteral(captureName);

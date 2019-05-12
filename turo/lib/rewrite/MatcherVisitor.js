@@ -29,7 +29,7 @@ function newMap(key, value) {
 function bypassParens (node) {
   if (node.nodeType === 'ParensNode') {
     const [inner] = node.children;
-    return inner;
+    return bypassParens(inner);
   }
   return node;
 }
@@ -39,6 +39,9 @@ export default class MatcherVisitor extends PatternVisitor {
     return node.children.map(
       child => child.accept(this, ...args)
     );
+  }
+
+  visitBinaryNonTerminal (pattern, astNode, nodeEquals, ...args) {
   }
 
   visitAnyExpression (pattern, astNode, ...args) {
@@ -77,10 +80,13 @@ export default class MatcherVisitor extends PatternVisitor {
     const { nodeType, literal } = bareNode;
 
     if (nodeType !== 'BinaryNode' || literal !== pattern.literal) {
+      // we should check here if there are any special cases of the pattern 
+      // e.g. $literal * $subtree or $subtree ^ $literal which 
+      // would match iff $literal == 1.
       return;
     }
 
-    if (astNode.children.length !== pattern.children.length) {
+    if (bareNode.children.length !== pattern.children.length) {
       return;
     }
 
@@ -129,7 +135,7 @@ export default class MatcherVisitor extends PatternVisitor {
       return;
     }
 
-    if (astNode.children.length !== pattern.children.length) {
+    if (bareNode.children.length !== pattern.children.length) {
       return;
     }
 
@@ -144,10 +150,5 @@ export default class MatcherVisitor extends PatternVisitor {
     }
 
     return mergeCaptures(leftCapture, rightCapture, nodeEquals);
-  }
-
-  visitInequality (node, ...args) {
-    const [left, right] = this.visitChildren(node, ...args);
-    return `${left} ${node.literal} ${right}`;
   }
 }

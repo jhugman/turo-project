@@ -9,12 +9,11 @@ const fakeScope = Scope.newScope('default');
   .forEach(c => fakeScope.addVariable(c, {}));
 
 const astParser = new Parser(fakeScope);
-const ast = (string) => astParser.parse(string);
-
 // very slow but sure way of checking if two astNodes are equivalent.
 const nodeEquals = (lhs, rhs) => output.toString(lhs) === output.toString(rhs);
 
 test("Dumb check of parser", t => {
+  const ast = (string) => astParser.parse(string);
   t.equal(output.toString(ast('1 + 2')), '1 + 2');
   t.equal(output.toString(ast('1 + x')), '1 + x');
 
@@ -65,8 +64,6 @@ test("Leaf pattern matching", t => {
   t.end();
 });
 
-
-
 test("Non-terminal matching", t => {
   const p1 = variable('X').binary('+', value(0));
   okMatch(t, p1, 'a + 0');
@@ -102,6 +99,28 @@ test("Non-terminal matching", t => {
   const p6 = variable('C').equals(p5);
   // okMatch(t, p4, 'c^2 == a^2 + b^2');
   okMatch(t, p6, 'd == sqrt(b^2 + a^2)');
+
+  t.end();
+});
+
+test("Parens are transparent", t => {
+  const p1 = variable('X').binary('+', value(0));
+  okMatch(t, p1, 'a + (0)');
+  okMatch(t, p1, '(b) + 0');
+  okMatch(t, p1, '(c + 0)');
+  okMatch(t, p1, '((d)) + ((0))');
+  okMatch(t, p1, '(e) + (0)');
+  okMatch(t, p1, '((f) + (0))');
+  okMatch(t, p1, '(((g))+((0)))');
+
+  const p2 = variable('X').parens().parens().binary('+', value(0).parens().parens()).parens();
+  okMatch(t, p2, 'a + (0)');
+  okMatch(t, p2, '(b) + 0');
+  okMatch(t, p2, '(c + 0)');
+  okMatch(t, p2, '((d)) + ((0))');
+  okMatch(t, p2, '(e) + (0)');
+  okMatch(t, p2, '((f) + (0))');
+  okMatch(t, p2, '(((g))+((0)))');
 
   t.end();
 });

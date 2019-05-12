@@ -1,5 +1,6 @@
 import { test } from 'tap';
 import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
+import RewriteContext from '../../lib/rewrite/RewriteContext';
 import { Parser, Scope } from '../../lib/parser';
 import output from '../../lib/output';
 
@@ -23,7 +24,8 @@ test("Dumb check of parser", t => {
 const okMatch = (t, pattern, codeString, expectedCaptures, expectedPass = true) => {
   const astNode = astParser.parse(codeString);
 
-  const captures = pattern.match(astNode, nodeEquals);
+  const context = new RewriteContext({ nodeEquals });
+  const captures = pattern.match(astNode, context);
 
   if (!expectedPass) {
     t.notOk(captures, `Pattern ${pattern.toString()} did not match ${codeString}`);
@@ -31,6 +33,21 @@ const okMatch = (t, pattern, codeString, expectedCaptures, expectedPass = true) 
   }
 
   t.ok(captures, `Pattern ${pattern.toString()} did match ${codeString}`);
+
+  if (!expectedCaptures) {
+    return;
+  }
+
+  debugger;
+
+  const observedCaptures = new Map();
+  for (let [k, v] of captures.entries()) {
+    observedCaptures.set(k, output.toString(v));
+  }
+
+  const expectedCapturesMap = new Map(Object.entries(expectedCaptures));
+
+  t.deepEqual(observedCaptures, expectedCapturesMap, `${codeString} has expected captures`);
 };
 
 const notOkMatch = (t, pattern, codeString) => {
@@ -65,25 +82,27 @@ test("Leaf pattern matching", t => {
 });
 
 test("Non-terminal matching", t => {
-  const p1 = variable('X').binary('+', value(0));
+  const X = variable('X');
+  const zero = value(0);
+  const p1 = X.binary('+', zero);
   okMatch(t, p1, 'a + 0');
   okMatch(t, p1, 'b + 0');
   notOkMatch(t, p1, 'a + 1');
   notOkMatch(t, p1, 'a - 0');
 
-  const p2 = variable('X').binary('+', variable('X'));
+  const p2 = X.binary('+', X);
   okMatch(t, p2, 'a + a');
   okMatch(t, p2, 'b + b');
   notOkMatch(t, p2, 'a + b');
 
-  const p3 = variable('X').unary('log');
+  const p3 = X.unary('log');
   okMatch(t, p3, 'log a');
   okMatch(t, p3, 'log b');
   okMatch(t, p3, 'log(c)');
   notOkMatch(t, p3, 'log 1');
 
   const p4 = 
-    variable('X').binary('^', value(2))
+    X.binary('^', value(2))
   .binary('+', 
     variable('Y').binary('^', value(2)));
 
@@ -104,7 +123,10 @@ test("Non-terminal matching", t => {
 });
 
 test("Parens are transparent", t => {
-  const p1 = variable('X').binary('+', value(0));
+  const X = variable('X');
+  const zero = value(0);
+
+  const p1 = X.binary('+', zero);
   okMatch(t, p1, 'a + (0)');
   okMatch(t, p1, '(b) + 0');
   okMatch(t, p1, '(c + 0)');
@@ -113,7 +135,7 @@ test("Parens are transparent", t => {
   okMatch(t, p1, '((f) + (0))');
   okMatch(t, p1, '(((g))+((0)))');
 
-  const p2 = variable('X').parens().parens().binary('+', value(0).parens().parens()).parens();
+  const p2 = X.parens().parens().binary('+', zero.parens().parens()).parens();
   okMatch(t, p2, 'a + (0)');
   okMatch(t, p2, '(b) + 0');
   okMatch(t, p2, '(c + 0)');
@@ -121,6 +143,46 @@ test("Parens are transparent", t => {
   okMatch(t, p2, '(e) + (0)');
   okMatch(t, p2, '((f) + (0))');
   okMatch(t, p2, '(((g))+((0)))');
+
+  t.end();
+});
+
+test("Identities rewritten", t => {
+  const X = variable('X');
+
+  const a = anyValue('a'); 
+  const b = anyValue('b');
+
+  const p1 = a.binary('*', X);
+  okMatch(t, p1, '2 * x');
+  okMatch(t, p1, 'x');
+
+  const p2 = X.binary('^', b);
+  okMatch(t, p2, 'x ^ 2', { var_X: 'x', $b: 2 });
+  okMatch(t, p2, 'x', { var_X: 'x', $b: 1 });
+
+  const p3 = X.binary('*', a);
+  okMatch(t, p3, 'x * 2', { var_X: 'x', $a: '2' });
+  okMatch(t, p3, 'x', { var_X: 'x', $a: '1' });
+
+  const p4 = a.binary('*', X.binary('^', b));
+  okMatch(t, p4, '3 * x ^ 2', { var_X: 'x', $a: '3', $b: '2' });
+  okMatch(t, p4, 'x');  
+  t.end();
+});
+
+test("Capture merging", t => {
+  const a = anyValue('a');
+  const X = any('X');
+  const Y = any('Y');
+  const Z = any('Z');
+
+  const p1 = X.binary('/', X);
+  okMatch(t, p1, '(x + 1) / (x + 1)', { _X: '(x + 1)'});
+  notOkMatch(t, p1, '(x + 1) / (x + 2)');
+
+  const p2 = X.binary('^', a).binary('+', Y.binary('^', a));
+  okMatch(t, p2, '(2 * x)^2 + y^2', { _X: '(2 * x)', a: '2', _Y: 'y'});
 
   t.end();
 });

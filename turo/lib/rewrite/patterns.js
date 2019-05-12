@@ -10,6 +10,10 @@ class PatternNode {
     this._literal = literal;
   }
 
+  get nodeType () {
+    return this.constructor.name;
+  }
+
   get children() {
     return this._children;
   }
@@ -31,7 +35,6 @@ class PatternNode {
   match (astNode, nodeEquals, ...args) {
     return this.accept(matcher, astNode, nodeEquals, ...args);
   }
-
 
   ////////////////////////////////////////////////////////////////////////////
 

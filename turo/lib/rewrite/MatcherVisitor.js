@@ -1,6 +1,6 @@
 import PatternVisitor from './PatternVisitor';
 
-function mergeCaptures(left, right, nodeEquals) {
+function mergeCaptures(left, right, context) {
   const target = new Map(left.entries());
   
   for (let [k, v] of right.entries()) {  
@@ -10,7 +10,7 @@ function mergeCaptures(left, right, nodeEquals) {
       continue;
     }
 
-    if (!nodeEquals(existing, v)) {
+    if (!context.nodeEquals(existing, v)) {
       return;
     }
 
@@ -39,9 +39,6 @@ export default class MatcherVisitor extends PatternVisitor {
     return node.children.map(
       child => child.accept(this, ...args)
     );
-  }
-
-  visitBinaryNonTerminal (pattern, astNode, nodeEquals, ...args) {
   }
 
   visitAnyExpression (pattern, astNode, ...args) {
@@ -75,32 +72,48 @@ export default class MatcherVisitor extends PatternVisitor {
     }
   }
 
-  visitBinaryOperation (pattern, astNode, nodeEquals, ...args) {
+  checkIdentity (pattern, opLiteral, anyLiteralPattern, subtreePattern, astNode, context, ...args) {
+    if (pattern.literal === opLiteral
+      && anyLiteralPattern.nodeType === 'AnyLiteral') {
+      const subtreeCapture = subtreePattern.accept(this, astNode, context, ...args);
+
+      if (subtreeCapture) {
+        const identityCapture = newMap(anyLiteralPattern.captureSymbol, context.createIdentity(1));
+        return mergeCaptures(subtreeCapture, identityCapture, context);
+      }
+    }
+  }
+
+  visitBinaryOperation (pattern, astNode, context, ...args) {
     const bareNode = bypassParens(astNode);
     const { nodeType, literal } = bareNode;
+
+    const [leftPattern, rightPattern] = pattern.children;
 
     if (nodeType !== 'BinaryNode' || literal !== pattern.literal) {
       // we should check here if there are any special cases of the pattern 
       // e.g. $literal * $subtree or $subtree ^ $literal which 
       // would match iff $literal == 1.
-      return;
+
+      return this.checkIdentity(pattern, '*', leftPattern, rightPattern, bareNode, context, ...args)
+        || this.checkIdentity(pattern, '^', rightPattern, leftPattern, bareNode, context, ...args)
+        || this.checkIdentity(pattern, '*', rightPattern, leftPattern, bareNode, context, ...args);
     }
 
-    if (bareNode.children.length !== pattern.children.length) {
+    if (bareNode.children.length !== 2) {
       return;
     }
-
-    const [leftPattern, rightPattern] = pattern.children;
+    
     const [leftAstNode, rightAstNode] = bareNode.children;
 
-    const leftCapture = leftPattern.accept(this, leftAstNode, nodeEquals, ...args);
-    const rightCapture = rightPattern.accept(this, rightAstNode, nodeEquals, ...args);
+    const leftCapture = leftPattern.accept(this, leftAstNode, context, ...args);
+    const rightCapture = rightPattern.accept(this, rightAstNode, context, ...args);
 
     if (!leftCapture || !rightCapture) {
       return;
     }
 
-    return mergeCaptures(leftCapture, rightCapture, nodeEquals);
+    return mergeCaptures(leftCapture, rightCapture, context);
   }
 
   visitParenthesis (pattern, astNode, ...args) {
@@ -124,7 +137,9 @@ export default class MatcherVisitor extends PatternVisitor {
     return patternChild.accept(this, astNodeChild, ...args);
   }
 
-  visitEquality (pattern, astNode, nodeEquals, ...args) {
+  visitEquality (pattern, astNode, context, ...args) {
+    // This should disappear into a generic binary node;
+    // however, the parser is not there yet.
     const bareNode = bypassParens(astNode);
     const { nodeType, literal } = bareNode;
 
@@ -142,13 +157,13 @@ export default class MatcherVisitor extends PatternVisitor {
     const [leftPattern, rightPattern] = pattern.children;
     const [leftAstNode, rightAstNode] = bareNode.children;
 
-    const leftCapture = leftPattern.accept(this, leftAstNode, nodeEquals, ...args);
-    const rightCapture = rightPattern.accept(this, rightAstNode, nodeEquals, ...args);
+    const leftCapture = leftPattern.accept(this, leftAstNode, context, ...args);
+    const rightCapture = rightPattern.accept(this, rightAstNode, context, ...args);
 
     if (!leftCapture || !rightCapture) {
       return;
     }
 
-    return mergeCaptures(leftCapture, rightCapture, nodeEquals);
+    return mergeCaptures(leftCapture, rightCapture, context);
   }
 }

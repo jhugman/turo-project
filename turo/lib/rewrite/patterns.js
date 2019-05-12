@@ -62,9 +62,8 @@ class PatternNode {
 ////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////
 class CapturePattern extends PatternNode {
-  constructor (prefix, captureName) {
-    super(prefix + captureName);
-    this.captureName = captureName;
+  constructor (captureName) {
+    super(captureName);
   }
 
   get captureId() {
@@ -79,7 +78,7 @@ class CapturePattern extends PatternNode {
 ////////////////////////////////////////////////////////////////////////////
 class AnyLiteral extends CapturePattern {
   constructor (captureName) {
-    super('$', captureName);
+    super(captureName);
   }
 
   accept (visitor, ...args) {
@@ -87,10 +86,20 @@ class AnyLiteral extends CapturePattern {
   }
 }
 
+class AnyNonLiteral extends CapturePattern {
+  constructor (captureName) {
+    super(captureName);
+  }
+
+  accept (visitor, ...args) {
+    return visitor.visitAnyNonLiteral(this, ...args);
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////
 class AnyExpression extends CapturePattern {
   constructor (captureName) {
-    super('_', captureName);
+    super(captureName);
   }
 
   accept (visitor, ...args) {
@@ -101,7 +110,7 @@ class AnyExpression extends CapturePattern {
 ////////////////////////////////////////////////////////////////////////////
 class Variable extends CapturePattern {
   constructor (captureName) {
-    super('var_', captureName);
+    super(captureName);
   }
 
   accept (visitor, ...args) {

@@ -82,7 +82,7 @@ test("Leaf pattern matching", t => {
 });
 
 test("Non-terminal matching", t => {
-  const X = variable('X');
+  const X = variable('_X');
   const zero = value(0);
   const p1 = X.binary('+', zero);
   okMatch(t, p1, 'a + 0');
@@ -123,7 +123,7 @@ test("Non-terminal matching", t => {
 });
 
 test("Parens are transparent", t => {
-  const X = variable('X');
+  const X = variable('var_X');
   const zero = value(0);
 
   const p1 = X.binary('+', zero);
@@ -148,10 +148,10 @@ test("Parens are transparent", t => {
 });
 
 test("Identities rewritten", t => {
-  const X = variable('X');
+  const X = variable('var_X');
 
-  const a = anyValue('a'); 
-  const b = anyValue('b');
+  const a = anyValue('$a'); 
+  const b = anyValue('$b');
 
   const p1 = a.binary('*', X);
   okMatch(t, p1, '2 * x');
@@ -173,9 +173,9 @@ test("Identities rewritten", t => {
 
 test("Capture merging", t => {
   const a = anyValue('a');
-  const X = any('X');
-  const Y = any('Y');
-  const Z = any('Z');
+  const X = any('_X');
+  const Y = any('_Y');
+  const Z = any('_Z');
 
   const p1 = X.binary('/', X);
   okMatch(t, p1, '(x + 1) / (x + 1)', { _X: '(x + 1)'});

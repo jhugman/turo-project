@@ -39,6 +39,21 @@ class ASTNode {
     }
     return this._offsetLast;
   }
+
+  // construction methods
+  binary (literal, that) {
+    if (that instanceof ASTNode) {
+      return new BinaryNode(this, that, literal);  
+    }
+  }
+
+  unary (literal) {
+    return new UnaryOperationNode(this, literal);
+  }
+
+  parens() {
+    return new ParensNode(this);
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -65,6 +80,10 @@ class UnaryOperationNode extends ASTNode {
     this.literal = literal;
   }
 
+  get inner () {
+    return operand;
+  }
+
   accept (visitor, ...args) {
     return visitor.visitUnaryOperation(this, ...args);
   }
@@ -77,6 +96,10 @@ class ParensNode extends ASTNode {
     super(ast);
     this.astType = 'parens';
     this.ast = ast;
+  }
+
+  get inner () {
+    return this.ast;
   }
 
   accept (visitor, ...args) {
@@ -186,6 +209,10 @@ class VariableDefinition extends ASTNode {
     this.identifier = identifier;
     this.ast = definition;
     this.value = value;
+  }
+
+  get inner () {
+    return this.ast;
   }
 
   accept (visitor, ...args) {

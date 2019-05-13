@@ -178,10 +178,12 @@ const value = value => new LiteralLiteral(value);
 const anyValue = captureName => new AnyLiteral(captureName);
 const any = captureName => new AnyExpression(captureName);
 const variable = captureName => new Variable(captureName); 
+const anyNonLiteral = captureName => new AnyNonLiteral(captureName);
 
 export {
   value,
   anyValue,
+  anyNonLiteral, 
   any,
   variable,
 };

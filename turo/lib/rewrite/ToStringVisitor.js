@@ -19,6 +19,10 @@ export default class ToStringVisitor extends PatternVisitor {
     return node.captureId;
   }
 
+  visitAnyNonLiteral (node, ...args) {
+    return node.captureId; 
+  }
+
   visitLiteralLiteral (node, ...args) {
     return '' + node.literal;
   }

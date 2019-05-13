@@ -63,6 +63,15 @@ export default class MatcherVisitor extends PatternVisitor {
     }
   }
 
+  visitAnyNonLiteral (pattern, astNode, ...args) {
+    const bareNode = bypassParens(astNode);
+    const { nodeType, value } = bareNode;
+
+    if (nodeType !== 'NumberNode') {
+      return newMap(pattern.captureSymbol, bareNode);
+    }
+  }
+
   visitLiteralLiteral (pattern, astNode, ...args) {
     const bareNode = bypassParens(astNode);
     const { nodeType, value } = bareNode;

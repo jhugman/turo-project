@@ -19,6 +19,12 @@ class ASTNode {
     return that;
   }
 
+  deepClone () {
+    const that = this.clone();
+    that._children = this._children.map(child => child.deepClone());
+    return that;
+  }
+
   accept (visitor, ...args) {
     throw new Error("unimplemented");
   }
@@ -60,13 +66,19 @@ class ASTNode {
 class BinaryNode extends ASTNode {
   constructor (left, right, literal) {
     super(left, right);
-    this.left = left;
-    this.right = right;
     this.literal = literal;
   }
 
   accept (visitor, ...args) {
     return visitor.visitBinaryOperator(this, ...args)
+  }
+
+  get left () {
+    return this.children[0];
+  }
+
+  get right () {
+    return this.children[1];
   }
 }
 
@@ -75,13 +87,16 @@ class BinaryNode extends ASTNode {
 class UnaryOperationNode extends ASTNode {
   constructor (operand, literal, isPrefix) {
     super(operand);
-    this.value = operand;
     this.isPrefix = isPrefix;
     this.literal = literal;
   }
 
   get inner () {
-    return operand;
+    return this.children[0];
+  }
+
+  get value () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {
@@ -94,12 +109,14 @@ class UnaryOperationNode extends ASTNode {
 class ParensNode extends ASTNode {
   constructor (ast) {
     super(ast);
-    this.astType = 'parens';
-    this.ast = ast;
   }
 
   get inner () {
-    return this.ast;
+    return this.children[0];
+  }
+
+  get ast () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {
@@ -207,12 +224,15 @@ class VariableDefinition extends ASTNode {
   constructor (identifier, definition, value) {
     super(definition);
     this.identifier = identifier;
-    this.ast = definition;
     this.value = value;
   }
 
   get inner () {
-    return this.ast;
+    return this.children[0];
+  }
+
+  get ast () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {

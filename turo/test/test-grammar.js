@@ -324,22 +324,22 @@ test('Node offsets', function (t) {
 
   node = parser.parse('(1.0)');
   t.equal(node.offsetFirst, 0, '(1.0)');
-  t.equal(node.ast.offsetFirst, 1);
-  t.equal(node.ast.offsetLast, 3);
+  t.equal(node.inner.offsetFirst, 1);
+  t.equal(node.inner.offsetLast, 3);
   t.equal(node.offsetLast, 4);
 
   node = parser.parse(' ( 1.0 )');
   t.equal(node.offsetFirst, 1, ' ( 1.0 )');
-  t.equal(node.ast.offsetFirst, 3);
-  t.equal(node.ast.offsetLast, 5);
+  t.equal(node.inner.offsetFirst, 3);
+  t.equal(node.inner.offsetLast, 5);
   t.equal(node.offsetLast, 7);
 
   parser.parse('xyz = 1.0', 'Statement'); 
   
   node = parser.parse('(xyz)');
   t.equal(node.offsetFirst, 0, '(xyz)');
-  t.equal(node.ast.offsetFirst, 1);
-  t.equal(node.ast.offsetLast, 3);
+  t.equal(node.inner.offsetFirst, 1);
+  t.equal(node.inner.offsetLast, 3);
   t.equal(node.offsetLast, 4);  
 
   node = parser.parse('1.0 + xyz');
@@ -375,12 +375,12 @@ test('Node offsets', function (t) {
   node = parser.parse('(1.0 + xyz)');
   t.equal(node.offsetFirst, 0, '(1.0 + xyz)');
   //t.equal(node._og_offsetFirst, 1);
-  t.equal(node.ast.left.offsetFirst, 1);
-  t.equal(node.ast.left.offsetLast, 3);
-  t.equal(node.ast._offsetLiteralFirst, 5);
-  t.equal(node.ast._offsetLiteralLast, 5);
-  t.equal(node.ast.right.offsetFirst, 7);
-  t.equal(node.ast.right.offsetLast, 9);
+  t.equal(node.inner.left.offsetFirst, 1);
+  t.equal(node.inner.left.offsetLast, 3);
+  t.equal(node.inner._offsetLiteralFirst, 5);
+  t.equal(node.inner._offsetLiteralLast, 5);
+  t.equal(node.inner.right.offsetFirst, 7);
+  t.equal(node.inner.right.offsetLast, 9);
   //t.equal(node._og_offsetLast, 9);
   t.equal(node.offsetLast, 10);
 
@@ -391,10 +391,10 @@ test('Node offsets', function (t) {
 
   t.equal(node._offsetLiteralFirst, 0);
   t.equal(node._offsetLiteralLast, 2);
-  t.equal(node.value.offsetFirst, 3);
-  t.equal(node.value.ast.offsetFirst, 4);
-  t.equal(node.value.ast.offsetLast, 6);
-  t.equal(node.value.offsetLast, 7);
+  t.equal(node.inner.offsetFirst, 3);
+  t.equal(node.inner.inner.offsetFirst, 4);
+  t.equal(node.inner.inner.offsetLast, 6);
+  t.equal(node.inner.offsetLast, 7);
   t.equal(node.offsetLast, 7);
 
   // value._offsetLiteralFirst

@@ -115,7 +115,7 @@ class InitialGraphBuilder extends ASTVisitor {
     }
 
     context.currentId = id;
-    node.ast.accept(this, context);
+    node.inner.accept(this, context);
 
     // This will be checked against the deleteToken, 
     // produced by IdentifierRemovalVisitor.

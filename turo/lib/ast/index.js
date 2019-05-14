@@ -53,8 +53,8 @@ class ASTNode {
     }
   }
 
-  unary (literal) {
-    return new UnaryOperationNode(this, literal);
+  unary (literal, prefix = true) {
+    return new UnaryOperationNode(this, literal, prefix);
   }
 
   parens() {

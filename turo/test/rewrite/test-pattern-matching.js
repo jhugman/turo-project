@@ -38,8 +38,6 @@ const okMatch = (t, pattern, codeString, expectedCaptures, expectedPass = true) 
     return;
   }
 
-  debugger;
-
   const observedCaptures = new Map();
   for (let [k, v] of captures.entries()) {
     observedCaptures.set(k, output.toString(v));

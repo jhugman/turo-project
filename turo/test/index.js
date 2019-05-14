@@ -37,3 +37,4 @@
 
 import './rewrite/test-pattern-basics';
 import './rewrite/test-pattern-matching';
+import './rewrite/test-pattern-replacement';

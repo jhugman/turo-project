@@ -5,8 +5,6 @@
   const helper = require('./parser-helper.js').default;
   const ast = require('../ast').default;
 
-  const operators = this.operators;
-
   const self = this;
 
   const units = this.scope.units;
@@ -514,7 +512,7 @@ NamedBinaryOperatorLiteral =
     specialOp:SpecialNamedBinaryOperator
   / operator:IdentifierLiteral
     &{
-      return (operators && operators.hasInfixOperator(operator));
+      return (parseContext.scope.hasInfixOperator(operator));
     }
     {
       return operator;
@@ -553,7 +551,7 @@ SymbolTablePrefixOperator
   / "!" !"=" { return "!"; }
   / literal:IdentifierLiteral
     &{
-      return (operators && operators.hasPrefixOperator(literal));
+      return (parseContext.scope.hasPrefixOperator(literal));
     }
     {
       return literal;
@@ -588,10 +586,8 @@ SymbolTablePostfixOperator "postfixOp"
   / "%"
   / literal:IdentifierLiteral
     &{
-      return (operators && operators.hasPostfixOperator(literal));
+      return (parseContext.scope.hasPostfixOperator(literal));
     }
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 

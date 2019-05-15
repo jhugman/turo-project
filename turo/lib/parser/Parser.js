@@ -8,6 +8,9 @@ import parserPrefs from './parserPrefs';
 // prefs should be accessible from outside of the parser, e.g. someplace like turo.js
 
 function TuroParser (scope = Scope.newScope(), { prefs = parserPrefs, operators = defaultOperators } = {}) {
+  if (!scope.operators) {
+    scope.operators = operators;
+  }
   this.parseContext = {
     scope,
   };

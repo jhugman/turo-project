@@ -12,6 +12,14 @@ export default class RewriteContext {
     return new ast.NumberNode(value);
   }
 
+  createNumberNode (turoNumber) {
+    const { number: value, unit, valueType } = turoNumber;
+    return Object.assign(
+      new ast.NumberNode(value),
+      { unit, valueType }
+    );
+  }
+
   createIdentifier (id) {
     return new ast.IdentifierNode(id);
   }

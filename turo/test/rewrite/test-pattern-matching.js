@@ -2,9 +2,10 @@ import { test } from 'tap';
 import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
 import RewriteContext from '../../lib/rewrite/RewriteContext';
 import { Parser, Scope } from '../../lib/parser';
+import { defaultOperators } from '../../lib/operators';
 import output from '../../lib/output';
 
-const fakeScope = Scope.newScope('default');
+const fakeScope = Scope.newScope('default', undefined, defaultOperators);
 'abcdefghijklmnopqrstuvwxyz'
   .split('')
   .forEach(c => fakeScope.addVariable(c, {}));

@@ -21,13 +21,15 @@ export default class ReplaceVisitor extends ASTVisitor {
     return left.binary(pattern.literal, right);
   }
 
-  visitUnaryOperation (pattern, ...args) {
-    const inner = pattern.inner.accept(this, ...args);
+  visitUnaryOperation (pattern, captures, context, ...args) {
+    const inner = pattern.inner.accept(this, captures, context, ...args);
     const literal = pattern.literal;
 
     switch (literal) {
       case 'eval':
-        return evaluator.evaluate(inner);
+        const res = evaluator.evaluate(inner);
+        return context.createNumberNode(res);
+
       default: 
         return inner.unary(pattern.literal, pattern.isPrefix);
     }

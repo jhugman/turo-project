@@ -5,16 +5,25 @@ import ReplaceVisitor from '../../lib/rewrite/ReplaceVisitor';
 import { Parser, Scope } from '../../lib/parser';
 import output from '../../lib/output';
 
-const fakeScope = Scope.newScope('default');
+import { Operators, defaultOperators } from '../../lib/operators';
+
+const astType = 'astType';
+const patternOperators = new Operators();
+patternOperators.addPrefixOperator('eval', astType, astType, [{}]);
+
+const baseScope = Scope.newScope('default', undefined, defaultOperators);
+const patternScope = baseScope.newScope('patterns', undefined, patternOperators);
+
 'abcdefghijklmnopqrstuvwxyz'
   .split('')
-  .forEach(c => fakeScope.addVariable(c, {}));
+  .forEach(c => baseScope.addVariable(c, {}));
 
 '123456789'
   .split('')
-  .forEach(c => fakeScope.addVariable('$' + c, {}));
+  .forEach(c => patternScope.addVariable('$' + c, {}));
 
-const astParser = new Parser(fakeScope);
+const astParser = new Parser(baseScope);
+const patternParser = new Parser(patternScope);
 
 function capturesMap (object, context) {
   const map = new Map();
@@ -25,7 +34,7 @@ function capturesMap (object, context) {
 }
 
 function okReplace (t, replacementString, expected, obj) {
-  const pattern = astParser.parse(replacementString);
+  const pattern = patternParser.parse(replacementString);
   const captures = capturesMap(obj);
 
   const subject = new ReplaceVisitor();
@@ -76,8 +85,8 @@ test('Shortcut replacement strings', t => {
 
 test('Eval operator', t => {
   okReplace(t, 
-    '1 + eval(a + b)',
-    '1 + 5',
+    '1 + eval(a * b)',
+    '1 + 6',
     { a: '2', b: '1 + 2' }
   );
 

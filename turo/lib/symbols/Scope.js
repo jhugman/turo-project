@@ -262,12 +262,12 @@ export default class Scope {
 
   ////////////////////////////////////////////////////////////////////
 
-  newScope(id) {
+  newScope(id, ...args) {
     if (!id) {
       id = this.id + '/' + this._nextChildId;
       this._nextChildId ++;
     }
-    return new Scope(this, id);
+    return new Scope(this, id, ...args);
   }
 
   fresh() {

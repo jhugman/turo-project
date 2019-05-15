@@ -44,12 +44,12 @@ export default class EvaluatorVisitor extends ASTVisitor {
 
   visitUnaryOperation (node, context) {
     var operation = node.operation,
-        result = operation.evaluate(node.value, context);
+        result = operation.evaluate(node.inner, context);
     return unitConversion(node, result);
   }
 
   visitParens (node, context) {
-    var child = node.ast,
+    var child = node.inner,
         result = child.accept(this, context);
     return unitConversion(node, result);
   }  
@@ -81,7 +81,7 @@ export default class EvaluatorVisitor extends ASTVisitor {
   }
 
   visitVariableDefinition (node, context) {
-    var value = node.ast.accept(this, context);
+    var value = node.inner.accept(this, context);
     node.currentValue = value;
     return value;
   }

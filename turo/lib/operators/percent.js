@@ -38,7 +38,7 @@ export default {
                 return;
             }
 
-            if (operandNode.astType === 'parens' && operandNode.ast.literal === '/') {
+            if (operandNode.nodeType === 'ParensNode' && operandNode.inner.literal === '/') {
               // i.e. (10 / 1000) % = 1%
               return turoNumber.newInstance(operandValue * 100, null, this.returnValueType);
             }

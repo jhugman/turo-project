@@ -6,7 +6,7 @@ function t(...args) {
   return new Token(...args);
 }
 
-export default class ToSourceVisitor extends ASTVisitor {
+export default class ToTokensVisitor extends ASTVisitor {
   bracketStart (node, tokens, context) {
     var bracketCount = context.bracketCount || 0,
         token = t('bracketStart', '(', node.line, node.offsetFirst);
@@ -113,11 +113,11 @@ export default class ToSourceVisitor extends ASTVisitor {
     if (node.isPrefix) {
       tokens.push(t('operator', node.literal, node.line, node._offsetLiteralFirst, '-', 'sqrt'));
       this.optionalBracketStart(node, tokens, context);
-      node.value.accept(this, tokens, context);
+      node.inner.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);
     } else {
       this.optionalBracketStart(node, tokens, context);
-      node.value.accept(this, tokens, context);
+      node.inner.accept(this, tokens, context);
       this.optionalBracketEnd(node, tokens, context);
       tokens.push(t('operator', node.literal, node.line, node._offsetLiteralFirst, '!', 'bang'));
     }
@@ -129,7 +129,7 @@ export default class ToSourceVisitor extends ASTVisitor {
   visitParens (node, tokens, context) {
     this.bracketStart(node, tokens, context);
     this.errorStart(node, tokens, context);
-    node.ast.accept(this, tokens, context);
+    node.inner.accept(this, tokens, context);
     this.errorEnd(node, tokens, context);
     this.bracketEnd(node, tokens, context);
     this.printUnit(node, tokens, context);
@@ -190,8 +190,8 @@ export default class ToSourceVisitor extends ASTVisitor {
 
     tokens.push(t('identifier', node.identifier, node.lineFirst, node.statementOffsetFirst, 'x'));
     tokens.push(t('equal', '=', node.lineFirst, -1, '='));
-    if (node.ast) {
-      node.ast.accept(this, tokens, context);
+    if (node.inner) {
+      node.inner.accept(this, tokens, context);
     } else if (node.definition) {
       tokens.push(node.definition);
     }

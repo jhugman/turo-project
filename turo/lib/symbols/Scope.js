@@ -35,9 +35,10 @@ var nextId = (function () {
 // DAO
 
 export default class Scope {
-  constructor (parent, id, unitsTable) {
+  constructor (parent, id, unitsTable, operators) {
     this.parent = parent;
     this._unitsTable = unitsTable;
+    this._operators = operators;
     this.id = id || nextId();
     this._init();
     this._nextChildId = 0;
@@ -49,8 +50,8 @@ export default class Scope {
     this._includes = {};
   }
 
-  static newScope(id, unitsTable) {
-    return new Scope(undefined, id, unitsTable);
+  static newScope(...args) {
+    return new Scope(undefined, ...args);
   }
 
   clone() {
@@ -150,6 +151,48 @@ export default class Scope {
     );
   }
 
+
+  ////////////////////////////////////////////////////////////////////
+  // variables. We could use the existing symbol table here.
+  ////////////// 
+  
+  get operators() {
+    if (this._operators) {
+      return this._operators;
+    }
+    if (this.parent) {
+      return this.parent.operators;
+    }
+  }
+
+  set operators (operators) {
+    this._operators = operators;
+  }
+
+  hasInfixOperator (name) {
+    return this._findFirst(this._hasInfixOperator, arguments);
+  }
+
+  hasPrefixOperator (name) {
+    return this._findFirst(this._hasPrefixOperator, arguments);
+  }
+
+  hasPostfixOperator (name) {
+    return this._findFirst(this._hasPostfixOperator, arguments);
+  }
+
+  _hasInfixOperator (name) {
+    return this._operators && this._operators.hasInfixOperator(name);
+  }
+
+  _hasPrefixOperator (name) {
+    return this._operators && this._operators.hasPrefixOperator(name);
+  }
+
+  _hasPostfixOperator (name) {
+    return this._operators && this._operators.hasPostfixOperator(name);
+  }
+
   ////////////////////////////////////////////////////////////////////
 
   _findFirst(thisArrayFunction, args) {
@@ -219,12 +262,12 @@ export default class Scope {
 
   ////////////////////////////////////////////////////////////////////
 
-  newScope(id) {
+  newScope(id, ...args) {
     if (!id) {
       id = this.id + '/' + this._nextChildId;
       this._nextChildId ++;
     }
-    return new Scope(this, id);
+    return new Scope(this, id, ...args);
   }
 
   fresh() {

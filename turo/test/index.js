@@ -34,3 +34,7 @@ import './test-integration-errors';
 import './test-percent-arithmetic';
 import './test-trig-functions';
 import './test-unit-schemes';
+
+import './rewrite/test-pattern-basics';
+import './rewrite/test-pattern-matching';
+import './rewrite/test-pattern-replacement';

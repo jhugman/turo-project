@@ -5,12 +5,23 @@ class ASTNode {
   constructor(...children) {
     this._children = children.filter(child => child && child.accept);
   }
+
+  get nodeType () {
+    return this.constructor.name;
+  }
+
   get children() { return this._children; }
 
   clone () {
     const that = new this.constructor();
 
     Object.assign(that, this);
+    return that;
+  }
+
+  deepClone () {
+    const that = this.clone();
+    that._children = this._children.map(child => child.deepClone());
     return that;
   }
 
@@ -34,19 +45,40 @@ class ASTNode {
     }
     return this._offsetLast;
   }
+
+  // construction methods
+  binary (literal, that) {
+    if (that instanceof ASTNode) {
+      return new BinaryNode(this, that, literal);  
+    }
+  }
+
+  unary (literal, prefix = true) {
+    return new UnaryOperationNode(this, literal, prefix);
+  }
+
+  parens() {
+    return new ParensNode(this);
+  }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 class BinaryNode extends ASTNode {
   constructor (left, right, literal) {
     super(left, right);
-    this.left = left;
-    this.right = right;
     this.literal = literal;
   }
 
   accept (visitor, ...args) {
     return visitor.visitBinaryOperator(this, ...args)
+  }
+
+  get left () {
+    return this.children[0];
+  }
+
+  get right () {
+    return this.children[1];
   }
 }
 
@@ -55,9 +87,16 @@ class BinaryNode extends ASTNode {
 class UnaryOperationNode extends ASTNode {
   constructor (operand, literal, isPrefix) {
     super(operand);
-    this.value = operand;
     this.isPrefix = isPrefix;
     this.literal = literal;
+  }
+
+  get inner () {
+    return this.children[0];
+  }
+
+  get value () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {
@@ -70,8 +109,14 @@ class UnaryOperationNode extends ASTNode {
 class ParensNode extends ASTNode {
   constructor (ast) {
     super(ast);
-    this.astType = 'parens';
-    this.ast = ast;
+  }
+
+  get inner () {
+    return this.children[0];
+  }
+
+  get ast () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {
@@ -179,8 +224,15 @@ class VariableDefinition extends ASTNode {
   constructor (identifier, definition, value) {
     super(definition);
     this.identifier = identifier;
-    this.ast = definition;
     this.value = value;
+  }
+
+  get inner () {
+    return this.children[0];
+  }
+
+  get ast () {
+    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {

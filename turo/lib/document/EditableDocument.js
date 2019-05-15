@@ -28,25 +28,24 @@ class EditableDocument {
     if (!this) {
       return new EditableDocument(id);
     }
-    var importScope = Scope.newScope(undefined, statics.units),
+    var importScope = Scope.newScope(undefined, statics.units, defaultOperators),
         scope = importScope.newScope(id);
     this._state = {
-      id: id,
+      id,
       model: new DocumentModel(id),
-      importScope: importScope,
-      scope: scope,
+      importScope,
+      scope,
     };
 
-    var parser = new Parser(scope);
+    var parser = new Parser(scope, {
+      operators: defaultOperators,
+    });
     // Scope rules control the access to units, 
     // so novel units can drop in and out of scope. 
     // However, redefining existing units has undefined 
     // results.
     // This is probably the worst of both worlds,
     // so we may not want to scope units with block scope
-    parser.units = scope.units;
-    parser.operators = defaultOperators;
-
     this.parser = parser;
 
     this.documentHelper = new DocumentHelper(EditableDocument.storage);

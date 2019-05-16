@@ -38,3 +38,9 @@ import './test-unit-schemes';
 import './rewrite/test-pattern-basics';
 import './rewrite/test-pattern-matching';
 import './rewrite/test-pattern-replacement';
+import './rewrite/test-rule-parsing';
+import './rewrite/test-rule-apply';
+import './rewrite/test-simplify-visitor';
+
+ import './parser/test-pratt-parser';
+import './parser/test-pratt-example';

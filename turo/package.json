@@ -6,6 +6,8 @@
     "async": "~0.9.0",
     "babel-tap": "^5.0.0",
     "dependency-graph": "~0.7.0",
+    "perplex": "^0.11.0",
+    "pratt": "^0.7.0",
     "turo-docs": "github:jhugman/turo-docs",
     "underscore": "~1.4.4"
   },

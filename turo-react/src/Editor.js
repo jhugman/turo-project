@@ -142,7 +142,6 @@ export default class _Editor extends Component {
   }
 
   render() {
-    console.log(this.turoDoc.statements[0])
     if (this.state.docLoaded) {
       return <EditorContainer
         {...this.props}

@@ -16,6 +16,7 @@ export default class VisitorContext {
   reportError (errorCode, ...highlightedNodes) {
     highlightedNodes.forEach(node => {
       const error = new TuroError(errorCode, node);
+      node.error = error;
       this.errors.push(error);
     });
   }

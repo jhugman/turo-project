@@ -11,10 +11,13 @@ body {
   font-size: 1.5em;
 }
 
+html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100%;}
+
 .public-DraftEditor-content{
   box-sizing: border-box;
   overflow: auto;
   width: 100%;
+  padding-top: 2em;
   height: 100%;
   text-align: right;
 }
@@ -30,7 +33,6 @@ body {
 
 .results {
   width: 40%;
-  // border-left: 1px solid #eee;
 }
 
 .statement {
@@ -44,7 +46,7 @@ body {
 
 .statement__content, .statement__result, .public-DraftEditorPlaceholder-root {
   width: 100%;
-  padding: .3em .5em;
+  padding: .3em 2em;
 }
 
 .statement__content {
@@ -56,8 +58,12 @@ body {
   user-select: none;
   white-space: nowrap;
   width: min-content;
-  color: #b5b5b5;
+  color: #999;
+  align-self: center;
   display: flex;
+  text-align: left;
+  font-size: .7em;
+  padding-left: 1em;
   flex-direction: column-reverse;
 }
 
@@ -117,3 +123,6 @@ body {
   display: block;
   max-width: 40px;
 }
+
+
+.error, .token--error { color: red }

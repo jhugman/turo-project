@@ -3,13 +3,49 @@ import './App.css';
 import { EditorState, EditorBlock } from 'draft-js';
 import { EditorContainer, Editor, Plugin } from '@djsp/core';
 import { EditableDocument, CompositeStorage, loaders } from 'turo';
+import Lang from './Lang';
+
+const ErrorToken = ({ children }) => <span className="token--error">{children}</span>
 
 const tokenComps = {
   identifier: ({ children }) => <span className="token--identifier">{children}</span>,
-  unit: ({ children }) => <span className="token--unit">{children}</span>,
   operator: ({ children }) => <span className="token--operator">{children}</span>,
   number: ({ children }) => <span className="token--number">{children}</span>,
 }
+
+const createErrorStrategy = (turoDoc) => ({
+  strategy: (block, cb, contentState) => {
+    const lineNumber = contentState
+      .getBlockMap()
+      .keySeq()
+      .findIndex(key => key === block.getKey());
+
+    let blockOffset = contentState.getBlocksAsArray()
+      .slice(0, lineNumber)
+      .map(block => block.getText())
+      .join('\n').length
+
+    if (lineNumber > 0) {
+      blockOffset+= 1
+    }
+
+    const statement = turoDoc.statements[lineNumber]
+
+    statement && statement.tokens
+    .reduce((errorStartOffset, token, index) => {
+      if (token.displayType === 'errorStart') {
+        return token.startOffset;
+      } else if (token.displayType === 'errorEnd' && errorStartOffset > -1) {
+        cb(errorStartOffset, token.startOffset)
+        return -1
+      }
+
+      return errorStartOffset;
+    }, blockOffset)
+  },
+  component: ErrorToken
+})
+
 
 const createTokenStrategy = (displayType, turoDoc) => ({
   strategy: (block, cb, contentState) => {
@@ -18,7 +54,10 @@ const createTokenStrategy = (displayType, turoDoc) => ({
       .keySeq()
       .findIndex(key => key === block.getKey());
 
-    let blockOffset = contentState.getBlocksAsArray().slice(0, lineNumber).map(block => block.getText()).join('\n').length
+    let blockOffset = contentState.getBlocksAsArray()
+      .slice(0, lineNumber)
+      .map(block => block.getText())
+      .join('\n').length
 
     if (lineNumber > 0) {
       blockOffset+= 1
@@ -47,7 +86,9 @@ class Statement extends Component {
           <EditorBlock {...this.props} />
         </div>
         {statement != null && <div contentEditable={false} className='statement__result'>
-          <span>{statement && statement.valueToString()}</span>
+          {statement.errors != null ? (
+            <span className="error"><Lang>{statement.errors[0].message}</Lang></span>
+          ) :<span>{statement && statement.valueToString()}</span>}
         </div>}
       </div>
     );
@@ -107,7 +148,11 @@ export default class _Editor extends Component {
         onChange={this.onChange}
       >
         <Plugin
-          decorators={Object.keys(tokenComps).map((type) => createTokenStrategy(type, this.turoDoc))}
+          decorators={
+            Object.keys(tokenComps)
+            .map((type) => createTokenStrategy(type, this.turoDoc))
+            .concat([createErrorStrategy(this.turoDoc)]).reverse()
+          }
           blockRendererFn={this.blockRendererFn}
         />
         <Editor />

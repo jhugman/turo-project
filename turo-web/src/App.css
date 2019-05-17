@@ -40,6 +40,9 @@ main {
 .token--number {
   color: #4400b3;
 }
+.token--error {
+  color: red;
+}
 
 .token--identifier {
   color: #0079ff;
@@ -81,6 +84,8 @@ main {
   max-width: 1200px;
   width: 80vw;
 }
+
+.error { color: red !important; }
 
 @keyframes App-logo-spin {
   from {

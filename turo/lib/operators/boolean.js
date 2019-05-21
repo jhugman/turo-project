@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import turoNumber from '../turo-number';
 import mixins from './mixins';
+import { Precedence } from './precedence';
 
 const { makeMixin, isDimensionless } = mixins;
     
@@ -22,7 +23,8 @@ export default {
         function (l, r) {
           return l && r;
         },
-        mixins.binaryNoUnits
+        mixins.binaryNoUnits,
+        Precedence.logicalAND
       )
     );
 
@@ -34,6 +36,7 @@ export default {
         function (l, r) {
           return l || r;
         },
+        Precedence.logicalOR,
         mixins.binaryNoUnits
       )
     );
@@ -46,6 +49,7 @@ export default {
         function (o) {
           return !o;
         },
+        Precedence.logicalNOT,
         mixins.unaryNoUnits
       )
     );
@@ -58,6 +62,7 @@ export default {
         function (o) {
           return !o;
         },
+        Precedence.logicalNOT,
         mixins.unaryNoUnits
       )
     );

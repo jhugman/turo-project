@@ -10,6 +10,9 @@ function mergeCaptures(left, right, context) {
       continue;
     }
 
+    if (!context.nodeEquals) {
+      debugger;
+    }
     if (!context.nodeEquals(existing, v)) {
       return;
     }

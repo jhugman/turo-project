@@ -2,7 +2,7 @@ import { test, plan } from 'tap';
 import { Operators, mixins } from '../lib/operators';
 
 test("simple", function (t) {
-  var operators = new Operators({});
+  var operators = new Operators();
 
   operators.addInfixOperator(
     "+", 

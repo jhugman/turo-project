@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import turoNumber from '../turo-number';
 import mixins from './mixins';
+import { Precedence } from './precedence';
 
 const { makeMixin, isDimensionless } = mixins;
 
@@ -22,6 +23,7 @@ export default {
           console.log('bool', l, r);
           return l < r;
         },
+        Precedence.comparision,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );
@@ -34,6 +36,7 @@ export default {
         function (l, r) {
           return l <= r;
         },
+        Precedence.comparision,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );
@@ -46,6 +49,7 @@ export default {
         function (l, r) {
           return l === r;
         },
+        Precedence.equality,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );
@@ -58,6 +62,7 @@ export default {
         function (l, r) {
           return l >= r;
         },
+        Precedence.comparision,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );
@@ -70,6 +75,7 @@ export default {
         function (l, r) {
           return l > r;
         },
+        Precedence.comparision,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );
@@ -82,6 +88,7 @@ export default {
         function (l, r) {
           return l !== r;
         },
+        Precedence.inequality,
         mixins.binaryMatchingUnits, mixins.binaryReturnNoUnits
       )
     );

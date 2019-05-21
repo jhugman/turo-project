@@ -2,6 +2,10 @@ import turoNumber from '../turo-number';
 import AbstractOperation from './AbstractOperation';
 
 export default class UnaryOperation extends AbstractOperation {
+  get numOperands () {
+    return 1;
+  }
+
   evaluate(x, ctx) {
     return this.nodeCalculator(x, ctx);
   }
@@ -49,5 +53,9 @@ export default class UnaryOperation extends AbstractOperation {
 
   simpleValueCalculator (left) {
     throw new Error(`No simpleValueCalculator specified for ${literal} operator over ${lValueType} or ${rValueType}`);
+  }
+
+  toString () {
+    return (this.isPrefix) ? `${this.literal}(${this.rValueType})` : `(${this.lValueType})${this.literal}`;
   }
 }

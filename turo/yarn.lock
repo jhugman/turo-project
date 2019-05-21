@@ -2945,6 +2945,11 @@ performance-now@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-0.2.0.tgz#33ef30c5c77d4ea21c5a53869d91b56d8f2555e5"
 
+perplex@^0.11.0:
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/perplex/-/perplex-0.11.0.tgz#950889a5327da5ad162b801c1cd6f67891dd6e2d"
+  integrity sha512-jBloEOPzQWOk5gWaJjmPuOmCdSGquzM6lzA0aharey9qNE24vB+sTqbPzNGRXMejzCmViuj+9XIKX7JkqyqoLA==
+
 pify@^2.0.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/pify/-/pify-2.3.0.tgz#ed141a6ac043a849ea588498e7dca8b15330e90c"
@@ -2974,6 +2979,11 @@ pkg-dir@^2.0.0:
   resolved "https://registry.yarnpkg.com/pkg-dir/-/pkg-dir-2.0.0.tgz#f6d5d1109e19d63edf428e0bd57e12777615334b"
   dependencies:
     find-up "^2.1.0"
+
+pratt@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/pratt/-/pratt-0.7.0.tgz#4943cc5a66a0a135651a0dabfbd395124e91c985"
+  integrity sha512-QmZfgboJk0tZmCJM93PAdd9H16+4fnSj8XRFNJWHV5ilenqdQM489j57baW/vbtouYeewCTRoLzw+lIksnH3JA==
 
 preserve@^0.2.0:
   version "0.2.0"

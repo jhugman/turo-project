@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import turoNumber from '../turo-number';
 import mixins from './mixins';
+import { Precedence } from './precedence';
 
 const { makeMixin, isDimensionless } = mixins;
     
@@ -18,14 +19,13 @@ export default {
       number, number,
       makeMixin(
         function (x) {
-          console.log('hello dude', x);
-
           if (Math.sinh) {
             return Math.sinh(x);
           } else {
             return (Math.exp(x) - Math.exp(-x)) / 2;
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits
       )
     );
@@ -41,6 +41,7 @@ export default {
             return Math.ln(x + Math.sqrt(x*x + 1));
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits
       )
     );
@@ -55,6 +56,7 @@ export default {
             return (Math.exp(x) + Math.exp(-x)) / 2;
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits
       )
     );
@@ -70,6 +72,7 @@ export default {
             return Math.ln(x + Math.sqrt(x*x - 1));
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits, 
         {
           preflightCheck: function (operandNode, operandValue, ctx) {
@@ -93,6 +96,7 @@ export default {
             return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits
       )
     );
@@ -108,6 +112,7 @@ export default {
             return Math.ln((1 + x) / (1 - x)) / 2;
           }
         },
+        Precedence.functionCall,
         mixins.unaryNoUnits, 
         {
           preflightCheck: function (operandNode, operandValue, ctx) {

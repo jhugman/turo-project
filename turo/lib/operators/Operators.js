@@ -7,12 +7,11 @@ function makeKey(lValueType, literal, rValueType) {
   return lValueType + '::' + literal + '::' + rValueType;
 }
 
-var UNARY_OPERATION = "++N/A++";
+var UNARY_OPERATION = "";
 
 export default class Operators {
-  constructor(table, prefs) {
-    this.table = table || {};
-    this._turoPrefs = prefs || {};
+  constructor(table) {
+    this.table = table || new Map();
     this._infixOperatorNames = {};
     this._prefixOperatorNames = {};
     this._postfixOperatorNames = {};
@@ -78,6 +77,8 @@ export default class Operators {
 
   _addUnaryOperator (literal, lValueType, rValueType, retValueType, mixins) {
     const operationObject = Object.assign(new UnaryOperation(), ...mixins);
+    // disgusting.
+    operationObject.isPrefix = lValueType === UNARY_OPERATION;
     this._addOperator(literal, lValueType, rValueType, retValueType, operationObject);
   }
 
@@ -89,18 +90,22 @@ export default class Operators {
       returnValueType: retValueType,
     });
 
-    this.table[makeKey(lValueType, literal, rValueType)] = operationObject;
+    this.table.set(makeKey(lValueType, literal, rValueType),  operationObject);
   }
 
   findOperator(literal, lNode, rNode) {
-    return this.table[makeKey(lNode, literal, rNode)];
+    return this.table.get(makeKey(lNode, literal, rNode));
   }
 
   findUnaryOperator (literal, nodeType, isPrefix) {
     var key = isPrefix ?
       makeKey(UNARY_OPERATION, literal, nodeType) :
       makeKey(nodeType, literal, UNARY_OPERATION);
-    return this.table[key];
+    return this.table.get(key);
+  }
+
+  get operations() {
+    return this.table.values();
   }
 }
 

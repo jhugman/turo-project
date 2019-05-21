@@ -11,6 +11,7 @@ class ASTNode {
   }
 
   get children() { return this._children; }
+  set children(newChildren) { this._children = newChildren; }
 
   clone () {
     const that = new this.constructor();
@@ -80,6 +81,10 @@ class BinaryNode extends ASTNode {
   get right () {
     return this.children[1];
   }
+
+  get numOperands () {
+    return 2;
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,6 +106,10 @@ class UnaryOperationNode extends ASTNode {
 
   accept (visitor, ...args) {
     return visitor.visitUnaryOperation(this, ...args);
+  }
+
+  get numOperands () {
+    return 1;
   }
 }
 

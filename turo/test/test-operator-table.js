@@ -5,7 +5,7 @@ import { Operators, defaultOperators, mixins } from '../lib/operators';
 import turoNumber from '../lib/turo-number';
 
 test("simple", function (t) {
-  var operators = new Operators({});
+  var operators = new Operators();
 
   operators.addInfixOperator(
     "+", 

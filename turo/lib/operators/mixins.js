@@ -1,4 +1,4 @@
-import { toArray, isFunction, chain } from 'underscore';
+import { toArray, isFunction, isObject, chain } from 'underscore';
 import turoNumber from '../turo-number';
 
 const NO_UNITS = null;
@@ -11,15 +11,15 @@ function isDimensionless (operandValue) {
   return !operandValue.unit || operandValue.unit.isDimensionless();
 }
 
-function makeMixin (simpleValueCalculator) {
-  var list = toArray(arguments);
+function makeMixin (simpleValueCalculator, ...args) {
   if (isFunction(simpleValueCalculator)) {
-    list.shift();
-    list.push({
-      simpleValueCalculator: simpleValueCalculator
+    args.push({
+      simpleValueCalculator
     });
+  } else if (isObject(simpleValueCalculator)) {
+    args.push(simpleValueCalculator);
   }
-  return list;
+  return args;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -344,6 +344,14 @@ var mixins = {
       return ok;
     },
   },
+
+  binaryPrecedence (precedence, isRightAssociative = false, parselet) {
+    return { precedence, isRightAssociative, parselet };
+  },
+
+  unaryPrecedence (precedence, parselet) {
+    return { precedence, parselet };
+  }
 
 };
 

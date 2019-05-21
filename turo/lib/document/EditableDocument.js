@@ -2,7 +2,6 @@ import { Units } from '../units';
 import { Parser } from '../parser';
 import { defaultOperators } from '../operators';
 import { Scope } from '../symbols';
-import EditorActions from '../actions/EditorActions';
 
 import DocumentHelper from './DocumentHelper';
 import DocumentModel from './DocumentModel';

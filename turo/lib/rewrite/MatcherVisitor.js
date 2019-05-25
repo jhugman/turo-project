@@ -1,41 +1,5 @@
 import PatternVisitor from './PatternVisitor';
-
-function mergeCaptures(left, right, context) {
-  const target = new Map(left.entries());
-  
-  for (let [k, v] of right.entries()) {  
-    const existing = target.get(k);
-    if (!existing) {
-      target.set(k, v);
-      continue;
-    }
-
-    if (!context.nodeEquals) {
-      debugger;
-    }
-    if (!context.nodeEquals(existing, v)) {
-      return;
-    }
-
-    target.set(k, v);
-  }
-
-  return target;
-}
-
-const emptyMap = new Map();
-
-function newMap(key, value) {
-  return new Map().set(key, value);
-}
-
-function bypassParens (node) {
-  if (node.nodeType === 'ParensNode') {
-    const [inner] = node.children;
-    return bypassParens(inner);
-  }
-  return node;
-}
+import { mergeCaptures, bypassParens, emptyMap, newMap, one } from './utils';
 
 export default class MatcherVisitor extends PatternVisitor {
   visitChildren (node, ...args) {
@@ -50,7 +14,7 @@ export default class MatcherVisitor extends PatternVisitor {
 
   visitVariable (pattern, astNode, ...args) {
     const bareNode = bypassParens(astNode);
-    const { nodeType, value } = bareNode;
+    const { nodeType } = bareNode;
 
     if (nodeType === 'IdentifierNode') {
       return newMap(pattern.captureSymbol, bareNode);
@@ -59,16 +23,26 @@ export default class MatcherVisitor extends PatternVisitor {
 
   visitAnyLiteral (pattern, astNode, ...args) {
     const bareNode = bypassParens(astNode);
-    const { nodeType, value } = bareNode;
+    const { nodeType } = bareNode;
 
     if (nodeType === 'NumberNode') {
       return newMap(pattern.captureSymbol, bareNode);
+    }
+
+    if (nodeType === 'UnaryOperationNode') {
+      const { literal, inner } = bareNode;
+      if (literal === '-' || literal === '+') {
+        const operand = bypassParens(inner);
+        if (operand.nodeType === 'NumberNode') {
+          return newMap(pattern.captureSymbol, bareNode);
+        }
+      }
     }
   }
 
   visitAnyNonLiteral (pattern, astNode, ...args) {
     const bareNode = bypassParens(astNode);
-    const { nodeType, value } = bareNode;
+    const { nodeType } = bareNode;
 
     if (nodeType !== 'NumberNode') {
       return newMap(pattern.captureSymbol, bareNode);
@@ -90,7 +64,7 @@ export default class MatcherVisitor extends PatternVisitor {
       const subtreeCapture = subtreePattern.accept(this, astNode, context, ...args);
 
       if (subtreeCapture) {
-        const identityCapture = newMap(anyLiteralPattern.captureSymbol, context.createIdentity(1));
+        const identityCapture = newMap(anyLiteralPattern.captureSymbol, one());
         return mergeCaptures(subtreeCapture, identityCapture, context);
       }
     }

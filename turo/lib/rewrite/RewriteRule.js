@@ -12,10 +12,10 @@ export default class RewriteRule {
   }
 
   apply (...args) {
-    return this.simpleApply(...args);
+    return this.applyAtNode(...args);
   }
 
-  simpleApply (astNode, context) {
+  applyAtNode (astNode, context) {
     const captures = this._search.match(astNode, context);
     if (!captures) {
       return undefined;

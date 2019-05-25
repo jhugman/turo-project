@@ -170,6 +170,13 @@ test("Identities rewritten", t => {
   t.end();
 });
 
+test("Negative numbers match numbers", t => {
+  const p3 = anyValue('n');
+  okMatch(t, p3, '1');
+  okMatch(t, p3, '-2', { n: '-2' });
+  t.end();
+});
+
 test("Capture merging", t => {
   const a = anyValue('a');
   const X = any('_X');

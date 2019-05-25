@@ -36,6 +36,11 @@ import './rewrite/test-pattern-replacement';
 import './rewrite/test-rule-parsing';
 import './rewrite/test-rule-apply';
 import './rewrite/test-simplify-visitor';
+import './rewrite/test-ruleset';
+import './rewrite/test-gather-terms';
+import './rewrite/test-get-metadata';
 
- import './parser/test-pratt-parser';
+import './parser/test-pratt-parser';
 import './parser/test-pratt-example';
+
+import './parser/test-parens-helper';

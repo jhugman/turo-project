@@ -10,7 +10,6 @@ var number = 'number';
 /////////////////////////////////////////////////////////////////////////////////////////////
 export default {
   registerOperators(ops) {
-    debugger;
     ops.addInfixOperator(
       '+', number, number, number,
       makeMixin(

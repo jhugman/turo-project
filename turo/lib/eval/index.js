@@ -7,7 +7,16 @@ import EvaluatorVisitor from './EvaluatorVisitor';
 const operationLabellerVisitor = new OperationLabeller();
 const evaluatorVisitor = new EvaluatorVisitor();
 
-function evaluate (node, { prefs = {}, operators = defaultOperators } = {}) {
+function label (node, errors = [], operators = defaultOperators, prefs = {}) {
+    const labellerContext = new VisitorContext(
+      operationLabellerVisitor,
+      { prefs, errors, operators }
+    );
+
+    return labellerContext.evaluate(node);
+}
+
+function evaluate (node, { operators = defaultOperators, prefs = {} } = {}) {
     // we need to do this because we can't detect if the variables
     // have changed units or types.
     const errors = node.errors || [],
@@ -16,12 +25,7 @@ function evaluate (node, { prefs = {}, operators = defaultOperators } = {}) {
 
     const len = errors.length;
 
-    const labellerContext = new VisitorContext(
-      operationLabellerVisitor,
-      { prefs, errors, operators }
-    );
-
-    labellerContext.evaluate(node);
+    label(node, errors, operators, prefs)
 
     if (errors.length !== len) {
       node.errors = errors;

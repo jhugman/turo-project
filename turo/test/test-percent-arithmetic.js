@@ -16,17 +16,17 @@ function eval_t (t, input, expectedOutput) {
 
 test("Percent input & output", async function (t) {
   await turo.reset();
-  eval_t(t, '10%', '10 %');
-  eval_t(t, '(10)%', '10 %');
-  eval_t(t, '(10%)', '10 %');
+  eval_t(t, '10%', '10%');
+  eval_t(t, '(10)%', '10%');
+  eval_t(t, '(10%)', '10%');
   t.end();
 });
 
 test("Percent simple arithmetic", async function (t) {
   await turo.reset();
-  eval_t(t, '10% + 20%', '30 %');
-  eval_t(t, '10% - 20%', '-10 %');
-  eval_t(t, '10% * 20%', '2 %');
+  eval_t(t, '10% + 20%', '30%');
+  eval_t(t, '10% - 20%', '-10%');
+  eval_t(t, '10% * 20%', '2%');
   eval_t(t, '20% / 10%', '2');
   t.end();
 });
@@ -65,7 +65,7 @@ test("Percent special case arithmetic", async function (t) {
 
 test("Percent special case arithmetic", async function (t) {
   await turo.reset();
-  eval_t(t, 'tip = 10%', '10 %');
+  eval_t(t, 'tip = 10%', '10%');
   eval_t(t, '10 m + tip', '11 metres');
 
   t.end();

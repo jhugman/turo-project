@@ -55,7 +55,7 @@ test('Test simple replacement', t => {
   okReplace(t, '1 + c', '1 + c', { a: '2' }); // missing capture
 
   okReplace(t, '1 + (a)', '1 + (2)', { a: '2' }); // parens
-  okReplace(t, '1 + sin(a)', '1 + sin (2)', { a: '2' }); // unary
+  okReplace(t, '1 + sin(a)', '1 + sin(2)', { a: '2' }); // unary
 
   t.end();
 });

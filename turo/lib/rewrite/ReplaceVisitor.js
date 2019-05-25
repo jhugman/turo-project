@@ -1,8 +1,6 @@
 import { ASTVisitor } from '../visitors';
 import PatternVisitor from './PatternVisitor';
 
-import evaluator from '../eval';
-
 export default class ReplaceVisitor extends ASTVisitor {
   createReplacement (pattern, captures, context, ...args) {
     let index = 1;
@@ -27,8 +25,7 @@ export default class ReplaceVisitor extends ASTVisitor {
 
     switch (literal) {
       case 'eval':
-        const res = evaluator.evaluate(inner);
-        return context.createNumberNode(res);
+        return context.evalNode(inner);
 
       default: 
         return inner.unary(pattern.literal, pattern.isPrefix);

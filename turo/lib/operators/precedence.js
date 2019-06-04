@@ -11,6 +11,7 @@ const Precedence = {
   parenthesis:    left(13),
   arrayLookup:    left(19 * scalar),
   functionCall:   left(19 * scalar),
+  trigonometric:  left(16 * scalar),
   unaryAddition:  right(16 * scalar),
   factorial:      left(16 * scalar),
   logicalNOT:     right(16 * scalar),

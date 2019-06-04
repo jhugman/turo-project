@@ -24,12 +24,13 @@ function hasOperator(cache, op) {
   throw new Error(`Precedence of operator ${op.toString()} conflicts with ${existing[1]}`);
 }
 
-
 export default class PrattParser {
   constructor (scope = Scope.newScope('rootScope', undefined, defaultOperators), { prefs = {} } = {}) {
 
-    this._caches = { 
+    this._caches = {
+      // cache of string to regular expressions for literals for all operators.
       patternCache: new Map(),
+      // cache of string to precedence
       nudCache: new Map(), 
       ledCache: new Map(),
     };
@@ -59,6 +60,30 @@ export default class PrattParser {
     this._expressionParser = builder.build();
     this._builder = builder;
     this._lex = lex;
+  }
+
+  getPrefixOperatorPrecedence (literal) {
+    const op = this._caches.nudCache.get(literal);
+    if (!op) {
+      throw new Error(`Unable to find prefix operator ${literal}`);
+    }
+    return op[0];
+  }
+
+  getInfixOperatorPrecedence (literal) {
+    const op = this._caches.ledCache.get(literal);
+    if (!op) {
+      throw new Error(`Unable to find infix operator ${literal}`);
+    }
+    return op[0];
+  }
+
+  getPostfixOperatorPrecedence (literal) {
+    const op = this._caches.ledCache.get(literal);
+    if (!op) {
+      throw new Error(`Unable to find postfix operator ${literal}`);
+    }
+    return op[0];
   }
 
   _addOperators (builder, lex, operators) {

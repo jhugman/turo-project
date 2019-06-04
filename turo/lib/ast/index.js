@@ -26,6 +26,20 @@ class ASTNode {
     return that;
   }
 
+  transformChildren (transform) {
+    const newChildren = this._children.map(transform);
+    if (newChildren.filter(c => !!c).length === 0) {
+      return;
+    }
+
+    const that = this.clone();
+    for (const key of newChildren.keys()) {
+      newChildren[key] = newChildren[key] || this.children[key];
+    }
+    that._children = newChildren;
+    return that;
+  }
+
   accept (visitor, ...args) {
     throw new Error("unimplemented");
   }

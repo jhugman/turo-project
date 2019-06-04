@@ -1,39 +1,20 @@
 import { ASTVisitor } from '../visitors';
-import evaluator from '../eval';
+import { isNatural, isConstant, isOne, isZero, zero, one } from './utils';
 
 // Adapted from simplifyCore in math.js
 // https://github.com/josdejong/mathjs/blob/af37445940ac7c49e199d546eec18b76e1e53a12/src/function/algebra/simplify/simplifyCore.js
 
-function isConstant (node) {
-  return node.nodeType === 'NumberNode';
-}
-
-function isZero (node) {
-  return isConstant(node) && node.literal === '0';
-}
-
-function isNatural (node, string) {
-  return isConstant(node) && node.literal === string && (!node.unit || node.unit.isDimensionless());
-}
-
-function isOne (node) {
-  return isNatural(node, '1');
-}
-
-function zero (context) {
-  return context.createIdentity('0');
-}
-
-function one (context) {
-  return context.createIdentity('1');
-}
-
 function calc (literal, left, right, context) {
-  const v = evaluator.evaluate(left.binary(literal, right));
-  return context.createNumberNode(v);
+  return context.evalNode(left.binary(literal, right));
 }
 
 export default class SimplifyVisitor extends ASTVisitor {
+
+  // Rules can be applied.
+  apply (node, ...args) {
+    return node.accept(this, ...args);
+  }
+
   visitBinaryOperator (node, ...args) {
     const [context, ..._] = args;
 

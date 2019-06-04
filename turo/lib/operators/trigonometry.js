@@ -18,7 +18,7 @@ export default {
         function (x) {
           return Math.sin(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryAngleToDimensionless
       )
@@ -31,7 +31,7 @@ export default {
           // TODO check if -1 <= lNode <= 1
           return Math.asin(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryDimensionlessToAngle
       )
@@ -43,7 +43,7 @@ export default {
         function (x) {
           return Math.cos(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryAngleToDimensionless
       )
@@ -55,7 +55,7 @@ export default {
         function (x) {
           return Math.acos(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryDimensionlessToAngle
       )
@@ -67,7 +67,7 @@ export default {
         function (x) {
           return Math.tan(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryAngleToDimensionless
       )
@@ -79,7 +79,7 @@ export default {
         function (x) {
           return Math.atan(x);
         },
-        Precedence.functionCall,
+        Precedence.trigonometric,
         mixins.trigUtils,
         mixins.unaryDimensionlessToAngle
       )

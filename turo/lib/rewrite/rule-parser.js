@@ -1,7 +1,10 @@
 import { ASTVisitor } from '../visitors';
-import { any, anyValue, value, variable } from './patterns';
+import { any, anyValue, value, variable, anyNonLiteral } from './patterns';
 
 const identifierMapping = new Map()
+  .set(/n\w*/, (match) => any(match))
+  .set(/c\w*/, (match) => anyValue(match))
+  .set(/v\w*/, (match) => anyNonLiteral(match))
   .set(/[a-z]\w*/, (match) => anyValue(match))
   .set(/[A-Z]\w*/, (match) => any(match))
   .set(/\$\w*/, (match) => variable(match));

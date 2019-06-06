@@ -26,16 +26,23 @@ class ASTNode {
     return that;
   }
 
-  transformChildren (transform) {
-    const newChildren = this._children.map(transform);
-    if (newChildren.filter(c => !!c).length === 0) {
+  transformChildren (transform, ...args) {
+    let different = false;
+    const newChildren = this._children.map(c => {
+      const transformed = transform(c, ...args);
+      if (transformed) {
+        different = true;
+        return transformed;
+      } else {
+        return c;
+      }
+    });
+
+    if (!different) {
       return;
     }
 
     const that = this.clone();
-    for (const key of newChildren.keys()) {
-      newChildren[key] = newChildren[key] || this.children[key];
-    }
     that._children = newChildren;
     return that;
   }
@@ -136,10 +143,6 @@ class ParensNode extends ASTNode {
 
   get inner () {
     return this.children[0];
-  }
-
-  get ast () {
-    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {
@@ -252,10 +255,6 @@ class VariableDefinition extends ASTNode {
 
   get inner () {
     return this.children[0];
-  }
-
-  get ast () {
-    throw new Error("Deprecated: use .inner instead");
   }
 
   accept (visitor, ...args) {

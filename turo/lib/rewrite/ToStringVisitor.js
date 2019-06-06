@@ -1,4 +1,4 @@
-import PatternVisitor from './PatternVisitor';
+import { PatternVisitor } from '../visitors';
 
 export default class ToStringVisitor extends PatternVisitor {
   visitChildren (node, ...args) {

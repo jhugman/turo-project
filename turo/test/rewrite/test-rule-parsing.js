@@ -16,7 +16,7 @@ test('Simplistic', t => {
   const expected = '2 * (p + 1)';
 
   const astNode = parser.parse(src);
-  const context = new RewriteContext();
+  const context = new RewriteContext({ parser });
 
   const captures = search.match(astNode, context);
   const replacement = replaceVisitor.createReplacement(replace, captures, context);

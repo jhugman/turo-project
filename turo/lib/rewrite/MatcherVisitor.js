@@ -1,4 +1,4 @@
-import PatternVisitor from './PatternVisitor';
+import { PatternVisitor } from '../visitors';
 import { mergeCaptures, bypassParens, emptyMap, newMap, one } from './utils';
 
 export default class MatcherVisitor extends PatternVisitor {

@@ -1,5 +1,4 @@
-import { ASTVisitor } from '../visitors';
-import PatternVisitor from './PatternVisitor';
+import { ASTVisitor, PatternVisitor } from '../visitors';
 
 export default class ReplaceVisitor extends ASTVisitor {
   createReplacement (pattern, captures, context, ...args) {

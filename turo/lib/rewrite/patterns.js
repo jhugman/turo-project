@@ -32,8 +32,8 @@ class PatternNode {
     return this.accept(toString);
   }
 
-  match (astNode, nodeEquals, ...args) {
-    return this.accept(matcher, astNode, nodeEquals, ...args);
+  match (astNode, ...args) {
+    return this.accept(matcher, astNode, ...args);
   }
 
   ////////////////////////////////////////////////////////////////////////////

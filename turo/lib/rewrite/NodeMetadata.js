@@ -149,7 +149,7 @@ export default class CollectMetadata extends ASTVisitor {
   }
 
   visitParens (node, ...args) {
-    return this._visit(node, () => node.accept(this, ...args));
+    return this._visit(node, () => node.inner.accept(this, ...args));
   }  
 
   visitNumberNode (node, ...args) {

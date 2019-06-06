@@ -49,6 +49,14 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
   padding: .3em 2em;
 }
 
+.public-DraftEditor-content {
+  padding-bottom: 2em;
+}
+
+.public-DraftEditorPlaceholder-inner {
+  padding-top: 2em;
+}
+
 .statement__content {
   text-overflow: ellipsis;
   overflow: hidden;

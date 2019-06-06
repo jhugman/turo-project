@@ -171,11 +171,5 @@ module.exports = {
       filename: cssFilename,
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-  ],
-  node: {
-    dgram: 'empty',
-    fs: 'empty',
-    net: 'empty',
-    tls: 'empty',
-  },
+  ]
 }

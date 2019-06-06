@@ -36,7 +36,6 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
-
 const boing = { bail: false, mode: 'development', watch: isWatch }
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {

@@ -5,6 +5,8 @@ import Editor from './Editor';
 import { ContentState, EditorState, EditorBlock } from 'draft-js';
 import basic from './basic.turo'
 
+console.log('hello')
+
 
 class App extends Component {
   editor = null
@@ -56,9 +58,7 @@ class App extends Component {
       editorState={this.state.editorState}
     />
   }
-
 }
-
 
 render(
   <App />,

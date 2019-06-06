@@ -3,8 +3,11 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
@@ -29,14 +32,17 @@ module.exports = {
   mode: 'production',
   bail: true,
   watch: true,
-  devtool: 'source-map',
-  entry: paths.moduleIndex,
+  entry: paths.appIndex,
   output: {
-    path: paths.moduleBuild,
+    path: paths.appBuild,
     filename: 'index.js',
-    libraryTarget: 'umd',
-    libraryExport: 'default',
+//     libraryTarget: 'umd',
+//     libraryExport: 'default',
+
+    pathinfo: true,
+    publicPath: publicPath,
     devtoolModuleFilenameTemplate: info =>
+
       path
         .relative(paths.appSrc[0], info.absoluteResourcePath)
         .replace(/\\/g, '/'),
@@ -153,6 +159,13 @@ module.exports = {
     ],
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml,
+    }),
+    new webpack.NamedModulesPlugin(),
+    new CaseSensitivePathsPlugin(),
+    new WatchMissingNodeModulesPlugin(paths.appNodeModules),
     new webpack.DefinePlugin(env.stringified),
     new ExtractTextPlugin({
       filename: cssFilename,
@@ -164,5 +177,5 @@ module.exports = {
     fs: 'empty',
     net: 'empty',
     tls: 'empty',
-  }
-};
+  },
+}

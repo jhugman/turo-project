@@ -38,7 +38,7 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
 const boing = { bail: false, mode: 'development', watch: isWatch }
 // Create the production build and print the deployment instructions.
-function build(previousFileSizes) {
+function build() {
   const webpackConfig = Object.assign({}, config)
 
   let compiler = webpack(webpackConfig);
@@ -67,9 +67,11 @@ function build(previousFileSizes) {
       }
       return resolve({
         stats,
-        previousFileSizes,
         warnings: messages.warnings,
       });
     });
   });
 }
+
+
+build()

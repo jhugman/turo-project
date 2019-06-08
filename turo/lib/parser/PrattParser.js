@@ -53,7 +53,7 @@ export default class PrattParser {
       })
       .bp(')', 0)
 
-    this._addOperators(builder, lex, scope.operators);
+    this._addOperators(builder, lex, scope.getAvailableOperations());
 
     lex.token('IDENTIFIER', /^([^\d\W]|[_$])\w*/);
 
@@ -86,8 +86,7 @@ export default class PrattParser {
     return op[0];
   }
 
-  _addOperators (builder, lex, operators) {
-    const operations = Array.from(operators.operations);
+  _addOperators (builder, lex, operations) {
     // for the `jrop/pratt` lib, nuds have precedences, and they interfere with lex precedences. 
     // so we have to make sure that the nuds are done first.
     const nuds = operations.filter(op => op.numOperands === 1 && op.isPrefix);

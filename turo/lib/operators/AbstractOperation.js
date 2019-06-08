@@ -1,6 +1,6 @@
 export default class AbstractOperation {
 
-  numOperands: 0
+  get numOperands () { return 0; }
 
   // publically called by the evaluator.
   evaluate (leftNode, rightNode, ctx) {}

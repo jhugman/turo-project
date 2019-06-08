@@ -3,109 +3,129 @@ import BinaryOperation from './BinaryOperation';
 
 //////////////////////////////////////////////////
 
-function makeKey(lValueType, literal, rValueType) {
-  return lValueType + '::' + literal + '::' + rValueType;
+function makeKey(...args) {
+  return args.join('::');
 }
 
-var UNARY_OPERATION = "";
+function createCaches() {
+  const [ infix, prefix, postfix ] = [new Map(), new Map(), new Map()];
+  return {
+    infix, 
+    prefix, 
+    postfix,
+  };
+}
 
 export default class Operators {
   constructor(table) {
-    this.table = table || new Map();
-    this._infixOperatorNames = {};
-    this._prefixOperatorNames = {};
-    this._postfixOperatorNames = {};
+    this._caches = createCaches();
+    this._typedCaches = createCaches();
   }
 
-  _cacheGetOperatorNames (operatorType) {
-    var key = "__cache_" + operatorType;
-    if (!this[key]) {
-      this[key] = Object.keys(this["_" + operatorType + "OperatorNames"]);
+  _samplePrefix (literal, canReturnFalsey = false) {
+    const op = this._caches.prefix.get(literal);
+    if (op || canReturnFalsey) {
+      return op;
     }
-    return this[key];
+    throw new Error(`Unable to find prefix operator ${literal}`);
   }
 
-  _putNameCache (operatorType, operatorName) {
-    this["_" + operatorType + "OperatorNames"][operatorName] = true;
-    delete this["__cache_" + operatorType];
+  _sampleInfix (literal, canReturnFalsey = false) {
+    const op = this._caches.infix.get(literal);
+    if (op || canReturnFalsey) {
+      return op;
+    }
+    throw new Error(`Unable to find infix operator ${literal}`);
   }
 
-  getInfixOperatorNames() {
-    return this._cacheGetOperatorNames("infix");
-  }
-
-  getPrefixOperatorNames() {
-    return this._cacheGetOperatorNames("prefix");
-  }
-
-  getPostfixOperatorNames() {
-    return this._cacheGetOperatorNames("postfix");
+  _samplePostfix (literal, canReturnFalsey = false) {
+    const op = this._caches.postfix.get(literal);
+    if (op || canReturnFalsey) {
+      return op;
+    }
+    throw new Error(`Unable to find postfix operator ${literal}`);
   }
 
   hasInfixOperator (literal) {
-    return this._infixOperatorNames[literal];
+    return !!this._sampleInfix(literal, true);
   }
 
   hasPrefixOperator (literal) {
-    return this._prefixOperatorNames[literal];
+    return !!this._samplePrefix(literal, true);
   }
 
   hasPostfixOperator (literal) {
-    return this._postfixOperatorNames[literal];
+    return !!this._samplePostfix(literal, true);
   }
 
-  addInfixOperator(literal, lValueType, rValueType, retValueType, mixins) {
-    const op = Object.assign(new BinaryOperation(), ...mixins);
-    this._addOperator(literal, lValueType, rValueType, retValueType, op);
+  getPrefixOperatorPrecedence (literal) {
+    return this._samplePrefix(literal).precedence;
+  }
 
-    // XXX we can do this here, because 'in' is specifically mentioned in the parser.
-    if (literal !== 'in') {
-      this._putNameCache("infix", literal);
-    }
+  getInfixOperatorPrecedence (literal) {
+    return this._sampleInfix(literal).precedence;
+  }
+
+  getPostfixOperatorPrecedence (literal) {
+    return this._samplePostfix(literal).precedence; 
+  }
+
+  addInfixOperator (literal, lValueType, rValueType, returnValueType, mixins) {
+    const metadata = {
+      literal,
+      lValueType,
+      rValueType,
+      returnValueType,
+    };
+    const operationObject = Object.assign(new BinaryOperation(), ...mixins, metadata);
+    this._typedCaches.infix.set(makeKey(lValueType, literal, rValueType), operationObject);
+    this._caches.infix.set(literal, operationObject);
     // TODO get autocomplete to work with the type system.
+    
   }
 
-  addPrefixOperator(literal, rValueType, retValueType, mixins) {
-    this._addUnaryOperator(literal, UNARY_OPERATION, rValueType, retValueType, mixins);
-    this._putNameCache("prefix", literal);
+  addPrefixOperator (literal, rValueType, returnValueType, mixins) {
+    const metadata = {
+      literal,
+      rValueType,
+      returnValueType,
+      isPrefix: true,
+    };
+    const operationObject = Object.assign(new UnaryOperation(), ...mixins, metadata);
+    this._typedCaches.prefix.set(makeKey(literal, rValueType), operationObject);
+    this._caches.prefix.set(literal, operationObject);
   }
 
-  addPostfixOperator(literal, lValueType, retValueType, mixins) {
-    this._addUnaryOperator(literal, lValueType, UNARY_OPERATION, retValueType, mixins);
-    this._putNameCache("postfix", literal);
-  }
-
-  _addUnaryOperator (literal, lValueType, rValueType, retValueType, mixins) {
-    const operationObject = Object.assign(new UnaryOperation(), ...mixins);
-    // disgusting.
-    operationObject.isPrefix = lValueType === UNARY_OPERATION;
-    this._addOperator(literal, lValueType, rValueType, retValueType, operationObject);
-  }
-
-  _addOperator(literal, lValueType, rValueType, retValueType, operationObject) {
-    Object.assign(operationObject, {
-      literal: literal,
-      lValueType: lValueType,
-      rValueType: rValueType,
-      returnValueType: retValueType,
-    });
-
-    this.table.set(makeKey(lValueType, literal, rValueType),  operationObject);
+  addPostfixOperator (literal, lValueType, returnValueType, mixins) {
+    const metadata = {
+      literal,
+      lValueType,
+      returnValueType,
+      isPrefix: false,
+    };
+    const operationObject = Object.assign(new UnaryOperation(), ...mixins, metadata);
+    this._typedCaches.postfix.set(makeKey(literal, lValueType), operationObject);
+    this._caches.postfix.set(literal, operationObject);
   }
 
   findOperator(literal, lNode, rNode) {
-    return this.table.get(makeKey(lNode, literal, rNode));
+    const key = makeKey(lNode, literal, rNode);
+    const table = this._typedCaches.infix;
+    return table.get(key);
   }
 
-  findUnaryOperator (literal, nodeType, isPrefix) {
-    var key = isPrefix ?
-      makeKey(UNARY_OPERATION, literal, nodeType) :
-      makeKey(nodeType, literal, UNARY_OPERATION);
-    return this.table.get(key);
+  findUnaryOperator (literal, innerType, isPrefix) {
+    const key = makeKey(literal, innerType);
+    const table = isPrefix ? this._typedCaches.prefix : this._typedCaches.postfix;
+    return table.get(key);
   }
 
   get operations() {
-    return this.table.values();
+    return [
+      ...this._typedCaches.prefix.values(), 
+      ...this._typedCaches.postfix.values(),
+      ...this._typedCaches.infix.values(),
+    ];
   }
 }
 

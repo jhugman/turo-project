@@ -192,6 +192,16 @@ export default class Scope {
   _hasPostfixOperator (name) {
     return this._operators && this._operators.hasPostfixOperator(name);
   }
+  
+  getAvailableOperations() {
+    return this._getMineAndAncestors(
+      function () {
+        return this._operators ? this._operators.operations : [];
+      }, 
+      arguments
+    );
+  }
+
 
   ////////////////////////////////////////////////////////////////////
 

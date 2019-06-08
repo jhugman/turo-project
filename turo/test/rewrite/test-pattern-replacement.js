@@ -2,25 +2,18 @@ import { test } from 'tap';
 import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
 import RewriteContext from '../../lib/rewrite/RewriteContext';
 import ReplaceVisitor from '../../lib/rewrite/ReplaceVisitor';
-import { Parser, Scope } from '../../lib/parser';
+import Parser from '../../lib/parser/PrattParser';
+import Scope from '../../lib/symbols/Scope';
 import output from '../../lib/output';
 
 import { Operators, defaultOperators } from '../../lib/operators';
 
 const astType = 'astType';
 const patternOperators = new Operators();
-patternOperators.addPrefixOperator('eval', astType, astType, [{}]);
+patternOperators.addPrefixOperator('eval', astType, astType, [{ precedence: 14 }]);
 
 const baseScope = Scope.newScope('default', undefined, defaultOperators);
 const patternScope = baseScope.newScope('patterns', undefined, patternOperators);
-
-'abcdefghijklmnopqrstuvwxyz'
-  .split('')
-  .forEach(c => baseScope.addVariable(c, {}));
-
-'123456789'
-  .split('')
-  .forEach(c => patternScope.addVariable('$' + c, {}));
 
 const astParser = new Parser(baseScope);
 const patternParser = new Parser(patternScope);

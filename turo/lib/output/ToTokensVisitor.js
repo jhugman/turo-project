@@ -216,10 +216,38 @@ export default class ToTokensVisitor extends ASTVisitor {
         tokens.push(t('keyword', 'as a unit of', line, node._offsetLiteralFirst, 'kwd'));
         tokens.push(t('dimension', unit.getDimension().shortName, line, node._offsetLiteralFirst, 'm'));
       }
-
-      this.errorEnd(node, tokens, context);
     }
 
+    this.errorEnd(node, tokens, context);
+
+    return tokens;
+  }
+
+  visitRelativeUnitDefinitionStatement (node, tokens, context) {
+    this.errorStart(node, tokens, context);
+    tokens.push(t('keyword', 'unit', node.line, node.offsetFirst, 'kwd'));
+    if (node.multiplierNode) {
+      node.multiplierNode.accept(this, tokens, context);
+    }
+    tokens.push(t('unit', node.unitName, node.line, node.offsetFirst, 'm'));
+    tokens.push(t('keyword', ':', node.line, node._offsetLiteralFirst, 'kwd'));
+    node.definitionNode.accept(this, tokens, context);
+
+    this.errorEnd(node, tokens, context);
+    return tokens;
+  }
+
+  visitUnitDimensionDefinitionStatement (node, tokens, context) {
+    this.errorStart(node, tokens, context);
+    // TODO offsets are weird here.
+    tokens.push(t('keyword', 'unit', node.line, node.offsetFirst, 'kwd'));
+    if (node.multiplierNode) {
+      node.multiplierNode.accept(this, tokens, context);
+    }
+    tokens.push(t('unit', node.unitName, node.line, node.offsetFirst, 'm'));
+    tokens.push(t('keyword', ':', node.line, node._offsetLiteralFirst, 'kwd'));
+    tokens.push(t('dimension', node.dimensionName, node.line, node._offsetLiteralFirst, 'm'));
+    this.errorEnd(node, tokens, context);
     return tokens;
   }
 

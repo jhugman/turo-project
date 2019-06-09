@@ -40,6 +40,7 @@ const output_padding = {
   'x!': '',
   '(sqrt': '',
   ')!': '',
+  'kwd1': ' ',
 };
 
 

@@ -4,28 +4,30 @@ import output from '../../lib/output';
 import evaluator from '../../lib/eval';
 
 /////////////////////////////////////
-function okParse (t, subject, src, expectedPass = true) {
+function okParse (t, subject, src, expectedOutput = src, expectedPass = true) {
+  let ast;
   try {
-    const ast = subject.parse(src);
-    if (expectedPass) {
-      t.ok(ast, `${src} has a non null AST`);
-      t.equal(output.toString(ast, { output_defaultPadding: '' }), src, `${src} roundtrips ok`);  
-    } else {
-      t.notOk(expectedPass, 'src is not bad: ${src}');
-    }
-    
+    ast = subject.parse(src);
   } catch(e) {
     if (expectedPass) {
-      console.error("error", e);
+      console.error(`Error parsing ${src}`, e);
       t.ok(!expectedPass, `Good src is unexpectedly bad: ${src}`);  
     } else {
       t.ok(!expectedPass, `Bad src is bad: ${src}`);  
     }
+    return;
+  }
+
+  if (expectedPass) {
+    t.ok(ast, `${src} has a non null AST`);
+    t.equal(output.toString(ast, { output_defaultPadding: '' }), expectedOutput, `${src} roundtrips ok`);  
+  } else {
+    t.notOk(expectedPass, 'src is not bad: ${src}');
   }
 }
 
 function notOkParse (t, subject, src) {
-  okParse(t, subject, src, false);
+  okParse(t, subject, src, undefined, false);
 }
 
 ////////
@@ -108,7 +110,6 @@ test('Operator precedence', t => {
 
 test('identifiers', t => {
   const subject = new PrattParser();
-  debugger;
   okParse(t, subject, 'x==5');
   t.end();
 });
@@ -132,5 +133,43 @@ test('Lexer', t => {
   peek('0.25e3', '0.25e3', 'NUMBER');
   peek('sqrt', 'sqrt', `sqrt`);
   peek('250e-1', '250e-1', 'NUMBER');
+  t.end();
+});
+
+test('let statement', t => {
+  const subject = new PrattParser();
+  okParse(t, subject, 'let x = 5', 'x = 5');
+
+  t.end();
+});
+
+test('unit suffixes', t => {
+  const subject = new PrattParser();
+
+  okParse(t, subject, 'x m', 'x*m');
+  okParse(t, subject, 'x m + y cm', 'x*m+y*cm');
+
+  okParse(t, subject, '1 m/s', '1*m/s');
+  okParse(t, subject, '1 m/s^2', '1*m/s^2');
+
+  t.end();
+});
+
+
+test('unit statements', t => {
+  const subject = new PrattParser();
+
+  okParse(t, subject, 'unit 1 m : Length');
+  okParse(t, subject, 'unit 1 s : Time');
+
+  okParse(t, subject, 'unit 100 cm : 1 m');
+  okParse(t, subject, 'unit 1 h : 3600 s');
+
+  okParse(t, subject, 'unit 1 kph : 1000 km/h');
+
+  okParse(t, subject, 'unit 1 ha : 1000000 m^2');
+
+  okParse(t, subject, 'unit 1 mph : 1609 m/3600 s');
+
   t.end();
 });

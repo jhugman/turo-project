@@ -279,17 +279,22 @@ class IdentifierNode extends ASTNode {
 }
 ////////////////////////////////////////////////////////////////////////////////////////////
 class StatementNode extends ASTNode {
-  constructor (statementType, ast) {
-    super(ast);
+  constructor (statementType, ...args) {
+    const children = args.filter(arg => arg.accept);
+    super(children);
     this.statementType = statementType;
     this._visitorMethodName = "visit" + statementType + "Statement";
-    if (ast.accept) {
-      this.ast = ast;
-    } else if (_.isObject(ast)) {
-      _.extend(this, ast);
-    } else {
-      this.ast = ast;
-    }
+
+    args.filter(arg => !arg.accept)
+      .forEach(arg => {
+        if (_.isObject(arg)) {
+          Object.assign(this, arg);
+        }
+      });
+  }
+
+  get ast () {
+    return this._children[0];
   }
 
   accept (visitor, ...args) {

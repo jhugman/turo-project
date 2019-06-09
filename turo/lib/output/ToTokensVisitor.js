@@ -359,7 +359,7 @@ export default class ToTokensVisitor extends ASTVisitor {
 
   visitImportStatement (node, tokens, context) {
     t.push(t('statement', 'include', node.line, node.offsetFirst, 'kwd'));
-    t.push(t('string', '"' + node.ast + '"', 0, '"'));
+    t.push(t('string', '"' + node.filename + '"', 0, '"'));
   }
 
   visitUnitPower (node, tokens, context) {

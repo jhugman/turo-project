@@ -281,7 +281,7 @@ class IdentifierNode extends ASTNode {
 class StatementNode extends ASTNode {
   constructor (statementType, ...args) {
     const children = args.filter(arg => arg.accept);
-    super(children);
+    super(...children);
     this.statementType = statementType;
     this._visitorMethodName = "visit" + statementType + "Statement";
 

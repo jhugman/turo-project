@@ -330,7 +330,7 @@ UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.
 ////////////////////////////////////////////////////////////////////////////////
 
 ImportStatement = "import" __ filename:StringLiteral {
-  return new ast.StatementNode("Import", filename);
+  return new ast.StatementNode("Import", { filename });
 }
 
 ////////////////////////////////////////////////////////////////////////////////

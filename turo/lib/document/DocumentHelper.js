@@ -6,7 +6,7 @@ import async from 'async';
 
 class ImportFinder extends ASTVisitor {
   visitImportStatement (node, context) {
-    const documentId = node.ast;
+    const documentId = node.filename;
     context.toImport[documentId] = true;
   }
 }

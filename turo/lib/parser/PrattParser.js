@@ -1,7 +1,7 @@
 import pratt from 'pratt';
 import Lexer from 'perplex';
 
-import { consume } from './utils';
+import { consume, optional, zeroOrMore, oneOrMore } from './utils';
 
 import { defaultOperators, Precedence } from '../operators';
 import { Scope } from '../symbols';
@@ -10,7 +10,9 @@ import ast from '../ast';
 const matchOperatorsRegex = /[|\\{}()[\]^$+*?.-]/g;
 
 function regexForSymbol (literal) {
-  const escapes = '\\';
+  if (literal.match(/^(\w+)$/)) {
+    return RegExp('^' + literal + '\\b');
+  }
   return RegExp('^' + 
     literal.replace(matchOperatorsRegex, '\\$&')
   );
@@ -52,7 +54,6 @@ export default class PrattParser {
 
     this._expressionParser = this._buildExpressionParser(lex, scope.getAvailableOperations());
     this._statementParser = this._buildStatementParser(lex);
-    this._unitParser = this._buildUnitParser(lex);
 
     lex.token('IDENTIFIER', /^([^\d\W]|[_$])\w*/);
 
@@ -88,31 +89,14 @@ export default class PrattParser {
 
     this._addToken(lex, '=');
     this._addToken(lex, ':');
+    this._addToken(lex, ',');
+    builder.bp(',', 0);
 
-    const simpleUnitParser = this._buildSimpleUnitParser(lex);
     const compoundUnitParser = this._buildUnitParser(lex)
 
-    this._addStatement(lex, builder, 'unit', symbol => {
-      const left = simpleUnitParser.parse();
-
-      consume(lex, ':', '=');
-
-      switch (lex.peek().type) {
-      case 'IDENTIFIER':
-        const dimensionName = lex.expect('IDENTIFIER').match;
-        return new ast.StatementNode("UnitDimensionDefinition", left, { dimensionName });
-      case 'NUMBER':
-        const definitionNode = compoundUnitParser.parse();
-        return new ast.StatementNode("RelativeUnitDefinition", left, { definitionNode });
-      }
-    });
-
-    this._addStatement(lex, builder, 'let', symbol => {
-      const t = lex.expect('IDENTIFIER');
-      lex.expect('=');
-      const expr = this._expressionParser.parse();
-      return new ast.VariableDefinition(t.match, expr);
-    });
+    this._addStatement(lex, builder, 'unit', _ => this._parseUnitDefinition(lex, compoundUnitParser));
+    this._addStatement(lex, builder, 'let', _ => this._parseConstDefinition(lex));
+    this._addStatement(lex, builder, 'const', _ => this._parseConstDefinition(lex));
 
     return builder.build();
   }
@@ -128,21 +112,54 @@ export default class PrattParser {
     builder.nud(type, 0, parselet);
   }
 
-  _buildSimpleUnitParser (lex) {
-    const builder = new pratt(lex).builder();
+  _parseConstDefinition (lex) {
+    const t = lex.expect('IDENTIFIER');
+    lex.expect('=');
+    const expr = this._expressionParser.parse();
+    return new ast.VariableDefinition(t.match, expr);
+  }
 
-    builder
-      .nud('NUMBER', 100, t => {
-        const multiplierNode = new ast.NumberNode(t.token.match);
-        const unitName = lex.expect('IDENTIFIER').match;
-        return { multiplierNode, unitName };
-      });
+  _parseUnitDefinition(lex, compoundUnitParser) {
+    // unit kg kilogram kilograms (SI) : Mass;
+    // unit psi (imperial) : Pressure, 1 lb/inch^2
+    const multiplierToken = optional(lex, 'NUMBER');
+    const multiplierNode = multiplierToken ? new ast.NumberNode(multiplierToken.match) : undefined;
+    const unitName = consume(lex, 'IDENTIFIER').match;
+    const alternativeNames = zeroOrMore(lex, 'IDENTIFIER').map(t => t.match);
 
-    builder
-      .bp('=', 0)
-      .bp(':', 0);
+    let unitSchemes;
+    if (optional(lex, '(')) {
+      unitSchemes = oneOrMore(lex, 'IDENTIFIER').map(t => t.match);
+      consume(lex, ')');
+    }
 
-    return builder.build();
+    consume(lex, ':', '=');
+
+    let definitionNode, dimensionName;
+    switch (lex.peek().type) {
+    case 'IDENTIFIER':
+      dimensionName = consume(lex, 'IDENTIFIER').match;
+      definitionNode = optional(lex, ',') ? compoundUnitParser.parse() : undefined;
+      break;
+    case 'NUMBER':
+      definitionNode = compoundUnitParser.parse();
+      break;
+    }
+
+    const config = {
+      unitName, 
+      multiplierNode,
+      dimensionName, 
+      definitionNode,
+      alternativeNames,
+      unitSchemes,
+    };
+
+    if (definitionNode) {
+      return new ast.StatementNode("RelativeUnitDefinition", config);
+    } else {
+      return new ast.StatementNode("UnitDimensionDefinition", config);
+    }
   }
 
   _buildUnitParser (lex) {

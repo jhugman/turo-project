@@ -171,5 +171,26 @@ test('unit statements', t => {
 
   okParse(t, subject, 'unit 1 mph : 1609 m/3600 s');
 
+  okParse(t, subject, 'unit 12 inch : 1 ft');
+  t.end();
+});
+
+
+test('unit statements with twiddly bits', t => {
+  const subject = new PrattParser();
+
+  okParse(t, subject, 'unit 1 m metre metres : Length');
+  okParse(t, subject, 'unit 1 s second seconds : Time');
+
+  okParse(t, subject, 'unit 100 cm centimetre centimetres : 1 m');
+  okParse(t, subject, 'unit 1 h hour hours : 3600 s');
+
+  okParse(t, subject, 'unit 1 kph : Speed, 1000 km/h');
+
+  okParse(t, subject, 'unit 1 ha : Area, 1000000 m^2');
+
+  okParse(t, subject, 'unit 1 mph : 1609 m/3600 s');
+
+  okParse(t, subject, 'unit mph (imperial) : Speed, 1609 m/h')
   t.end();
 });

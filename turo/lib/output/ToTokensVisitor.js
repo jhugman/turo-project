@@ -224,31 +224,50 @@ export default class ToTokensVisitor extends ASTVisitor {
   }
 
   visitRelativeUnitDefinitionStatement (node, tokens, context) {
+    return this.visitUnitDefinitionStatement2(node, tokens, context);
+  }
+
+  visitUnitDefinitionStatement2 (node, tokens, context) {
     this.errorStart(node, tokens, context);
     tokens.push(t('keyword', 'unit', node.line, node.offsetFirst, 'kwd'));
     if (node.multiplierNode) {
       node.multiplierNode.accept(this, tokens, context);
     }
     tokens.push(t('unit', node.unitName, node.line, node.offsetFirst, 'm'));
+
+    if (node.alternativeNames) {
+      node.alternativeNames.forEach(name => {
+        tokens.push(t('unit', name, node.line, node.offsetFirst, 'm'));
+      });
+    }
+
+    if (node.unitSchemes) {
+      tokens.push(t('keyword', '(', node.line, node._offsetLiteralFirst, '('));
+      node.unitSchemes.forEach(name => {
+        tokens.push(t('unit', name, node.line, node.offsetFirst, 'm'));
+      });
+      tokens.push(t('keyword', ')', node.line, node._offsetLiteralFirst, ')'));
+    }
+
     tokens.push(t('keyword', ':', node.line, node._offsetLiteralFirst, 'kwd'));
-    node.definitionNode.accept(this, tokens, context);
+    if (node.dimensionName) {
+      tokens.push(t('dimension', node.dimensionName, node.line, node._offsetLiteralFirst, 'm'));
+    }
+
+    if (node.dimensionName && node.definitionNode) {
+      tokens.push(t('keyword', ',', node.line, node._offsetLiteralFirst, ','));
+    }
+    
+    if (node.definitionNode) {
+      node.definitionNode.accept(this, tokens, context);  
+    }
 
     this.errorEnd(node, tokens, context);
     return tokens;
   }
 
   visitUnitDimensionDefinitionStatement (node, tokens, context) {
-    this.errorStart(node, tokens, context);
-    // TODO offsets are weird here.
-    tokens.push(t('keyword', 'unit', node.line, node.offsetFirst, 'kwd'));
-    if (node.multiplierNode) {
-      node.multiplierNode.accept(this, tokens, context);
-    }
-    tokens.push(t('unit', node.unitName, node.line, node.offsetFirst, 'm'));
-    tokens.push(t('keyword', ':', node.line, node._offsetLiteralFirst, 'kwd'));
-    tokens.push(t('dimension', node.dimensionName, node.line, node._offsetLiteralFirst, 'm'));
-    this.errorEnd(node, tokens, context);
-    return tokens;
+    return this.visitUnitDefinitionStatement2(node, tokens, context);
   }
 
   visitResult (node, tokens, context) {

@@ -152,7 +152,7 @@ class ParensNode extends ASTNode {
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 class UnitLiteralNode extends ASTNode {
-  constructor (unit, literal) {
+  constructor (literal, unit) {
     super();
     this.unit = unit;
     this.literal = literal;

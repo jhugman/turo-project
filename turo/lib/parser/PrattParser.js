@@ -172,24 +172,16 @@ export default class PrattParser {
 
     builder
       .led(
-        'IDENTIFIER', this.getInfixOperatorPrecedence('*'), 
-        ({ left, token, bp }) => left.binary(' ', new ast.IdentifierNode(token.match))
-      );
-
-    builder
-      .led(
-        '/', this.getInfixOperatorPrecedence('/'), 
+        '/', Precedence.unitMult.precedence, 
       ({ left, bp }) => left.binary('/', parser.parse({ terminals: [ bp ] }))
       )
       .led(
-        '^', this.getInfixOperatorPrecedence('^'), 
+        '^', Precedence.exponentiation.precedence, 
         ({ left, bp }) => left.binary('^', parser.parse({ terminals: [ bp - 1 ] }))
-      );
-
-    builder
+      )
       .led(
-        'IDENTIFIER', this.getInfixOperatorPrecedence('*'), 
-        ({ left, token, bp }) => left.binary(' ', new ast.IdentifierNode(token.match))
+        'IDENTIFIER', Precedence.unitMult.precedence, 
+        ({ left, token, bp }) => left.binary(' ', new ast.UnitLiteralNode(token.match))
       );
 
     return parser;
@@ -203,11 +195,11 @@ export default class PrattParser {
       .nud('NUMBER', 100, t => new ast.NumberNode(t.token.match))
       .nud('IDENTIFIER', 100, t => new ast.IdentifierNode(t.token.match))
       .nud('(', Precedence.parenthesis.precedence, ({ bp }) => {
-        const expr = parser.parse({ terminals: [ bp ] })
-        lex.expect(')')
-        return expr.parens()
+        const expr = parser.parse({ terminals: [ bp ] });
+        consume(lex, ')');
+        return expr.parens();
       })
-      .bp(')', 0)
+      .bp(')', 0);
 
     // for the `jrop/pratt` lib, nuds have precedences, and they interfere with lex precedences. 
     // so we have to make sure that the nuds are done first.
@@ -217,10 +209,11 @@ export default class PrattParser {
     nuds.forEach(op => this._addOperator(builder, lex, op));
     leds.forEach(op => this._addOperator(builder, lex, op));
 
+    // Units.
     builder.led(
       'IDENTIFIER', 
-      this.getInfixOperatorPrecedence('*'), 
-      ({ left, token, bp }) => left.binary('*', new ast.IdentifierNode(token.match)));
+      Precedence.unitMult.precedence, 
+      ({ left, token, bp }) => left.binary(' ', new ast.UnitLiteralNode(token.match)));
 
     return parser;
   }

@@ -146,11 +146,11 @@ test('let statement', t => {
 test('unit suffixes', t => {
   const subject = new PrattParser();
 
-  okParse(t, subject, 'x m', 'x*m');
-  okParse(t, subject, 'x m + y cm', 'x*m+y*cm');
+  okParse(t, subject, 'x m', 'x m');
+  okParse(t, subject, 'x m + y cm', 'x m+y cm');
 
-  okParse(t, subject, '1 m/s', '1*m/s');
-  okParse(t, subject, '1 m/s^2', '1*m/s^2');
+  okParse(t, subject, '1 m/s', '1 m/s');
+  okParse(t, subject, '1 m/s^2', '1 m/s^2');
 
   t.end();
 });

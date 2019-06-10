@@ -2,33 +2,35 @@
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence
 
-const make = (precedence, isRightAssociative) => { return { precedence, isRightAssociative } };
+const scalar = 1;
+const make = (precedence, isRightAssociative) => { return { precedence: precedence * scalar, isRightAssociative } };
 const left = (num) => make(num, false);
 const right = (num) => make(num, true);
-const scalar = 2;
+
 
 const Precedence = {
-  parenthesis:    left(13),
-  arrayLookup:    left(19 * scalar),
-  functionCall:   left(19 * scalar),
-  trigonometric:  left(16 * scalar),
-  unaryAddition:  right(16 * scalar),
-  factorial:      left(16 * scalar),
-  logicalNOT:     right(16 * scalar),
-  exponentiation: right(15 * scalar),
-  multiplication: left(14 * scalar),
-  addition:       left(13 * scalar),
-  bitwiseShift:   left(12 * scalar),
-  comparision:    left(11 * scalar),
-  conversion:     left(11 * scalar),
-  inequality:     left(10 * scalar),
-  equality:       left(10 * scalar),
-  logicalAND:     left(9 * scalar),
-  logicalXOR:     left(8 * scalar),
-  logicalOR:      left(7 * scalar),
-  conditional:    left(4 * scalar),
-  assignment:     left(3 * scalar),
-  comma:          left(1 * scalar),
+  arrayLookup:    left(19),
+  functionCall:   left(19),
+  trigonometric:  left(16),
+  unaryAddition:  right(16),
+  factorial:      left(16),
+  logicalNOT:     right(16),
+  exponentiation: right(15),
+  unitMult:       left(14.5),
+  multiplication: left(14),
+  addition:       left(13),
+  bitwiseShift:   left(12),
+  comparision:    left(11),
+  conversion:     left(11),
+  inequality:     left(10),
+  equality:       left(10),
+  logicalAND:     left(9),
+  logicalXOR:     left(8),
+  logicalOR:      left(7),
+  parenthesis:    left(6),
+  conditional:    left(4),
+  assignment:     left(3),
+  comma:          left(1),
 };
 
 export { Precedence };

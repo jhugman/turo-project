@@ -321,7 +321,7 @@ RaiseToPowerOperatorLiteral
   / "**" { return "^"; }
 
 UnitIdentifier "unit" = unitName:UnitIdentifierLiteral &{ return !!parseContext.scope.findUnit(unitName); } {
-  var node = new ast.UnitLiteralNode(parseContext.scope.findUnit(unitName), unitName);
+  var node = new ast.UnitLiteralNode(unitName, parseContext.scope.findUnit(unitName));
   const { offset, line } = location().start;
 
   return helper.decorateTerminal(node, line, offset, unitName);

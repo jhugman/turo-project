@@ -7,23 +7,23 @@ import async from 'async';
 class ImportFinder extends ASTVisitor {
   visitImportStatement (node, context) {
     const documentId = node.filename;
-    context.toImport[documentId] = true;
+    context.toImport.set(documentId, true);
   }
 }
 
 const visitor = new ImportFinder();
 
 //////////////////////////////////////////////////////////////////////////
-export default class DocumentHelper {
+export default class DocumentImportHelper {
   constructor (storage) {
     this._storage = storage;
   }
 
   evaluate(rootNode, callback, context) {
-    context.toImport = {};
+    context.toImport = new Map();
     rootNode.accept(visitor, context);
 
-    var toImport = _.keys(context.toImport),
+    var toImport = Array.from(context.toImport.keys()),
         documentCreator = context.documentEvaluator,
         doc = context.document;
 

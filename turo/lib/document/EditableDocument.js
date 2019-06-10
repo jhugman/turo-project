@@ -3,7 +3,7 @@ import { Parser } from '../parser';
 import { defaultOperators } from '../operators';
 import { Scope } from '../symbols';
 
-import DocumentHelper from './DocumentHelper';
+import DocumentImportHelper from './DocumentImportHelper';
 import DocumentModel from './DocumentModel';
 
 import { isArray } from 'underscore';
@@ -47,7 +47,7 @@ class EditableDocument {
     // so we may not want to scope units with block scope
     this.parser = parser;
 
-    this.documentHelper = new DocumentHelper(EditableDocument.storage);
+    this.documentImportHelper = new DocumentImportHelper(EditableDocument.storage);
   }
 
   /**
@@ -73,7 +73,7 @@ class EditableDocument {
 
 
     var scope = this._state.importScope;
-    return this.documentHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
+    return this.documentImportHelper.import(toImport, scope, statics.createEditableDocument_withCallback, callback);
   }
 
   import (id) {
@@ -144,7 +144,7 @@ class EditableDocument {
     // contain this, i.e. the document.
     var isReady;
 
-    this.documentHelper.evaluate(
+    this.documentImportHelper.evaluate(
       firstParseNode,
       (err, doc) => {
         isReady = syncEval(err, doc);

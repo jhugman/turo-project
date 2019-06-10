@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import { test, plan } from 'tap';
 
-import DocumentHelper from '../lib/document/DocumentHelper';
+import DocumentImportHelper from '../lib/document/DocumentImportHelper';
 import { AbstractStorage } from '../lib/storage/abstract-storage';
 import { Parser } from '../lib/parser';
 import { Scope } from '../lib/symbols';
@@ -83,7 +83,7 @@ class MockStorage extends AbstractStorage {
 /////////////////////////////////////////////////////////////////////////
 function setup () {
   fileSource = new MockStorage();
-  helper = new DocumentHelper(fileSource);
+  helper = new DocumentImportHelper(fileSource);
 
   fileSource
     .put('current', 
@@ -126,7 +126,7 @@ function setup () {
 
 test('abstract-storage', function (t) {
   var storage = new MockStorage();
-  helper = new DocumentHelper(storage);
+  helper = new DocumentImportHelper(storage);
   storage.put('a', ['aaa']).put('b', ['bbb']);
 
   t.notOk(storage.hasDocument('a'));

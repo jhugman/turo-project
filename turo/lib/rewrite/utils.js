@@ -55,10 +55,6 @@ function generateKey (node) {
   return output.toString(node);
 }
 
-function isBinaryAdd(node) {
-  return isBinary(node, '+', '-');
-}
-
 function isUnary(node, ...ops) {
   if (!node) {
     debugger;
@@ -150,7 +146,6 @@ function getPrecedence(node, parser) {
 export {
   isUnary,
   isBinary,
-  isBinaryAdd,
   getPrecedence,
   mergeCaptures,
   bypassParens,

@@ -1,5 +1,4 @@
 import { 
-  isBinaryAdd, 
   isBinary, 
   isUnary,
   bypassParens,
@@ -68,10 +67,10 @@ export default class Gather extends ASTVisitor {
 
   gather (constant, parens, ...args) {
     const node = bypassParens(parens);
-    if (!isBinaryAdd(node)) {
+    if (!isBinary(node, '+', '-')) {
       const term = this.term(node, ...args).multiplyByConstant(constant);
 
-      if (isBinaryAdd(term.inner)) {
+      if (isBinary(term.inner, '+', '-')) {
         if ( this.opts.expandConstantByParens) {
           return this.gather(term.coeff.binary('*', constant), term.inner, ...args);
         }

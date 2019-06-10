@@ -717,9 +717,9 @@ export default class CompoundUnit {
 function findCompoundUnits (allUnits, reducingUnit, unitScheme) {
   var list = [],
       unitDimension = reducingUnit.getDimension();
-  _.each(allUnits, function (i, unitName) {
-      var unit = allUnits[unitName],
-          dimension = unit.getDimension();
+
+  allUnits.forEach((unit, unitName) => {
+      const dimension = unit.getDimension();
       // only compound ones needed
       if (dimension.cardinality() <= 1) {
         return;
@@ -731,9 +731,9 @@ function findCompoundUnits (allUnits, reducingUnit, unitScheme) {
         if (!unitScheme || _.indexOf(unit.getUnitSchemes(), unitScheme) >= 0) {
           list.push(unit);
         }
-
       }
-  });
+    }
+  );
 
   list = _.sortBy(list, function (unit) {
     return unit.cardinality();

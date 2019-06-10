@@ -15,10 +15,10 @@ function isStringOrUnit(obj) {
 
 export default class Units {
   constructor(initial) {
-    this.units = initial || {};
+    this.units = initial ? new Map(...Object.entries(initial)) : new Map();
     this.unitSchemes = new UnitSchemes();
     // Big units table, including aliases.
-    this._bigTable = {};
+    this._bigTable = new Map();
   }
 
   addUnit (name, relativeTo_x, relativeTo_units, unitSchemes, dimensionName, alternatives) {
@@ -49,7 +49,7 @@ export default class Units {
       this.addUnitAliases(unit, alternatives);
     }
 
-    this._bigTable[name] = unit;
+    this._bigTable.set(name, unit);
 
     return unit;
   }
@@ -62,7 +62,7 @@ export default class Units {
     
     var t = this._bigTable;
     _.each(aliases, function (n) {
-        t[n] = unit;
+        t.set(n, unit);
     });
 
     var shortName = unit.name,
@@ -83,8 +83,9 @@ export default class Units {
   }
 
   _addUnitWithDimension (name, dimension) {
-    this.units[name] = new CompoundUnit(this, name, new Dimension(dimension));
-    return this.units[name];
+    const newUnit = new CompoundUnit(this, name, new Dimension(dimension));
+    this.units.set(name, newUnit);
+    return newUnit;
   }
 
   _addUnitRelativeToAnotherUnit (name, t, b, other) {
@@ -127,13 +128,13 @@ export default class Units {
     unit._unitSchemes = other.getUnitSchemes();
 
 
-    this.units[name] = unit;
+    this.units.set(name, unit);
     return unit;
   }
 
   _addUnitFromExistingUnit (name, unit) {
     unit.name = name;
-    this.units[name] = unit;
+    this.units.set(name, unit);
     return unit;
   }
 
@@ -141,7 +142,7 @@ export default class Units {
     var self = this;
     _.each(units, function (unit) {
       if (typeof unit === "string") {
-        unit = self.units[unit];
+        unit = self.units.get(unit);
       }
       if (unit && unit.addUnitScheme) {
         unit.addUnitScheme(unitSchemeName);
@@ -149,7 +150,7 @@ export default class Units {
     });
 
     _.each(self.units, function (i, key) {
-      var unit = self.units[key];
+      var unit = self.units.get(key);
       delete unit._unitSchemes;
     });
     // we'll generate it on demand,
@@ -157,11 +158,11 @@ export default class Units {
   }
 
   getUnit (name) {
-    return this._bigTable[name];
+    return this._bigTable.get(name);
   }
 
   getUnitNames () {
-    return _.keys(this.units);
+    return this.units.keys();
   }
 
   getDimension (name) {

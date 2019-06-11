@@ -149,9 +149,12 @@ export default class _Editor extends Component {
       >
         <Plugin
           decorators={
+            []
+            /*
             Object.keys(tokenComps)
             .map((type) => createTokenStrategy(type, this.turoDoc))
             .concat([createErrorStrategy(this.turoDoc)]).reverse()
+            */
           }
           blockRendererFn={this.blockRendererFn}
         />

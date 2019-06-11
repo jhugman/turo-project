@@ -6,6 +6,10 @@ yarn-debug.log*
 yarn-error.log*
 dist
 
+
+.DS_Store
+*.code-workspace
+
 # Runtime data
 pids
 *.pid

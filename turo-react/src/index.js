@@ -14,8 +14,14 @@ class App extends Component {
   constructor(props) {
     super(props)
 
+    this.updatedHash = false
+
     window.onhashchange = (ev) => {
-      this.setFromHash()
+      if (this.updatedHash === false) {
+        this.setFromHash()
+      } else {
+        this.updatedHash = false
+      }
     }
 
     this.state = {
@@ -34,16 +40,18 @@ class App extends Component {
 
   onChange = editorState => {
     this.setState({ editorState })
+    const now = Date.now()
+
+    this.updatedHash = true
+    window.location.hash = window.encodeURIComponent(editorState.getCurrentContent().getPlainText())
   }
 
   setFromHash = () => {
-    console.log(this.editor)
-    this.onChange(
-      EditorState.push(
-        this.state.editorState,
-        ContentState.createFromText(decodeURIComponent(window.location.hash.substr(1)))
-      )
-    )
+    this.updatedHash = true
+    this.onChange(EditorState.push(
+      this.state.editorState,
+      ContentState.createFromText(decodeURIComponent(window.location.hash.substr(1)))
+    ))
 
     setTimeout(() => {
       document.querySelector('[contenteditable=true]').focus()

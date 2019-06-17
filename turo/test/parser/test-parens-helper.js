@@ -52,6 +52,8 @@ test('Prefix ops', t => {
 });
 
 test('Postfix ops', t => {
-  okAdd(t, '(sin x)!', 'sin x!');
+  okAdd(t, '(sin x)!', '(sin x)!');
+  okAdd(t, 'sin x!', '(sin x)!');
+  okAdd(t, 'sin(x!)', 'sin(x!)');
   t.end();
 });

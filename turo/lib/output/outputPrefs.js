@@ -45,6 +45,7 @@ const output_padding = {
   'm,': '',
   'm(': ' ',
   ')kwd': ' ',
+  '!)': '',
 };
 
 

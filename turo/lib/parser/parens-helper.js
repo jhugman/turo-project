@@ -49,7 +49,9 @@ class ParensAdder extends ASTVisitor {
       const theirPrecedence = getPrecedence(torc, parser);
       if (theirPrecedence < myPrecedence) {
         return torc.parens();
-      } 
+      } else if (torc.numOperands === 1 && node.numOperands === 1 && node.isPrefix !== torc.isPrefix) {
+        return torc.parens();
+      }
       return t;
     });
   }

@@ -194,3 +194,29 @@ test('unit statements with twiddly bits', t => {
   okParse(t, subject, 'unit mph (imperial) : Speed, 1609 m/h')
   t.end();
 });
+
+test('assignment statements', t => {
+  const subject = new PrattParser();
+
+  okParse(t, subject, 'x = 1');
+  okParse(t, subject, 'y = 1+x');
+
+  okParse(t, subject, 'longVariableName = x+y');
+  t.end();
+});
+
+test('import statements', t => {
+  const subject = new PrattParser();
+
+  const lex = subject._lex;
+  const expected = 'filename';
+  lex.source = `"${expected}"`;
+
+  const token = lex.next();
+  t.ok(token, 'String is non-null');
+
+  // now put string in an import statement
+  okParse(t, subject, 'import "fundamental"');
+  okParse(t, subject, 'import "metric"');
+  t.end();
+});

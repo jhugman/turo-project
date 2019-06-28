@@ -56,6 +56,7 @@ export default class PrattParser {
     this._statementParser = this._buildStatementParser(lex);
 
     lex.token('IDENTIFIER', /^([^\d\W]|[_$])\w*/);
+    lex.token('STRING', /^\"([^\"\n]+)\"/);
 
     this._lex = lex;
   }
@@ -97,6 +98,7 @@ export default class PrattParser {
     this._addStatement(lex, builder, 'unit', _ => this._parseUnitDefinition(lex, compoundUnitParser));
     this._addStatement(lex, builder, 'let', _ => this._parseConstDefinition(lex));
     this._addStatement(lex, builder, 'const', _ => this._parseConstDefinition(lex));
+    this._addStatement(lex, builder, 'import', _ => this._parseImportStatement(lex));
 
     return builder.build();
   }
@@ -112,9 +114,15 @@ export default class PrattParser {
     builder.nud(type, 0, parselet);
   }
 
+  _parseImportStatement (lex) {
+    debugger;
+    const filename = consume(lex, 'STRING').groups[1];
+    return new ast.StatementNode("Import", { filename });
+  }
+
   _parseConstDefinition (lex) {
-    const t = lex.expect('IDENTIFIER');
-    lex.expect('=');
+    const t = consume(lex, 'IDENTIFIER');
+    consume(lex, '=');
     const expr = this._expressionParser.parse();
     return new ast.VariableDefinition(t.match, expr);
   }
@@ -288,13 +296,17 @@ export default class PrattParser {
 
   parse (string) {
     this._lex.source = string;
-    return this._parseStatement();
+    return this._parseStatement(this._lex);
   }
 
-  _parseStatement () {
-    const token = this._lex.peek();
+  _parseStatement (lex) {
+    const token = lex.peek();
     if (this._statementParser._nuds.has(token.type)) {
       return this._statementParser.parse()
+    }
+
+    if (token.type === 'IDENTIFIER' && lex.peek(token.end).type === '=') {
+      return this._parseConstDefinition(this._lex, this._expressionParser);
     }
 
     return this._expressionParser.parse();

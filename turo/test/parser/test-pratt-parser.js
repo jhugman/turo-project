@@ -110,7 +110,12 @@ test('Operator precedence', t => {
 
 test('identifiers', t => {
   const subject = new PrattParser();
-  okParse(t, subject, 'x==5');
+  okParse(t, subject, 'x = 1');
+  okParse(t, subject, '_1 = 1');
+  okParse(t, subject, '$1 = 1');
+
+  okParse(t, subject, 'x1 = 1');
+  okParse(t, subject, 'x_1 = 1');
   t.end();
 });
 
@@ -218,5 +223,23 @@ test('import statements', t => {
   // now put string in an import statement
   okParse(t, subject, 'import "fundamental"');
   okParse(t, subject, 'import "metric"');
+  t.end();
+});
+
+test('end of lines can be anything', t => {
+  const subject = new PrattParser();
+
+  okParse(t, subject, 'import "x" // comment', 'import "x"');
+  okParse(t, subject, 'x = 1;', 'x = 1');
+  okParse(t, subject, 'y = 1 // comment', 'y = 1');
+
+  // most of these should be soaked up by the unit parsing
+  okParse(t, subject, 'y = 2 I don\'t think this should error', 'y = 2 I don t think this should error');
+
+  okParse(t, subject, 'y = 3 This "should" not be acceptable', 'y = 3 This should');
+
+  // This should be cleared up by the ASTCleaner.
+  okParse(t, subject, 'y = 4 ^_^', 'y = 4^_');
+
   t.end();
 });

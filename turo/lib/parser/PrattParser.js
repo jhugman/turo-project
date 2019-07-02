@@ -50,15 +50,19 @@ export default class PrattParser {
         .token('WHITESPACE', /\s+/, true) // true means 'skip'
         .token('(', /\(/)
         .token(')', /\)/)
-        .token('NUMBER', /^\d+(\.\d+)?([eE][+-]?\d+)?/);
+        .token('NUMBER', /^\d+(\.\d+)?([eE][+-]?\d+)?/)
+        .token('LINE_COMMENT', /^\/\/[^\n]*(\n|$)/, true)
+        .token('BLOCK_COMMENT', /\/\*(\*(?!\/)|[^*])*\*\//, true);
 
     this._expressionParser = this._buildExpressionParser(lex, scope.getAvailableOperations());
     this._statementParser = this._buildStatementParser(lex);
 
     lex.token('IDENTIFIER', /^([^\d\W]|[_$])\w*/);
     lex.token('STRING', /^\"([^\"\n]+)\"/);
+    lex.token('UNKNOWN', /^[^ =\(\)\w]+/, true);
 
     this._lex = lex;
+    this._scope = scope;
   }
 
   getPrefixOperatorPrecedence (literal) {
@@ -115,7 +119,6 @@ export default class PrattParser {
   }
 
   _parseImportStatement (lex) {
-    debugger;
     const filename = consume(lex, 'STRING').groups[1];
     return new ast.StatementNode("Import", { filename });
   }
@@ -295,20 +298,46 @@ export default class PrattParser {
   }
 
   parse (string) {
-    this._lex.source = string;
-    return this._parseStatement(this._lex);
+    while (string) {
+      try {
+        this._lex.source = string;
+        return this._parseLine(this._lex);
+      } catch (e) {
+        debugger;
+        string = string.substring(0, this._lex.position - 1);
+      }
+    }
   }
 
-  _parseStatement (lex) {
+  _parseLine (lex) {
     const token = lex.peek();
-    if (this._statementParser._nuds.has(token.type)) {
-      return this._statementParser.parse()
-    }
+    
+    const ast = 
+        this._parseKeywordStatement(token, lex) || this._parseBareAssignment(token, lex) || this._parseExpression(lex);
 
+    return ast;
+  }
+
+  _parseKeywordStatement (token, lex) {
+    if (this._statementParser._nuds.has(token.type)) {
+      return this._statementParser.parse();
+    }
+  }
+
+  _parseBareAssignment (token, lex) {
     if (token.type === 'IDENTIFIER' && lex.peek(token.end).type === '=') {
       return this._parseConstDefinition(this._lex, this._expressionParser);
     }
+  }
 
+  _parseExpression (lex) {
     return this._expressionParser.parse();
+  }
+
+  parseFirst (string) {
+    const imports = string.split('\n').filter(line => line.match(/^\s*import/))
+      .map(line => this.parse(line));
+
+    return new ast.EditorLinesNode(imports);
   }
 }

@@ -1,5 +1,6 @@
 export class ParseError extends Error {
   constructor (observed, expected) {
+    super();
     this._expectedTypes = expected;
     this._observed = observed;
   }

@@ -243,3 +243,45 @@ test('end of lines can be anything', t => {
 
   t.end();
 });
+
+
+import ASTCleaner from '../../lib/parser/ASTCleaner';
+function okClean (t, parser, subject, src, expectedOutput = src) {
+  const scope = parser._scope;
+
+  let ast;
+  try {
+    ast = parser.parse(src);
+  } catch(e) {
+    console.error(`Error parsing ${src}`, e);
+    t.ok(false, `Good src is unexpectedly bad: ${src}`);  
+    return;
+  }
+
+  const newAst = ast.accept(subject, scope) || ast;
+
+  t.equal(output.toString(newAst, { output_defaultPadding: '' }), expectedOutput, `${src} cleans up ok`);
+}
+
+test('parser with cleaner', t => {
+  const parser = new PrattParser();
+  const scope = parser._scope;
+  const subject = new ASTCleaner();
+
+  parser.parse('x = 1');
+  parser.parse('unit 1 m metre metres : Length');
+
+  okClean(t, parser, subject, '1 m');
+  okClean(t, parser, subject, '2 nope', '2');
+  okClean(t, parser, subject, '2 nope metres', '2 metres');
+
+  okClean(t, parser, subject, '3 x', '3');
+  okClean(t, parser, subject, 'x m', 'x m');
+
+  okClean(t, parser, subject, '4 + x', '4+x');
+  okClean(t, parser, subject, '4 + nope', '4');
+
+  okClean(t, parser, subject, 'y = 4 ^_^', 'y = 4');
+
+  t.end();
+});

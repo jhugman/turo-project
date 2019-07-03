@@ -125,9 +125,11 @@ export default class PrattParser {
 
   _parseConstDefinition (lex) {
     const t = consume(lex, 'IDENTIFIER');
+    const id = t.match;
     consume(lex, '=');
     const expr = this._expressionParser.parse();
-    return new ast.VariableDefinition(t.match, expr);
+    this._scope.addVariable(id, expr);
+    return new ast.VariableDefinition(id, expr);
   }
 
   _parseUnitDefinition(lex, compoundUnitParser) {
@@ -166,6 +168,7 @@ export default class PrattParser {
       unitSchemes,
     };
 
+    this._scope.addUnit(unitName, unitName, alternativeNames);
     if (definitionNode) {
       return new ast.StatementNode("RelativeUnitDefinition", config);
     } else {

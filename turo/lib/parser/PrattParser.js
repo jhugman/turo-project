@@ -2,7 +2,7 @@ import pratt from 'pratt';
 import Lexer from 'perplex';
 
 import { consume, optional, zeroOrMore, oneOrMore } from './utils';
-
+import ASTCleaner from './ASTCleaner';
 import { defaultOperators, Precedence } from '../operators';
 import { Scope } from '../symbols';
 import ast from '../ast';
@@ -45,6 +45,8 @@ export default class PrattParser {
       nudCache: new Map(), 
       ledCache: new Map(),
     };
+
+    this._cleaner = new ASTCleaner();
 
     const lex = new Lexer()
         .token('WHITESPACE', /\s+/, true) // true means 'skip'
@@ -195,7 +197,7 @@ export default class PrattParser {
       )
       .led(
         'IDENTIFIER', Precedence.unitMult.precedence, 
-        ({ left, token, bp }) => left.binary(' ', new ast.UnitLiteralNode(token.match))
+        ({ left, token, bp }) => left.binary(' ', new ast.IdentifierNode(token.match))
       );
 
     return parser;
@@ -227,7 +229,7 @@ export default class PrattParser {
     builder.led(
       'IDENTIFIER', 
       Precedence.unitMult.precedence, 
-      ({ left, token, bp }) => left.binary(' ', new ast.UnitLiteralNode(token.match)));
+      ({ left, token, bp }) => left.binary(' ', new ast.IdentifierNode(token.match)));
 
     return parser;
   }
@@ -301,15 +303,33 @@ export default class PrattParser {
   }
 
   parse (string) {
+    const lines = string.split('\n').map(line => this.parseLine(line));
+
+    let node;
+
+    switch (lines.length) {
+      case 0:
+        return;
+      case 1:
+        return lines[0];
+      default: 
+        return new ast.EditorLinesNode(...lines);
+    }
+  }
+
+  parseLine (string) {
     while (string) {
       try {
         this._lex.source = string;
         return this._parseLine(this._lex);
       } catch (e) {
-        debugger;
         string = string.substring(0, this._lex.position - 1);
       }
     }
+  }
+
+  clean (astNode) {
+    return this._cleaner.apply(astNode) || astNode;
   }
 
   _parseLine (lex) {
@@ -317,6 +337,8 @@ export default class PrattParser {
     
     const ast = 
         this._parseKeywordStatement(token, lex) || this._parseBareAssignment(token, lex) || this._parseExpression(lex);
+
+    ast.scope = this._scope;
 
     return ast;
   }

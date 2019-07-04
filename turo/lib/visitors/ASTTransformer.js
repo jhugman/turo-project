@@ -1,7 +1,3 @@
-function descend (visitor, node, ...args) {
-  
-}
-
 export default class ASTVisitor {
   visitImportStatement (node, ...args) {
   }
@@ -37,6 +33,10 @@ export default class ASTVisitor {
   }
 
   visitUnit (node, ...args) {
+  }
+
+  visitUnitDimensionDefinitionStatement (node, ...args) {
+    return node.transformChildren(child => child.accept(this, ...args));
   }
 
   visitUnitPower (node, ...args) {

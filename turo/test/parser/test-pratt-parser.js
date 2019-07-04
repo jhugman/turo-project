@@ -20,7 +20,8 @@ function okParse (t, subject, src, expectedOutput = src, expectedPass = true) {
 
   if (expectedPass) {
     t.ok(ast, `${src} has a non null AST`);
-    t.equal(output.toString(ast, { output_defaultPadding: '' }), expectedOutput, `${src} roundtrips ok`);  
+    t.equal(output.toString(ast, { output_defaultPadding: '' }), expectedOutput, `${src} roundtrips ok`);
+    return ast;
   } else {
     t.notOk(expectedPass, 'src is not bad: ${src}');
   }
@@ -244,9 +245,7 @@ test('end of lines can be anything', t => {
   t.end();
 });
 
-
-import ASTCleaner from '../../lib/parser/ASTCleaner';
-function okClean (t, parser, subject, src, expectedOutput = src) {
+function okClean (t, parser, src, expectedOutput = src) {
   const scope = parser._scope;
 
   let ast;
@@ -258,30 +257,39 @@ function okClean (t, parser, subject, src, expectedOutput = src) {
     return;
   }
 
-  const newAst = ast.accept(subject, scope) || ast;
-
+  const newAst = parser.clean(ast);
   t.equal(output.toString(newAst, { output_defaultPadding: '' }), expectedOutput, `${src} cleans up ok`);
 }
 
 test('parser with cleaner', t => {
   const parser = new PrattParser();
-  const scope = parser._scope;
-  const subject = new ASTCleaner();
 
   parser.parse('x = 1');
   parser.parse('unit 1 m metre metres : Length');
 
-  okClean(t, parser, subject, '1 m');
-  okClean(t, parser, subject, '2 nope', '2');
-  okClean(t, parser, subject, '2 nope metres', '2 metres');
+  okClean(t, parser, '1 m');
+  okClean(t, parser, '2 nope', '2');
+  okClean(t, parser, '2 nope metres', '2 metres');
 
-  okClean(t, parser, subject, '3 x', '3');
-  okClean(t, parser, subject, 'x m', 'x m');
+  okClean(t, parser, '3 x', '3');
+  okClean(t, parser, 'x m', 'x m');
 
-  okClean(t, parser, subject, '4 + x', '4+x');
-  okClean(t, parser, subject, '4 + nope', '4');
+  okClean(t, parser, '4 + x', '4+x');
+  okClean(t, parser, '5 + nope', '5');
+  okClean(t, parser, '6 + x nope', '6+x');
+  okClean(t, parser, '7 + x nope nope', '7+x');
 
-  okClean(t, parser, subject, 'y = 4 ^_^', 'y = 4');
+  okClean(t, parser, '8 + nope x', '8+x');
+  okClean(t, parser, '8 + nope nope x', '8+x');
+  okClean(t, parser, 'y = 9 ^_^', 'y = 9');
+  okClean(t, parser, 'sin undeclared x + 10', 'sin undeclared+10');
+
+  t.end();
+});
+
+test('multi-lines', t => {
+
+
 
   t.end();
 });

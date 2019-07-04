@@ -298,12 +298,10 @@ class StatementNode extends ASTNode {
   }
 
   accept (visitor, ...args) {
-    try {
-      return visitor[this._visitorMethodName].call(visitor, this, ...args);
-    } catch (e) {
-      console.error("visitor." + this._visitorMethodName + " not found");
-      throw e;
+    if (!visitor[this._visitorMethodName]) {
+      throw new Error(`${this._visitorMethodName} method missing`)
     }
+    return visitor[this._visitorMethodName].call(visitor, this, ...args);
   }
 }
 

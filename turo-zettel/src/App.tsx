@@ -1,38 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Editor, { RenderBlock } from '@zettel/react'
-import { EditorState, BlockTree, getBlockNumber, textToListIndex } from '@zettel/core'
+import { EditorState, BlockTree, textToListIndex } from '@zettel/core'
 // @ts-ignore
 import turo from 'turo';
 import Lang from './Lang'
+import { TuroDoc, TuroStatement, Token } from './types'
+import { blockStatement } from '@babel/types';
 const { EditableDocument, CompositeStorage, loaders } = turo
-
-type TuroStatement = {
-  currentValue: any,
-  errors: any[],
-  valueToString: () => string,
-  expression: any,
-  tokens: Token[],
-  node: any,
-}
-
-type TuroDoc = {
-  statements: TuroStatement[],
-  import: (key: string) => Promise<TuroDoc>,
-  evaluateDocument: (text: string) => Promise<TuroDoc>,
-}
-
-type Token = {
-  displayType: string,
-  line: number,
-  literal: string,
-  shortType: string,
-  startOffset: number
-}
 
 EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);
 
-const initialEditorState = EditorState.fromText(`3291m + 2m
+const initialEditorState: any = EditorState.fromText(`3291m + 2m
 3m in cm`)
 
 const Statement: RenderBlock = (props) => {
@@ -43,6 +22,33 @@ const toPlainText = (tree: BlockTree) => tree.blocks.map(block => block.value.ma
 
 const turoDoc: TuroDoc = EditableDocument.create('new-doc')
 
+const useHashStorage = (
+  update: (editorState: EditorState) => void,
+  doc: TuroDoc
+) => {
+  const [isUpdatingHash, setIsUpdatingHash] = useState(false)
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const text = decodeURIComponent(window.location.hash.substr(1))
+      const newEditorState = EditorState.fromText(text)
+
+      doc.evaluateDocument(toPlainText(newEditorState.tree))
+      update(newEditorState)
+
+      setIsUpdatingHash(false)
+    }
+    window.addEventListener('hashchange', onHashChange)
+
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  return (text: string) => {
+    setIsUpdatingHash(true)
+    window.history.pushState('Boing', 'Title', `#${encodeURIComponent(text)}`)
+  }
+}
+
 const App = () => {
   const [editorState, setEditorState] = useState(initialEditorState)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -52,15 +58,15 @@ const App = () => {
     .import('app')
     .then((doc) => {
       return doc.evaluateDocument(toPlainText(initialEditorState.tree))
-    })
-    .then((turoDoc: any) => {
+    }).then(() => {
       setIsLoaded(true)
     })
   }, [])
 
+  const updateHash = useHashStorage(setEditorState, turoDoc)
+
   const { value } = editorState.list
   const { statements } = turoDoc
-  console.log({ turoDoc })
 
   let newValue = value.slice()
 
@@ -89,34 +95,45 @@ const App = () => {
   })
 
   return (
-    <Editor
+    isLoaded ? <Editor
       htmlAttrs={{ className: "App" }}
       renderStyle={(props) => {
         return <span key={props.style} className={props.style}>{props.children}</span>
       }}
       renderBlock={(props) => {
-        const lineNumber = editorState.tree.blocks.findIndex(block => block.blockKey === props.block.blockKey)
+        const lineNumber = editorState.tree.blocks.findIndex((block: any) => block.blockKey === props.block.blockKey)
         const statement = turoDoc.statements[lineNumber]
+        const statementType = statement && statement.expression.constructor.name
 
-        return <div key={props.block.blockKey}>
-          <div className='statement'>
-            <div className='statement__content'>
-              {props.children}
-            </div>
-            {statement != null && <div contentEditable={false} className='statement__result'>
+        if (statementType === 'UnparsedText') {
+          return <p key={props.block.blockKey} className='statement__content col-2 statement__text'>
+            {props.children}
+          </p>
+        }
+
+        return <>
+            {statement != null && <div key={`${props.block.blockKey}-result`} contentEditable={false} className='col-1 statement__result'>
               {statement.errors != null ? (
                 <span className="error"><Lang>{statement.errors[0].message}</Lang></span>
               ) :<span>{statement && statement.valueToString()}</span>}
             </div>}
-          </div>
-        </div>
+
+            <div key={props.block.blockKey} className='statement__content col-2 statement__expression'>
+              {props.children}
+            </div>
+        </>
       }}
       editorState={mappedState}
+      renderChildren={(props) => {
+        return <div className='grid'>{props.children}</div>
+      }}
       onChange={(newEditorState) => {
-        turoDoc.evaluateDocument(toPlainText(newEditorState.tree))
+        const text = toPlainText(newEditorState.tree)
+        updateHash(text)
+        turoDoc.evaluateDocument(text)
         setEditorState(newEditorState)
       }}
-    />
+    /> : null
   );
 }
 

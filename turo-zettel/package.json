@@ -8,7 +8,7 @@
     "@types/react": "16.8.19",
     "@types/react-dom": "16.8.4",
     "@zettel/core": "^0.0.4",
-    "@zettel/react": "^0.0.3",
+    "@zettel/react": "^0.0.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "turo": "link:../turo",

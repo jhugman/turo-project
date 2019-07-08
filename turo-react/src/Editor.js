@@ -108,7 +108,8 @@ export default class _Editor extends Component {
     const blocks = editorState.getCurrentContent().getBlocksAsArray();
     const text = blocks.map((block) => block.getText()).join('\n');
 
-    this.turoDoc.import('app').then(() => this.turoDoc.evaluateDocument(text))
+    this.turoDoc.import('app')
+    .then(() => this.turoDoc.evaluateDocument(text))
     .then((turoDoc) => {
       this.setState({ docLoaded: true })
     })

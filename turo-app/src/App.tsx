@@ -57,6 +57,15 @@ const useHashStorage = (
   }
 }
 
+const useDocumentTitle = (editorState: EditorState) => {
+  const plainText = toPlainText(editorState.tree)
+
+  const firstLine = plainText.split('\n')[0]
+  return useEffect(() => {
+    document.title = firstLine || 'Turo'
+  }, [firstLine])
+}
+
 const App = () => {
   const [editorState, setEditorState] = useState(initialEditorState)
   const [isLoaded, setIsLoaded] = useState(false)
@@ -70,6 +79,8 @@ const App = () => {
       setIsLoaded(true)
     })
   }, [])
+
+  useDocumentTitle(editorState)
 
   const updateHash = useHashStorage(setEditorState, turoDoc, isLoaded)
 

@@ -7,17 +7,15 @@
     "@types/node": "12.0.8",
     "@types/react": "16.8.19",
     "@types/react-dom": "16.8.4",
-    "@zettel/core": "^0.0.4",
-    "@zettel/react": "^0.0.4",
+    "@zettel/core": "^0.0.5",
+    "@zettel/react": "^0.0.5",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "turo": "link:../turo",
     "react-scripts": "3.0.1",
+    "turo": "link:../turo",
     "typescript": "3.5.1"
   },
-  "peerDependencies": {
-
-  },
+  "peerDependencies": {},
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

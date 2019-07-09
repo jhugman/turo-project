@@ -5,14 +5,13 @@ import { EditorState, BlockTree, textToListIndex } from '@zettel/core'
 // @ts-ignore
 import turo from 'turo';
 import Lang from './Lang'
-import { TuroDoc, TuroStatement, Token } from './types'
-import { blockStatement } from '@babel/types';
+import { TuroDoc, Token } from './types'
+import defaultTuroDoc from './defaultTuroDoc'
 const { EditableDocument, CompositeStorage, loaders } = turo
 
 EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);
 
-const initialEditorState: any = EditorState.fromText(`3291m + 2m
-3m in cm`)
+const initialEditorState: any = EditorState.fromText(``)
 
 const Statement: RenderBlock = (props) => {
   return <div>{props.children}</div>
@@ -24,7 +23,8 @@ const turoDoc: TuroDoc = EditableDocument.create('new-doc')
 
 const useHashStorage = (
   update: (editorState: EditorState) => void,
-  doc: TuroDoc
+  doc: TuroDoc,
+  isLoaded: boolean
 ) => {
   const [isUpdatingHash, setIsUpdatingHash] = useState(false)
 
@@ -38,10 +38,18 @@ const useHashStorage = (
 
       setIsUpdatingHash(false)
     }
+
     window.addEventListener('hashchange', onHashChange)
 
+    if (window.location.hash.substr(1).trim().length === 0) {
+      // set default doc and reload
+      window.location.hash = defaultTuroDoc
+    } else {
+      onHashChange()
+    }
+
     return () => window.removeEventListener('hashchange', onHashChange)
-  }, [])
+  }, [isLoaded])
 
   return (text: string) => {
     setIsUpdatingHash(true)
@@ -63,7 +71,7 @@ const App = () => {
     })
   }, [])
 
-  const updateHash = useHashStorage(setEditorState, turoDoc)
+  const updateHash = useHashStorage(setEditorState, turoDoc, isLoaded)
 
   const { value } = editorState.list
   const { statements } = turoDoc

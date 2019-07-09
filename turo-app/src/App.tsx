@@ -111,9 +111,9 @@ const App = () => {
       renderBlock={(props) => {
         const lineNumber = editorState.tree.blocks.findIndex((block: any) => block.blockKey === props.block.blockKey)
         const statement = turoDoc.statements[lineNumber]
-        const statementType = statement && statement.expression.constructor.name
+        const isUnparsedText = statement && statement.currentValue == null
 
-        if (statementType === 'UnparsedText') {
+        if (isUnparsedText) {
           return <p key={props.block.blockKey} className='statement__content col-2 statement__text'>
             {props.children}
           </p>

@@ -1,8 +1,5 @@
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const paths = require('../config/paths');
-const TapWebpackPlugin = require('tap-webpack-plugin')
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = {
   devtool: 'source-map',
@@ -62,18 +59,6 @@ module.exports = {
 
     ]
   },
- 
   plugins: [
-    /*
-    new webpack.LoaderOptionsPlugin({
-      debug: true,
-    }),
-    */
-    // new UglifyJSPlugin()
-
-    // new TapWebpackPlugin(),
- 
-    // // or with a reporter: 
-    // new TapWebpackPlugin({ reporter: 'tap-spec' })
   ]
 }

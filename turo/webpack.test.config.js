@@ -1,6 +1,5 @@
 // Your webpack.config.js 
 const paths = require('../config/paths');
-const TapWebpackPlugin = require('tap-webpack-plugin')
 const path = require('path');
 const webpack = require('webpack');
 

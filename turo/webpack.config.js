@@ -5,7 +5,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 module.exports = {
-  devtool: 'eval',
+  devtool: 'source-map',
   target: 'node',
 
   resolve: {
@@ -21,7 +21,8 @@ module.exports = {
  
   entry: './lib/index.js',
   output: {
-    filename: './build/index.js'
+    filename: './build/index.js',
+    libraryTarget: 'commonjs',
   },
 
 
@@ -63,10 +64,12 @@ module.exports = {
   },
  
   plugins: [
+    /*
     new webpack.LoaderOptionsPlugin({
       debug: true,
     }),
-    new UglifyJSPlugin()
+    */
+    // new UglifyJSPlugin()
 
     // new TapWebpackPlugin(),
  

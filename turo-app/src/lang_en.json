@@ -1,0 +1,11 @@
+{
+  "DIMENSION_MISMATCH": "Dimension mismatch",
+  "DIVIDE_BY_ZERO": "Divide by zero",
+  "NEGATIVE_NUMBER_EXPONENTIATION": "Negative number exponentiation",
+  "NEGATIVE_NUMBER_SQRT": "Negative number square root",
+  "COMPLICATED": "This just doesn't work, sorry",
+  "NO_SUCH_VARIABLE": "This variable doesn't exist",
+  "TYPE_MISMATCH": "The types don't match",
+  "UNCALCULATED_VARIABLE": "Uncalculated variable",
+  "CYCLIC_DEFINITION": "Cyclic definition"
+}

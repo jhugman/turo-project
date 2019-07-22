@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="220px" height="220px" viewBox="0 0 220 220" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>design</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect id="Rectangle" fill="#000000" x="0" y="0" width="220" height="220" rx="10"></rect>
+        <path d="M40,40 L40,100 L80,100 C80,114.482548 80,126.687116 80,136.613705 C80,144.048497 78.1986234,148.615228 75.0864055,151.960572 C75.0770965,152.072354 92.157358,164.811587 92.1336176,164.793696 C96.7840952,159.06361 100,152.411938 100,145.917286 C100,136.050309 100,120.744547 100,100 L100,80 L60,80 L60,60 L160,60 L160,80 L120,80 L120,100 C120,118.372122 120,136.314505 120,153.827149 C120,162.720365 116.876745,170.575237 110,178.374176 C110.045198,178.410904 127.664934,191.875138 127.637139,191.887214 C135.484618,182.635646 140,171.56405 140,156.827149 C140,135.438674 140,116.49629 140,100 L180,100 L180,40" id="Path-7-Copy" fill="#FFFFFF" transform="translate(110.000000, 115.943607) scale(-1, 1) translate(-110.000000, -115.943607) "></path>
+    </g>
+</svg>

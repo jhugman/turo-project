@@ -1534,17 +1534,17 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
-"@zettel/core@0.0.9", "@zettel/core@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@zettel/core/-/core-0.0.9.tgz#2f1a3320ee41ea855089a090a2a24590c9d4ca57"
-  integrity sha512-qZ/KGcPopv9YhwakyK79WNa/9IhdwFaKpaOjxxnnvF2M1sUum53M6kh4MM5Da9tOSyQ9nd9lvHJvzBd6YGUIqA==
+"@zettel/core@0.0.10", "@zettel/core@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@zettel/core/-/core-0.0.10.tgz#39329d16a75c53b65469266c37a5b5c99c9c3319"
+  integrity sha512-J5rbEGkaqThcc2vGFRw4pgF0xKAAiaTNLskUNNEKz3ZcyxdA2jcvHJoKLLYi0TbIWO355LY/vT3MnageZD4/5A==
 
-"@zettel/react@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@zettel/react/-/react-0.0.9.tgz#cac6b368acb423fa0e7a4f32a7893f3e9cdf0440"
-  integrity sha512-okjFQRrGZ0xGhpYzaD6MiojW0Cx1zNIf3RTFWu5v3y+YBDcDapT+dS+qOMRmuF3mJ4a4aXgdywByrpgcBQzqRg==
+"@zettel/react@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@zettel/react/-/react-0.0.10.tgz#fa9f68148c9f85b94fdfabbda3fb928556b765e2"
+  integrity sha512-Kuy3Y2Qyi+UxAJzVLCSRNFmBLkHid7X2S+l6qyFwFDg/4JsbSTmgig4IGAscgskW7EOkJvZhSZH/sVarFJgITQ==
   dependencies:
-    "@zettel/core" "0.0.9"
+    "@zettel/core" "0.0.10"
 
 abab@^2.0.0:
   version "2.0.0"

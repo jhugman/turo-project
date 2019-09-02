@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import Editor, { RenderBlock } from '@zettel/react'
-import { EditorState, BlockTree, textToListIndex } from '@zettel/core'
+import Editor, { RenderStyle, RenderBlock } from '@zettel/react'
+import EditorBlock from '@zettel/react/dist/EditorBlock'
+import { Block, EditorState, BlockTree, textToListIndex } from '@zettel/core'
+import id from '@zettel/core/dist/EditorState/id'
 // @ts-ignore
 import turo from 'turo';
 import Lang from './Lang'
 import { TuroDoc, Token } from './types'
 import defaultTuroDoc from './defaultTuroDoc'
+import testdoc from './testdoc'
 const { EditableDocument, CompositeStorage, loaders } = turo
 
 EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);
@@ -43,7 +46,7 @@ const useHashStorage = (
 
     if (window.location.hash.substr(1).trim().length === 0) {
       // set default doc and reload
-      window.location.hash = defaultTuroDoc
+      window.location.hash = encodeURIComponent(defaultTuroDoc)
     } else {
       onHashChange()
     }
@@ -113,38 +116,96 @@ const App = () => {
     }
   })
 
+  const emptyBlocks: Block[] = []
+
+  mappedState.tree.blocks = mappedState.tree.blocks.reduce((acc, block) => {
+    const lineNumber = editorState.tree.blocks.findIndex((_block: any) => _block.blockKey === block.blockKey)
+    const statement = turoDoc.statements[lineNumber]
+    const prevBlock: Block = acc[acc.length - 1]
+
+    // we're grouping statements here
+    if (statement != null && statement.currentValue != null) {
+      if (prevBlock != null && prevBlock.blocks.length > 0) {
+        prevBlock.blocks.push({
+          ...block,
+          entity: {
+            statement
+          }
+        })
+        return acc
+      } else {
+        return [
+          ...acc,
+          {
+            blockKey: id(),
+            value: [],
+            blocks: [{
+              ...block,
+              entity: {
+                statement
+              }
+            }],
+            entity: {
+              type: 'statement'
+            }
+          }
+        ]
+      }
+    }
+
+    return [
+      ...acc,
+      {
+        ...block,
+        entity: {
+          statement
+        }
+      }
+    ]
+  }, emptyBlocks)
+
+  const renderStyle: RenderStyle = (props) => {
+    return <span key={props.style} className={props.style}>{props.children}</span>
+  }
+
+  const renderBlock: RenderBlock = (props) => {
+    const { entity } = props.block
+    const statement = entity != null ? entity.statement : null
+    const isUnparsedText = statement && statement.currentValue == null
+
+    if (entity != null && entity.type === 'statement') {
+      return <div className='statement__container'>
+      {props.block.blocks.map(block => <EditorBlock renderStyle={renderStyle} renderBlock={renderBlock} block={block} editorState={mappedState} />)}
+      </div>
+    }
+
+    if (isUnparsedText) {
+      return <p key={props.block.blockKey} className='statement__content statement__text'>
+        {props.children}
+      </p>
+    }
+
+    return <div className='statement'>
+        <div key={props.block.blockKey} className='statement__expression'>
+          {props.children}
+        </div>
+
+        {statement != null && <div key={`${props.block.blockKey}-result`} contentEditable={false} className='statement__result'>
+          {statement.errors != null ? (
+            <span className="error"><Lang>{statement.errors[0].message}</Lang></span>
+          ) :<span>{statement && statement.valueToString()}</span>}
+        </div>}
+    </div>
+  }
+
   return (
     isLoaded ? <Editor
       htmlAttrs={{ className: "App" }}
-      renderStyle={(props) => {
-        return <span key={props.style} className={props.style}>{props.children}</span>
-      }}
-      renderBlock={(props) => {
-        const lineNumber = editorState.tree.blocks.findIndex((block: any) => block.blockKey === props.block.blockKey)
-        const statement = turoDoc.statements[lineNumber]
-        const isUnparsedText = statement && statement.currentValue == null
-
-        if (isUnparsedText) {
-          return <p key={props.block.blockKey} className='statement__content col-2 statement__text'>
-            {props.children}
-          </p>
-        }
-
-        return <>
-            {statement != null && <div key={`${props.block.blockKey}-result`} contentEditable={false} className='col-1 statement__result'>
-              {statement.errors != null ? (
-                <span className="error"><Lang>{statement.errors[0].message}</Lang></span>
-              ) :<span>{statement && statement.valueToString()}</span>}
-            </div>}
-
-            <div key={props.block.blockKey} className='statement__content col-2 statement__expression'>
-              {props.children}
-            </div>
-        </>
-      }}
+      renderStyle={renderStyle}
+      renderBlock={renderBlock}
       editorState={mappedState}
       renderChildren={(props) => {
-        return <div className='grid'>{props.children}</div>
+        return props.children
       }}
       onChange={(newEditorState) => {
         const text = toPlainText(newEditorState.tree)

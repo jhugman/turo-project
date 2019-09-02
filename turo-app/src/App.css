@@ -27,32 +27,36 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
   min-height: 100vh;
 }
 
-.statements {
-  width: 60%;
-}
-
 .results {
   width: 40%;
 }
 
-.statement {
-  transition: 200ms;
+.statement__container {
   user-select: text;
+  padding: .5em .7em;
+  border-radius: 2px;
+  display: table;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  background: #fdf9ee;
+  border: 1px solid #e6e6e6;
+  margin-bottom: 1em;
 }
 
-.statement:hover {
-  border-color: #f0f0f0;
+.statement {
+  display: table-row;
 }
 
-.statement__content, .statement__result, .public-DraftEditorPlaceholder-root {
-  padding: .3em 1em;
+
+.statement__result {
+  padding: 0 1em;
+  flex: content;
 }
 
 .App {
-  padding-bottom: 2em;
+  padding: 2em;
   padding-top: 4em;
+  margin: auto;
   position: fixed;
   overflow-y: auto;
   left: 0;
@@ -62,7 +66,6 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
 
 .statement__text {
   margin: 0;
-  line-height: 1.1em;
   font-size: .9em;
   color: #222;
   padding-left: 0;
@@ -70,18 +73,16 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
   padding-top: .5em;
 }
 
-.statement__expression {
-  border-left: 1px solid #ccc;
+.statement__expression, .statement__result {
+  padding: 0.1em 0;
+  font-size: 0.8em;
+  display: table-cell;
 }
 
 .statement__result {
   user-select: none;
   white-space: nowrap;
-  width: 100%;
   color: #999;
-  align-self: center;
-  text-align: right;
-  font-size: .7em;
   padding-left: 1em;
 }
 
@@ -92,7 +93,7 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
 }
 
 .token--number {
-  color: #389E8C;
+  color: #60958E;
 }
 
 .token--operator {
@@ -125,7 +126,6 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
   width: 100%;
 }
 
-
 .top-bar input:focus {
   outline: none;
 }
@@ -141,13 +141,36 @@ html, body, #root, .DraftEditor-root, .DraftEditor-editorContainer { height: 100
   max-width: 40px;
 }
 
+main {
+  padding: 1em;
+  max-width: 960px;
+  margin: auto;
+}
 
 .error, .token--error { color: red }
 
-.grid {
-  display: grid;
+@media (max-width: 900px) {
+  .App {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
 }
-.col-1{
-  grid-column: 1;
+
+
+@media (max-width: 600px) {
+  .App {
+    padding-left: 0em;
+    padding-right: 0em;
+  }
+
+  .statement__text {
+    padding-left: 1em;
+    padding-right: 1em;
+  }
+
+  .statement__container {
+    border: none;
+    width: 100%;
+  }
 }
-.col-2{ grid-column: 2 / 5; }
+

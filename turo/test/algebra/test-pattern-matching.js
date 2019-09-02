@@ -1,6 +1,6 @@
 import { test } from 'tap';
-import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
+import { any, anyValue, value, variable } from '../../lib/algebra/patterns';
+import RewriteContext from '../../lib/algebra/RewriteContext';
 import Parser from '../../lib/parser/PrattParser';
 import { defaultOperators } from '../../lib/operators';
 import output from '../../lib/output';

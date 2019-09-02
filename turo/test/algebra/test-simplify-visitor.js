@@ -1,8 +1,8 @@
 import { test } from 'tap';
 import output from '../../lib/output';
 import Parser from '../../lib/parser/PrattParser';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
-import SimplifyVisitor from '../../lib/rewrite/SimplifyVisitor';
+import RewriteContext from '../../lib/algebra/RewriteContext';
+import SimplifyVisitor from '../../lib/algebra/SimplifyVisitor';
 
 
 const expressionParser = new Parser();

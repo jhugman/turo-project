@@ -1,7 +1,7 @@
 import { test } from 'tap';
-import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
-import ReplaceVisitor from '../../lib/rewrite/ReplaceVisitor';
+import { any, anyValue, value, variable } from '../../lib/algebra/patterns';
+import RewriteContext from '../../lib/algebra/RewriteContext';
+import ReplaceVisitor from '../../lib/algebra/ReplaceVisitor';
 import Parser from '../../lib/parser/PrattParser';
 import Scope from '../../lib/symbols/Scope';
 import output from '../../lib/output';

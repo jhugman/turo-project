@@ -30,15 +30,15 @@ import './test-percent-arithmetic';
 import './test-trig-functions';
 import './test-unit-schemes';
 
-import './rewrite/test-pattern-basics';
-import './rewrite/test-pattern-matching';
-import './rewrite/test-pattern-replacement';
-import './rewrite/test-rule-parsing';
-import './rewrite/test-rule-apply';
-import './rewrite/test-simplify-visitor';
-import './rewrite/test-ruleset';
-import './rewrite/test-gather-terms';
-import './rewrite/test-get-metadata';
+import './algebra/test-pattern-basics';
+import './algebra/test-pattern-matching';
+import './algebra/test-pattern-replacement';
+import './algebra/test-rule-parsing';
+import './algebra/test-rule-apply';
+import './algebra/test-simplify-visitor';
+import './algebra/test-ruleset';
+import './algebra/test-gather-terms';
+import './algebra/test-get-metadata';
 
 import './parser/test-pratt-parser';
 import './parser/test-pratt-example';

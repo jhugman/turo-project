@@ -1,8 +1,8 @@
 import { test } from 'tap';
 import output from '../../lib/output';
-import RuleSet, { create } from '../../lib/rewrite/RuleSet';
-import simplifyRules from '../../lib/rewrite/rules/simplify';
-import SimplifyVisitor from '../../lib/rewrite/SimplifyVisitor';
+import RuleSet, { create } from '../../lib/algebra/RuleSet';
+import simplifyRules from '../../lib/algebra/rules/simplify';
+import SimplifyVisitor from '../../lib/algebra/SimplifyVisitor';
 
 import Parser from '../../lib/parser/PrattParser';
 

@@ -1,5 +1,5 @@
 import { ASTVisitor } from '../visitors';
-import { isBinary, isUnary, getPrecedence } from '../rewrite/utils';
+import { isBinary, isUnary, getPrecedence } from '../algebra/utils';
 /////////////////////////////////////////////////////////////////////////////////////////
 class ParensRemover extends ASTVisitor {
 

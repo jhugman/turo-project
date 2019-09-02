@@ -1,7 +1,7 @@
 import { test } from 'tap';
-import { createFindPattern, createReplacePattern } from '../../lib/rewrite/rule-parser';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
-import ReplaceVisitor from '../../lib/rewrite/ReplaceVisitor';
+import { createFindPattern, createReplacePattern } from '../../lib/algebra/rule-parser';
+import RewriteContext from '../../lib/algebra/RewriteContext';
+import ReplaceVisitor from '../../lib/algebra/ReplaceVisitor';
 import Parser from '../../lib/parser/PrattParser';
 import output from '../../lib/output';
 

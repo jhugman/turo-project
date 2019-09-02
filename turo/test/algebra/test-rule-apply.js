@@ -1,9 +1,9 @@
 import { test } from 'tap';
-import Rule from '../../lib/rewrite/RewriteRule';
-import RuleApply from '../../lib/rewrite/RuleApply';
+import Rule from '../../lib/algebra/RewriteRule';
+import RuleApply from '../../lib/algebra/RuleApply';
 import output from '../../lib/output';
 import Parser from '../../lib/parser/PrattParser';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
+import RewriteContext from '../../lib/algebra/RewriteContext';
 
 const parser = new Parser();
 const ruleParser = new Parser();

@@ -1,8 +1,8 @@
 import { test } from 'tap';
-import GatherTerms from '../../lib/rewrite/GatherTerms';
+import GatherTerms from '../../lib/algebra/GatherTerms';
 
 import Parser from '../../lib/parser/PrattParser';
-import RewriteContext from '../../lib/rewrite/RewriteContext';
+import RewriteContext from '../../lib/algebra/RewriteContext';
 import { addParens, removeParens } from '../../lib/parser/parens-helper';
 import output from '../../lib/output';
 

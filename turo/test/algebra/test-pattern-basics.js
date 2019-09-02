@@ -1,5 +1,5 @@
 import { test } from 'tap';
-import { any, anyValue, value, variable } from '../../lib/rewrite/patterns';
+import { any, anyValue, value, variable } from '../../lib/algebra/patterns';
 
 test('Fluent API', (t) => {
 

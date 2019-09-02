@@ -9,7 +9,6 @@ import turo from 'turo';
 import Lang from './Lang'
 import { TuroDoc, Token } from './types'
 import defaultTuroDoc from './defaultTuroDoc'
-import testdoc from './testdoc'
 const { EditableDocument, CompositeStorage, loaders } = turo
 
 EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);

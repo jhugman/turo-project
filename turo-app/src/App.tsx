@@ -1,66 +1,24 @@
+// @ts-ignore
+import turo from 'turo';
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Editor, { RenderStyle, RenderBlock } from '@zettel/react'
 import EditorBlock from '@zettel/react/dist/EditorBlock'
-import { Block, EditorState, BlockTree, textToListIndex } from '@zettel/core'
+import { Block, EditorState, createViewState, textToListIndex, toText } from '@zettel/core'
 import id from '@zettel/core/dist/EditorState/id'
-// @ts-ignore
-import turo from 'turo';
 import Lang from './Lang'
 import { TuroDoc, Token } from './types'
-import defaultTuroDoc from './defaultTuroDoc'
+import useHashStorage from './lib/useHashStorage'
 const { EditableDocument, CompositeStorage, loaders } = turo
 
 EditableDocument.storage = new CompositeStorage([loaders.bundleLoader]);
 
 const initialEditorState: any = EditorState.fromText(``)
 
-const Statement: RenderBlock = (props) => {
-  return <div>{props.children}</div>
-}
-
-const toPlainText = (tree: BlockTree) => tree.blocks.map(block => block.value.map(val => val.char).join('')).join('\n')
-
 const turoDoc: TuroDoc = EditableDocument.create('new-doc')
 
-const useHashStorage = (
-  update: (editorState: EditorState) => void,
-  doc: TuroDoc,
-  isLoaded: boolean
-) => {
-  const [isUpdatingHash, setIsUpdatingHash] = useState(false)
-
-  useEffect(() => {
-    const onHashChange = () => {
-      const text = decodeURIComponent(window.location.hash.substr(1))
-      const newEditorState = EditorState.fromText(text)
-
-      doc.evaluateDocument(toPlainText(newEditorState.tree))
-      update(newEditorState)
-
-      setIsUpdatingHash(false)
-    }
-
-    window.addEventListener('hashchange', onHashChange)
-
-    if (window.location.hash.substr(1).trim().length === 0) {
-      // set default doc and reload
-      window.location.hash = encodeURIComponent(defaultTuroDoc)
-    } else {
-      onHashChange()
-    }
-
-    return () => window.removeEventListener('hashchange', onHashChange)
-  }, [isLoaded])
-
-  return (text: string) => {
-    setIsUpdatingHash(true)
-    window.history.pushState('Boing', 'Title', `#${encodeURIComponent(text)}`)
-  }
-}
-
 const useDocumentTitle = (editorState: EditorState) => {
-  const plainText = toPlainText(editorState.tree)
+  const plainText = toText(editorState)
 
   const firstLine = plainText.split('\n')[0]
   return useEffect(() => {
@@ -76,7 +34,7 @@ const App = () => {
     turoDoc
     .import('app')
     .then((doc) => {
-      return doc.evaluateDocument(toPlainText(initialEditorState.tree))
+      return doc.evaluateDocument(toText(initialEditorState))
     }).then(() => {
       setIsLoaded(true)
     })
@@ -117,8 +75,10 @@ const App = () => {
 
   const emptyBlocks: Block[] = []
 
-  mappedState.tree.blocks = mappedState.tree.blocks.reduce((acc, block) => {
-    const lineNumber = editorState.tree.blocks.findIndex((_block: any) => _block.blockKey === block.blockKey)
+  const viewState = createViewState(mappedState.list)
+  // @ts-ignore
+  viewState.blocks = viewState.blocks.reduce((acc, block) => {
+    const lineNumber = viewState.blocks.findIndex((_block: any) => _block.blockKey === block.blockKey) + 1
     const statement = turoDoc.statements[lineNumber]
     const prevBlock: Block = acc[acc.length - 1]
 
@@ -174,7 +134,7 @@ const App = () => {
 
     if (entity != null && entity.type === 'statement') {
       return <div className='statement__container'>
-      {props.block.blocks.map(block => <EditorBlock renderStyle={renderStyle} renderBlock={renderBlock} block={block} editorState={mappedState} />)}
+      {props.block.blocks.map(block => <EditorBlock renderStyle={renderStyle} renderBlock={renderBlock} block={block} />)}
       </div>
     }
 
@@ -203,11 +163,12 @@ const App = () => {
       renderStyle={renderStyle}
       renderBlock={renderBlock}
       editorState={mappedState}
+      viewState={viewState}
       renderChildren={(props) => {
         return props.children
       }}
       onChange={(newEditorState) => {
-        const text = toPlainText(newEditorState.tree)
+        const text = toText(newEditorState)
         updateHash(text)
         turoDoc.evaluateDocument(text)
         setEditorState(newEditorState)

@@ -24,7 +24,7 @@ export default class OperationLabellerVisitor extends ASTVisitor {
   }
 
   visitUnaryOperation (node, context) {
-    const operandType = node.value.accept(this, context);
+    const operandType = node.inner.accept(this, context);
 
     if (!operandType) {
       // An error happened further down the tree.
@@ -43,7 +43,7 @@ export default class OperationLabellerVisitor extends ASTVisitor {
   }
 
   visitParens (node, context) {
-    return node.ast.accept(this, context);
+    return node.inner.accept(this, context);
   } 
 
   visitNumberNode (node, context) {
@@ -91,7 +91,7 @@ export default class OperationLabellerVisitor extends ASTVisitor {
     // we could lazily calculate, but valueType is an intermediate value,
     // but changes in the variables used in this definition may change a
     // this variable.
-    node.valueType = node.ast.accept(this, context);
+    node.valueType = node.inner.accept(this, context);
 
     return node.valueType;
   }

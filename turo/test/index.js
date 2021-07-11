@@ -29,3 +29,18 @@ import './test-integration-errors';
 import './test-percent-arithmetic';
 import './test-trig-functions';
 import './test-unit-schemes';
+
+import './rewrite/test-pattern-basics';
+import './rewrite/test-pattern-matching';
+import './rewrite/test-pattern-replacement';
+import './rewrite/test-rule-parsing';
+import './rewrite/test-rule-apply';
+import './rewrite/test-simplify-visitor';
+import './rewrite/test-ruleset';
+import './rewrite/test-gather-terms';
+import './rewrite/test-get-metadata';
+
+import './parser/test-pratt-parser';
+import './parser/test-pratt-example';
+
+import './parser/test-parens-helper';

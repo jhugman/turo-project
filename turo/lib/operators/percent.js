@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import turoNumber from '../turo-number';
 import mixins from './mixins';
+import { Precedence } from './precedence';
 
 const { makeMixin, isDimensionless } = mixins;
     
@@ -23,7 +24,9 @@ export default {
     ops.addPostfixOperator(
       '%', number, percent,
       [
-        mixins.unaryNoUnits, mixins.unaryIdentity,
+        Precedence.multiplication,
+        mixins.unaryNoUnits, 
+        mixins.unaryIdentity,
         {
           nodeCalculator: function (operandNode, ctx) {
             var operandValue = ctx.evaluate(operandNode, ctx);
@@ -38,7 +41,7 @@ export default {
                 return;
             }
 
-            if (operandNode.astType === 'parens' && operandNode.ast.literal === '/') {
+            if (operandNode.nodeType === 'ParensNode' && operandNode.inner.literal === '/') {
               // i.e. (10 / 1000) % = 1%
               return turoNumber.newInstance(operandValue * 100, null, this.returnValueType);
             }
@@ -59,6 +62,7 @@ export default {
         function (a, b) {
           return a + b;
         },
+        Precedence.addition,
         mixins.binaryNoUnits
       )
     );
@@ -70,6 +74,7 @@ export default {
         function (a, b) {
           return a - b;
         },
+        Precedence.addition,
         mixins.binaryNoUnits
       )
     );
@@ -79,6 +84,7 @@ export default {
       '*', percent, percent, percent,
       makeMixin(
         percentNumberMultiply,
+        Precedence.multiplication,
         mixins.binaryNoUnits
       )
     );
@@ -93,6 +99,7 @@ export default {
         function (a, b) {
           return a / b;
         },
+        Precedence.multiplication,
         mixins.binaryNoUnits,
         mixins.binaryPercentNoUnits,
         mixins.binaryDivideUtils,
@@ -114,6 +121,7 @@ export default {
         function (a, b) {
           return a * (100 + b) / 100;
         },
+        Precedence.addition, // because it's like 10$ * 1.10
         mixins.binaryPercentNoUnits
       )
     );
@@ -129,6 +137,7 @@ export default {
         function (a, b) {
           return a * (100 - b) / 100;
         },
+        Precedence.addition,
         mixins.binaryPercentNoUnits
       )
     );
@@ -141,7 +150,8 @@ export default {
       number,
       makeMixin(
         percentNumberMultiply,
-        mixins.binaryPercentNoUnits
+        mixins.binaryPercentNoUnits,
+        Precedence.multiplication
       )
     );
 
@@ -153,7 +163,8 @@ export default {
       number,
       makeMixin(
         percentNumberMultiply,
-        mixins.binaryPercentNoUnits
+        mixins.binaryPercentNoUnits,
+        Precedence.multiplication
       )
     );
 
@@ -168,6 +179,7 @@ export default {
           // L % / R = (L / 100) / R
           return lValue / rValue / 100;
         },
+        Precedence.multiplication,
         mixins.binaryDivideUtils,
         mixins.binaryPercentDivide
       )
@@ -184,6 +196,7 @@ export default {
           // L / R% = L / (R / 100)
           return lValue * 100 / rValue;
         },
+        Precedence.multiplication,
         mixins.binaryDivideUtils,
         mixins.binaryPercentDivide
       )
@@ -197,6 +210,7 @@ export default {
         function (x) {
           return -x;
         },
+        Precedence.unaryAddition,
         mixins.unaryIdentity
       )
     );
@@ -204,6 +218,7 @@ export default {
     // unary +
     ops.addPrefixOperator(
       '+', percent, percent, [
+        Precedence.unaryAddition,
         mixins.unaryIdentity,
       ]
     );

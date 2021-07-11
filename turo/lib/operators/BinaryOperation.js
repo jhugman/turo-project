@@ -2,6 +2,10 @@ import turoNumber from '../turo-number';
 import AbstractOperation from './AbstractOperation';
 
 export default class BinaryOperation extends AbstractOperation {
+  get numOperands () {
+    return 2;
+  }
+
   evaluate (leftNode, rightNode, ctx) {
     return this.nodeCalculator(leftNode, rightNode, ctx);
   }
@@ -46,6 +50,10 @@ export default class BinaryOperation extends AbstractOperation {
   }
 
   simpleValueCalculator (left, right) {
-    throw new Error(`No simpleValueCalculator specified for ${literal} operator over ${lValueType} and ${rValueType}`);
+    throw new Error(`No simpleValueCalculator specified for ${this.toString()}`);
+  }
+
+  toString () {
+    return `(${this.lValueType})${this.literal}(${this.rValueType})`;
   }
 }
